@@ -5,6 +5,13 @@
 
     RewriteEngine On
 
+    # --- BỔ SUNG: Tắt cảnh báo Permissions-Policy từ Server ---
+    <IfModule mod_headers.c>
+        Header unset Permissions-Policy
+        Header always unset Permissions-Policy
+    </IfModule>
+    # ---------------------------------------------------------
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
