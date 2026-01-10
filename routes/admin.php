@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| IMPORT CONTROLLERS
+| IMPORT CONTROLLERS (KHAI BÁO CÁC FILE XỬ LÝ)
 |--------------------------------------------------------------------------
 */
 
@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\ReturnController;
 use App\Http\Controllers\Admin\InvoiceController;
+use App\Http\Controllers\Admin\CartController;
 
 // 3. Nhóm Sản Phẩm (Catalog)
 use App\Http\Controllers\Admin\ProductController;
@@ -45,14 +46,18 @@ use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\FlashSaleController;
 use App\Http\Controllers\Admin\AffiliateController;
 
-// 8. Nhóm Nội Dung & Game (Content)
+// 8. Nhóm Nội Dung & Giao diện (Content & Appearance)
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\GameSubjectController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\ImageController;
 
-// 9. Nhóm CRM
+// 9. Nhóm CRM (Khách hàng)
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ChatController;
+use App\Http\Controllers\Admin\RequestController;
 
 // 10. Nhóm Hệ Thống (System)
 use App\Http\Controllers\Admin\SettingController;
@@ -63,8 +68,10 @@ use App\Http\Controllers\Admin\SystemLogController;
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN ROUTES
+| ADMIN ROUTES (CẤU HÌNH MENU)
 |--------------------------------------------------------------------------
+| Lưu ý: Sử dụng Route::resource để tự động tạo đủ các chức năng:
+| Xem (index), Thêm (create/store), Sửa (edit/update), Xóa (destroy)
 */
 
 // --- DASHBOARD ---
@@ -73,77 +80,84 @@ Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 // --- 1. NHÓM BÁN HÀNG ---
 Route::prefix('sales')->group(function () {
-    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('deliveries', [DeliveryController::class, 'index'])->name('deliveries.index');
-    Route::get('returns', [ReturnController::class, 'index'])->name('returns.index');
-    Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::resource('orders', OrderController::class);
+    Route::resource('deliveries', DeliveryController::class);
+    Route::resource('returns', ReturnController::class);
+    Route::resource('invoices', InvoiceController::class);
+    Route::resource('carts', CartController::class); // [MỚI] Giỏ hàng treo
 });
 
 
 // --- 2. NHÓM SẢN PHẨM ---
 Route::prefix('catalog')->group(function () {
-    Route::get('products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::get('attributes', [AttributeController::class, 'index'])->name('attributes.index');
-    Route::get('suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
-    Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::resource('products', ProductController::class);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('attributes', AttributeController::class);
+    Route::resource('suppliers', SupplierController::class);
+    Route::resource('reviews', ReviewController::class);
 });
 
 
 // --- 3. NHÓM KHO HÀNG ---
 Route::prefix('inventory')->group(function () {
-    Route::get('stocks', [InventoryStockController::class, 'index'])->name('stocks.index');
-    Route::get('warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
-    Route::get('purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase_orders.index');
-    // Mới: Xem lịch sử biến động kho
-    Route::get('transactions', [InventoryTransactionController::class, 'index'])->name('inventory.transactions.index');
+    Route::resource('stocks', InventoryStockController::class);
+    Route::resource('warehouses', WarehouseController::class);
+    Route::resource('purchase-orders', PurchaseOrderController::class);
+    Route::resource('transactions', InventoryTransactionController::class);
 });
 
 
-// --- 4. NHÓM TÀI CHÍNH (MỚI) ---
+// --- 4. NHÓM TÀI CHÍNH ---
 Route::prefix('finance')->group(function () {
-    Route::get('distribution-rules', [ProfitDistributionController::class, 'index'])->name('finance.distribution.index');
-    Route::get('wallets', [WalletController::class, 'index'])->name('finance.wallets.index');
-    Route::get('commissions', [CommissionController::class, 'index'])->name('finance.commissions.index');
+    // Đổi tên route distribution-rules thành profits cho ngắn gọn
+    Route::resource('profits', ProfitDistributionController::class);
+    Route::resource('wallets', WalletController::class);
+    Route::resource('commissions', CommissionController::class);
 });
 
 
 // --- 5. NHÓM KÝ GỬI ---
 Route::prefix('consignment')->group(function () {
-    Route::get('orders', [ConsignmentController::class, 'index'])->name('consignment.orders.index');
-    Route::get('customers', [ConsignmentCustomerController::class, 'index'])->name('consignment.customers.index');
+    Route::resource('consignments', ConsignmentController::class);
+    Route::resource('customers', ConsignmentCustomerController::class)->names('consignment_customers');
 });
 
 
 // --- 6. NHÓM MARKETING ---
 Route::prefix('marketing')->group(function () {
-    Route::get('campaigns', [PromotionController::class, 'index'])->name('promotions.index');
-    Route::get('coupons', [CouponController::class, 'index'])->name('coupons.index');
-    Route::get('flash-sales', [FlashSaleController::class, 'index'])->name('flash_sales.index');
-    Route::get('affiliate', [AffiliateController::class, 'index'])->name('affiliate.index');
+    Route::resource('promotions', PromotionController::class);
+    Route::resource('coupons', CouponController::class);
+    Route::resource('flash-sales', FlashSaleController::class);
+    Route::resource('affiliates', AffiliateController::class);
 });
 
 
-// --- 7. NHÓM NỘI DUNG & GAME (MỚI) ---
+// --- 7. NHÓM NỘI DUNG & GIAO DIỆN ---
 Route::prefix('content')->group(function () {
-    Route::get('posts', [PostController::class, 'index'])->name('content.posts.index');
-    Route::get('banners', [BannerController::class, 'index'])->name('content.banners.index');
-    Route::get('game-subjects', [GameSubjectController::class, 'index'])->name('content.game_subjects.index');
+    Route::resource('posts', PostController::class);
+    Route::resource('banners', BannerController::class);
+    Route::resource('game-subjects', GameSubjectController::class);
+
+    // Các phần mới bổ sung
+    Route::resource('menus', MenuController::class);
+    Route::resource('pages', PageController::class);
+    Route::resource('images', ImageController::class);
 });
 
 
 // --- 8. NHÓM CRM ---
 Route::prefix('crm')->group(function () {
-    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
-    Route::get('chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::resource('customers', CustomerController::class);
+    Route::resource('chats', ChatController::class);
+    Route::resource('requests', RequestController::class);
 });
 
 
 // --- 9. NHÓM HỆ THỐNG ---
 Route::prefix('system')->group(function () {
-    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::get('users', [UserController::class, 'index'])->name('users.index');
-    Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
-    Route::get('locations', [LocationController::class, 'index'])->name('locations.index');
-    Route::get('logs', [SystemLogController::class, 'index'])->name('system.logs.index');
+    Route::resource('settings', SettingController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('locations', LocationController::class);
+    Route::resource('logs', SystemLogController::class);
 });
