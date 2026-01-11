@@ -340,21 +340,6 @@ return new class extends Migration
             $table->primary(['category_id', 'attribute_id']);
         });
 
-        Schema::create('inventory_warehouses', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('code', 50)->unique();
-            $table->enum('type', ['fulfillment', 'store', 'hub', 'kitchen'])->default('fulfillment');
-            $table->boolean('allow_frozen')->default(0);
-            $table->unsignedInteger('province_id');
-            $table->unsignedBigInteger('ward_id');
-            $table->string('address_detail');
-            $table->double('latitude')->nullable();
-            $table->double('longitude')->nullable();
-            $table->boolean('is_active')->default(1);
-            $table->timestamps();
-        });
-
         Schema::create('inventory_stocks', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('warehouse_id');
@@ -422,8 +407,11 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('code', 50)->unique();
+            $table->enum('type', ['fulfillment', 'store', 'hub', 'kitchen'])->default('fulfillment');
             $table->string('address')->nullable();
-            $table->boolean('is_active')->default(1);
+            $table->unsignedInteger('province_id')->nullable();
+            $table->unsignedBigInteger('ward_id')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 

@@ -1,0 +1,16 @@
+
+===============================================================================
+Lệnh này sẽ XOÁ TOÀN BỘ bảng cũ và tạo lại từ đầu
+php artisan migrate:fresh
+===============================================================================
+Sau khi tạo bảng xong, chạy lệnh này để RawSqlSeeder hoạt động (đọc file .sql trong database/data và nạp vào bảng provinces, wards...)
+php artisan db:seed
+===============================================================================
+Bạn có thể chạy 1 lệnh duy nhất để làm cả 2 việc trên cùng lúcphp artisan db:seed
+php artisan migrate:fresh --seed
+===============================================================================
+Chạy lệnh cập nhật (Lưu ý: Chỉ là migrate, KHÔNG có :fresh)
+php artisan migrate
+===============================================================================
+
+

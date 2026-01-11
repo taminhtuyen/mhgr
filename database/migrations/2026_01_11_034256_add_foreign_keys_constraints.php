@@ -8,7 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Users & Roles FK
+        // ----------------------------------------------------------------
+        // 1. NHÓM USERS & ROLES
+        // ----------------------------------------------------------------
         Schema::table('wards', function (Blueprint $table) {
             $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
         });
@@ -62,7 +64,9 @@ return new class extends Migration
             $table->foreign('role_group_id')->references('id')->on('roles')->onDelete('set null');
         });
 
-        // 2. Products & Categories FK
+        // ----------------------------------------------------------------
+        // 2. NHÓM SẢN PHẨM (PRODUCTS)
+        // ----------------------------------------------------------------
         Schema::table('categories', function (Blueprint $table) {
             $table->foreign('parent_id')->references('id')->on('categories')->onDelete('set null');
             $table->foreign('tax_class_id')->references('id')->on('tax_classes')->onDelete('set null');
@@ -113,35 +117,53 @@ return new class extends Migration
             $table->foreign('customer_id')->references('id')->on('users')->onDelete('cascade');
         });
 
-        // 3. Inventory FK
-        Schema::table('inventory_warehouses', function (Blueprint $table) {
+        // ----------------------------------------------------------------
+        // 3. NHÓM KHO VẬN (INVENTORY)
+        // ----------------------------------------------------------------
+
+        // Cập nhật FK địa chỉ cho bảng warehouses chính thức
+        Schema::table('warehouses', function (Blueprint $table) {
             $table->foreign('ward_id')->references('id')->on('wards');
             $table->foreign('province_id')->references('id')->on('provinces');
         });
+
         Schema::table('inventory_stocks', function (Blueprint $table) {
-            $table->foreign('warehouse_id')->references('id')->on('inventory_warehouses')->onDelete('cascade');
+            // warehouse_id trỏ về bảng warehouses (đã hợp nhất)
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('product_variation_id')->references('id')->on('product_variations')->onDelete('cascade');
         });
+
         Schema::table('inventory_transactions', function (Blueprint $table) {
-            $table->index(['product_id']);
-            $table->index(['product_variation_id']);
+            // warehouse_id trỏ về bảng warehouses
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->index(['reference_id', 'type']);
         });
+
+        // [KHÔI PHỤC] Bảng Snapshots - Lưu ý trỏ warehouse_id về bảng 'warehouses'
         Schema::table('inventory_snapshots', function (Blueprint $table) {
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('product_variation_id')->references('id')->on('product_variations')->onDelete('cascade');
+            // Thêm index để truy vấn báo cáo nhanh hơn
             $table->index(['recorded_date']);
             $table->index(['product_id', 'warehouse_id']);
         });
+
         Schema::table('purchase_orders', function (Blueprint $table) {
             $table->foreign('supplier_id')->references('id')->on('suppliers');
-            $table->foreign('warehouse_id')->references('id')->on('inventory_warehouses');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses');
             $table->foreign('creator_id')->references('id')->on('users');
         });
+
         Schema::table('purchase_order_items', function (Blueprint $table) {
             $table->foreign('purchase_order_id')->references('id')->on('purchase_orders')->onDelete('cascade');
         });
 
-        // 4. Cart & Promotions FK
+        // ----------------------------------------------------------------
+        // 4. NHÓM CART & PROMOTIONS
+        // ----------------------------------------------------------------
         Schema::table('carts', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
@@ -175,7 +197,9 @@ return new class extends Migration
             $table->foreign('product_variation_id')->references('id')->on('product_variations')->onDelete('cascade');
         });
 
-        // 5. Affiliate & Chat & Game FK
+        // ----------------------------------------------------------------
+        // 5. NHÓM AFFILIATE, CHAT & GAME
+        // ----------------------------------------------------------------
         Schema::table('affiliate_links', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
@@ -198,7 +222,9 @@ return new class extends Migration
             $table->foreign('voice_id')->references('id')->on('game_voices')->onDelete('cascade');
         });
 
-        // 6. Shipping FK
+        // ----------------------------------------------------------------
+        // 6. NHÓM VẬN CHUYỂN (SHIPPING)
+        // ----------------------------------------------------------------
         Schema::table('shipping_drivers', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('shipping_partner_id')->references('id')->on('shipping_partners');
@@ -206,7 +232,7 @@ return new class extends Migration
         Schema::table('shipping_shipments', function (Blueprint $table) {
             $table->foreign('driver_id')->references('id')->on('shipping_drivers');
             $table->foreign('shipping_partner_id')->references('id')->on('shipping_partners');
-            $table->foreign('warehouse_id')->references('id')->on('inventory_warehouses');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses'); // Trỏ về warehouses
         });
         Schema::table('shipping_shipment_items', function (Blueprint $table) {
             $table->foreign('shipment_id')->references('id')->on('shipping_shipments')->onDelete('cascade');
@@ -222,7 +248,9 @@ return new class extends Migration
             $table->index('order_id');
         });
 
-        // 7. Media & Content FK
+        // ----------------------------------------------------------------
+        // 7. NHÓM MEDIA & CMS
+        // ----------------------------------------------------------------
         Schema::table('imageables', function (Blueprint $table) {
             $table->foreign('image_id')->references('id')->on('images')->onDelete('cascade');
             $table->index(['imageable_id', 'imageable_type']);
@@ -248,7 +276,9 @@ return new class extends Migration
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
         });
 
-        // 8. Consignment & Booking Profit FK
+        // ----------------------------------------------------------------
+        // 8. NHÓM CONSIGNMENT & BOOKING
+        // ----------------------------------------------------------------
         Schema::table('booking_profit', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade');
             $table->index('order_id');
@@ -263,7 +293,9 @@ return new class extends Migration
             $table->index('product_id');
         });
 
-        // 9. Profit Distribution FK
+        // ----------------------------------------------------------------
+        // 9. NHÓM LỢI NHUẬN & THUẾ
+        // ----------------------------------------------------------------
         Schema::table('profit_distribution_group_members', function (Blueprint $table) {
             $table->foreign('group_id')->references('id')->on('profit_distribution_groups')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -275,18 +307,16 @@ return new class extends Migration
         Schema::table('review_rating_rules', function (Blueprint $table) {
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
         });
-
-        // 10. Tax FK
         Schema::table('tax_rates', function (Blueprint $table) {
             $table->foreign('tax_class_id')->references('id')->on('tax_classes')->onDelete('cascade');
         });
-
-        // 11. CÁC BẢNG LIÊN KẾT ORDERS (QUAN TRỌNG: DÙNG INDEX THAY VÌ FK CỨNG DO PARTITION)
-        // Đây là bước sửa lỗi: Thay vì foreign(...), ta dùng index(...)
         Schema::table('tax_invoices', function (Blueprint $table) {
-            $table->index('order_id'); // Đã sửa từ foreign key sang index
+            $table->index('order_id');
         });
 
+        // ----------------------------------------------------------------
+        // 10. NHÓM ĐƠN HÀNG (ORDERS - DÙNG INDEX VÌ PARTITION)
+        // ----------------------------------------------------------------
         Schema::table('orders', function (Blueprint $table) {
             $table->index('customer_id');
             $table->index('order_code');
@@ -313,10 +343,12 @@ return new class extends Migration
             $table->index(['user_id', 'type', 'status']);
         });
         Schema::table('shipping_shipments', function (Blueprint $table) {
-            $table->index('order_id'); // Link to Partitioned Order
+            $table->index('order_id');
         });
 
-        // 12. Wishlists
+        // ----------------------------------------------------------------
+        // 11. WISHLISTS
+        // ----------------------------------------------------------------
         Schema::table('wishlists', function (Blueprint $table) {
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -325,6 +357,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Khi rollback sẽ xóa bảng ở file 1, không cần drop FK
+        // Khi rollback không cần xử lý gì đặc biệt
     }
 };
