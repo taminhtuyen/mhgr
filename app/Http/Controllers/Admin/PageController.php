@@ -12,42 +12,12 @@ class PageController extends Controller
 
     public function index()
     {
-        // Bảng 'contents' lưu trữ các trang tĩnh (Giới thiệu, Chính sách...)
-        $schema = $this->getSchema('contents');
+        $tableName = 'contents';
 
         return view('admin.schema-view', [
             'title' => 'Quản lý Trang tĩnh (Contents)',
-            'schema' => $schema
+            'table' => $tableName,
+            'columns' => $this->getSchema($tableName)
         ]);
-    }
-
-    public function create()
-    {
-        return "Trang tạo trang tĩnh mới";
-    }
-
-    public function store(Request $request)
-    {
-        // Logic lưu
-    }
-
-    public function show($id)
-    {
-        //
-    }
-
-    public function edit($id)
-    {
-        return "Trang chỉnh sửa trang tĩnh ID: " . $id;
-    }
-
-    public function update(Request $request, $id)
-    {
-        // Logic cập nhật
-    }
-
-    public function destroy($id)
-    {
-        // Logic xóa
     }
 }

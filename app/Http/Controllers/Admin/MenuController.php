@@ -12,37 +12,12 @@ class MenuController extends Controller
 
     public function index()
     {
-        // Lấy cấu trúc bảng 'menus' để hiển thị tạm thời
-        $schema = $this->getSchema('menus');
+        $tableName = 'menus'; // Tên bảng trong Database
 
         return view('admin.schema-view', [
             'title' => 'Quản lý Menu (Frontend)',
-            'schema' => $schema
+            'table' => $tableName,
+            'columns' => $this->getSchema($tableName)
         ]);
-    }
-
-    public function create()
-    {
-        return "Trang tạo mới Menu (Chưa phát triển)";
-    }
-
-    public function store(Request $request)
-    {
-        // Logic lưu
-    }
-
-    public function edit($id)
-    {
-        return "Trang chỉnh sửa Menu ID: " . $id;
-    }
-
-    public function update(Request $request, $id)
-    {
-        // Logic cập nhật
-    }
-
-    public function destroy($id)
-    {
-        // Logic xóa
     }
 }

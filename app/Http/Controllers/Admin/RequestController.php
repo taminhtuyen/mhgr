@@ -12,22 +12,12 @@ class RequestController extends Controller
 
     public function index()
     {
-        // Bảng 'requests' lưu góp ý từ khách hàng
-        $schema = $this->getSchema('requests');
+        $tableName = 'requests';
 
         return view('admin.schema-view', [
             'title' => 'Danh sách Yêu cầu & Góp ý',
-            'schema' => $schema
+            'table' => $tableName,
+            'columns' => $this->getSchema($tableName)
         ]);
-    }
-
-    public function show($id)
-    {
-        return "Xem chi tiết yêu cầu ID: " . $id;
-    }
-
-    public function destroy($id)
-    {
-        // Logic xóa
     }
 }

@@ -12,17 +12,12 @@ class CartController extends Controller
 
     public function index()
     {
-        // Bảng 'carts' lưu giỏ hàng của khách (bao gồm cả khách vãng lai)
-        $schema = $this->getSchema('carts');
+        $tableName = 'carts';
 
         return view('admin.schema-view', [
-            'title' => 'Quản lý Giỏ hàng treo (Abandoned Carts)',
-            'schema' => $schema
+            'title' => 'Quản lý Giỏ hàng treo',
+            'table' => $tableName,
+            'columns' => $this->getSchema($tableName)
         ]);
-    }
-
-    public function show($id)
-    {
-        return "Xem chi tiết giỏ hàng ID: " . $id;
     }
 }

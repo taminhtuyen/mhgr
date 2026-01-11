@@ -12,27 +12,12 @@ class ImageController extends Controller
 
     public function index()
     {
-        // Bảng 'images' quản lý toàn bộ file ảnh đã upload lên hệ thống
-        $schema = $this->getSchema('images');
+        $tableName = 'images';
 
         return view('admin.schema-view', [
             'title' => 'Thư viện hình ảnh (Media)',
-            'schema' => $schema
+            'table' => $tableName,
+            'columns' => $this->getSchema($tableName)
         ]);
-    }
-
-    public function create()
-    {
-        return "Trang upload ảnh mới";
-    }
-
-    public function store(Request $request)
-    {
-        // Logic upload
-    }
-
-    public function destroy($id)
-    {
-        // Logic xóa ảnh
     }
 }
