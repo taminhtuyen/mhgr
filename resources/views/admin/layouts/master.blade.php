@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Quản trị hệ thống')</title>
 
-    <link href="{{ asset('/admin/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('/admin/css/all.css') }}" rel="stylesheet">
+    <link href="{{ asset('/css/admin/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/css/admin/all.css') }}" rel="stylesheet">
 
     <style>
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
