@@ -12,7 +12,7 @@
         .sidebar a { color: #cfd8dc; text-decoration: none; padding: 10px 15px; display: block; font-size: 0.95rem; }
         .sidebar a:hover { background-color: #495057; color: #fff; }
         .sidebar a.active { background-color: #0d6efd; color: #fff; font-weight: bold; }
-        .sidebar .section-title { font-size: 0.75rem; text-transform: uppercase; color: #adb5bd; padding: 15px 15px 5px; font-weight: bold; letter-spacing: 0.5px; }
+        .sidebar .section-title { font-size: 0.75rem; text-transform: uppercase; color: #adb5bd; padding: 15px 15px 5px; font-weight: bold; letter-spacing: 1px; }
         .main-content { padding: 20px; }
         .card { box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); border: none; }
         .table th { background-color: #f8f9fa; font-weight: 600; font-size: 0.9rem; }
