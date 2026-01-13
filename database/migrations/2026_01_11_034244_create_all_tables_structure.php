@@ -52,6 +52,7 @@ return new class extends Migration
             $table->string('email', 191)->unique();
             $table->string('phone', 20)->nullable()->unique();
             $table->string('password')->nullable();
+            // user_type: admin, staff, distributor (NPP), agency (Đại lý), customer (Khách lẻ)
             $table->string('user_type', 20)->default('customer');
             $table->tinyInteger('status')->default(1);
             $table->text('two_factor_secret')->nullable();
@@ -61,7 +62,7 @@ return new class extends Migration
             $table->string('last_login_ip', 45)->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedBigInteger('owner_id')->nullable();
+            $table->unsignedBigInteger('owner_id')->nullable(); // ID của cấp trên (VD: Đại lý thuộc về NPP nào)
             $table->string('store_name')->nullable();
         });
 
@@ -200,9 +201,8 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-
         // ----------------------------------------------------------------
-        // PHẦN 2: SẢN PHẨM & KHO HÀNG (PRODUCTS & INVENTORY)
+        // PHẦN 2: SẢN PHẨM, KHO HÀNG & NHÀ CUNG CẤP
         // ----------------------------------------------------------------
 
         Schema::create('categories', function (Blueprint $table) {
@@ -340,6 +340,18 @@ return new class extends Migration
             $table->primary(['category_id', 'attribute_id']);
         });
 
+        Schema::create('warehouses', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('code', 50)->unique();
+            $table->enum('type', ['fulfillment', 'store', 'hub', 'kitchen'])->default('fulfillment');
+            $table->string('address')->nullable();
+            $table->unsignedInteger('province_id')->nullable();
+            $table->unsignedBigInteger('ward_id')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
         Schema::create('inventory_stocks', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('warehouse_id');
@@ -376,6 +388,7 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
 
+        // BẢNG SUPPLIERS: LƯU DANH SÁCH ĐỐI TÁC CUNG CẤP
         Schema::create('suppliers', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
@@ -403,29 +416,40 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('warehouses', function (Blueprint $table) {
+        // ĐỔI TÊN: PURCHASE_ORDERS -> IMPORT_ORDERS (ĐỂ TRÁNH NHẦM VỚI SUPPLIERS)
+        // Bảng này chỉ dùng cho việc NHẬP HÀNG TỪ NGOÀI HỆ THỐNG
+        Schema::create('import_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
             $table->string('code', 50)->unique();
-            $table->enum('type', ['fulfillment', 'store', 'hub', 'kitchen'])->default('fulfillment');
-            $table->string('address')->nullable();
-            $table->unsignedInteger('province_id')->nullable();
-            $table->unsignedBigInteger('ward_id')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('supplier_id');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->unsignedBigInteger('creator_id');
+            $table->decimal('total_cost', 15, 2)->default(0);
+            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
+            $table->text('note')->nullable();
+            $table->date('expected_delivery_date')->nullable();
             $table->timestamps();
+        });
+
+        Schema::create('import_order_items', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('import_order_id');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('product_variation_id')->nullable();
+            $table->integer('quantity');
+            $table->decimal('import_price', 15, 2)->default(0);
         });
 
         Schema::create('wishlists', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('customer_id')->nullable(); // Có thể bỏ nếu đã chuẩn hoá user_id
             $table->unsignedBigInteger('product_id');
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['user_id', 'product_id'], 'unique_wishlist');
         });
-
         // ----------------------------------------------------------------
-        // PHẦN 3: ĐƠN HÀNG (PARTITIONING 2024 - 2100) & LOGS
+        // PHẦN 3: ĐƠN HÀNG TRUNG TÂM (ORDERS) & PARTITIONING
         // ----------------------------------------------------------------
 
         // Tạo chuỗi Partition từ 2024 đến 2100
@@ -436,7 +460,7 @@ return new class extends Migration
         }
         $partitions .= "PARTITION p_future VALUES LESS THAN MAXVALUE";
 
-        // SQL System Logs (Partitioned p_old)
+        // SQL System Logs
         $partitionSqlLogs = "PARTITION BY RANGE (year(`created_at`)) (
             PARTITION p_old VALUES LESS THAN (2024),\n" . $partitions . "\n)";
 
@@ -456,7 +480,8 @@ return new class extends Migration
             $partitionSqlLogs
         ");
 
-        // SQL Orders (Partitioned p_history)
+        // SQL Orders (Partitioned)
+        // CẬP NHẬT: Thêm buyer_id, buyer_type, seller_id, seller_type
         $partitionSqlOrders = "PARTITION BY RANGE (year(`created_at`)) (
             PARTITION p_history VALUES LESS THAN (2024),\n" . $partitions . "\n)";
 
@@ -464,9 +489,18 @@ return new class extends Migration
             CREATE TABLE `orders` (
               `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
               `order_code` varchar(50) NOT NULL COMMENT 'Mã vận đơn',
-              `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
+
+              /* THÔNG TIN NGƯỜI MUA (Đại lý hoặc Khách lẻ) */
+              `buyer_id` bigint(20) UNSIGNED DEFAULT NULL,
+              `buyer_type` varchar(50) DEFAULT 'user',
+
+              /* THÔNG TIN NGƯỜI BÁN (Admin/Kho tổng hoặc NPP) */
+              `seller_id` bigint(20) UNSIGNED DEFAULT NULL,
+              `seller_type` varchar(50) DEFAULT 'admin',
+
               `shipping_manager_id` bigint(20) UNSIGNED DEFAULT NULL,
               `preparing_manager_id` bigint(20) UNSIGNED DEFAULT NULL,
+
               `shipping_name` varchar(255) NOT NULL,
               `shipping_phone` varchar(20) NOT NULL,
               `shipping_address` text NOT NULL,
@@ -474,19 +508,23 @@ return new class extends Migration
               `shipping_ward_id` bigint(20) UNSIGNED DEFAULT NULL,
               `shipping_lat` double DEFAULT NULL,
               `shipping_lng` double DEFAULT NULL,
+
               `total_product_price` decimal(15,2) DEFAULT 0.00,
               `total_shipping_fee` decimal(15,2) DEFAULT 0.00,
               `total_discount` decimal(15,2) DEFAULT 0.00,
               `total_tax_amount` decimal(15,2) DEFAULT 0.00,
               `vat_percentage` int(11) DEFAULT 0,
               `final_amount` decimal(15,2) DEFAULT 0.00,
+
               `shipping_method_id` bigint(20) UNSIGNED DEFAULT NULL,
               `profit_user` decimal(15,2) DEFAULT 0.00,
               `profit_admin` decimal(15,2) DEFAULT 0.00,
               `vat_user` decimal(15,2) DEFAULT 0.00,
               `vat_admin` decimal(15,2) DEFAULT 0.00,
+
               `payment_method` varchar(50) DEFAULT 'cod',
               `payment_status` varchar(20) DEFAULT 'unpaid',
+
               `level_customer` int(4) DEFAULT NULL,
               `customer_group` varchar(255) DEFAULT NULL,
               `status` varchar(20) DEFAULT 'pending',
@@ -494,9 +532,10 @@ return new class extends Migration
               `delivery_trip_id` bigint(20) UNSIGNED DEFAULT NULL,
               `note` text DEFAULT NULL,
               `invoice_requested` tinyint(1) DEFAULT 0,
+
               `created_at` datetime NOT NULL DEFAULT current_timestamp(),
               `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-              `seller_id` bigint(20) UNSIGNED DEFAULT NULL,
+
               `order_type` varchar(20) DEFAULT 'retail',
               PRIMARY KEY (`id`, `created_at`),
               UNIQUE KEY `unique_order_code_partition` (`order_code`, `created_at`)
@@ -587,30 +626,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('purchase_orders', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('code', 50)->unique();
-            $table->unsignedBigInteger('supplier_id');
-            $table->unsignedBigInteger('warehouse_id');
-            $table->unsignedBigInteger('creator_id');
-            $table->decimal('total_cost', 15, 2)->default(0);
-            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
-            $table->text('note')->nullable();
-            $table->date('expected_delivery_date')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('purchase_order_items', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('purchase_order_id');
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('product_variation_id')->nullable();
-            $table->integer('quantity');
-            $table->decimal('import_price', 15, 2)->default(0);
-        });
-
         // ----------------------------------------------------------------
-        // PHẦN 4: KHUYẾN MÃI, MARKETING & NỘI DUNG (MARKETING & CONTENT)
+        // PHẦN 4: KHUYẾN MÃI, MARKETING & NỘI DUNG
         // ----------------------------------------------------------------
 
         Schema::create('promotions', function (Blueprint $table) {
@@ -889,7 +906,7 @@ return new class extends Migration
         });
 
         // ----------------------------------------------------------------
-        // PHẦN 5: HỆ THỐNG VẬN CHUYỂN, GIAO TIẾP & KHÁC (SHIPPING, CHAT, OTHER)
+        // PHẦN 5: HỆ THỐNG VẬN CHUYỂN, GIAO TIẾP & KHÁC
         // ----------------------------------------------------------------
 
         Schema::create('shipping_methods', function (Blueprint $table) {
@@ -1274,7 +1291,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Bảng Pulse (Laravel Pulse) - Thêm để đầy đủ nếu sau này cài package
         Schema::create('pulse_aggregates', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('bucket');

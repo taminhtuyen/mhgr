@@ -118,7 +118,7 @@ return new class extends Migration
         });
 
         // ----------------------------------------------------------------
-        // 3. NHÓM KHO VẬN (INVENTORY)
+        // 3. NHÓM KHO VẬN (INVENTORY) & NHẬP HÀNG (IMPORT)
         // ----------------------------------------------------------------
 
         // Cập nhật FK địa chỉ cho bảng warehouses chính thức
@@ -141,7 +141,7 @@ return new class extends Migration
             $table->index(['reference_id', 'type']);
         });
 
-        // [KHÔI PHỤC] Bảng Snapshots - Lưu ý trỏ warehouse_id về bảng 'warehouses'
+        // Bảng Snapshots - Lưu ý trỏ warehouse_id về bảng 'warehouses'
         Schema::table('inventory_snapshots', function (Blueprint $table) {
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
@@ -151,14 +151,17 @@ return new class extends Migration
             $table->index(['product_id', 'warehouse_id']);
         });
 
-        Schema::table('purchase_orders', function (Blueprint $table) {
+        // ĐỔI TÊN: purchase_orders -> import_orders
+        Schema::table('import_orders', function (Blueprint $table) {
             $table->foreign('supplier_id')->references('id')->on('suppliers');
             $table->foreign('warehouse_id')->references('id')->on('warehouses');
             $table->foreign('creator_id')->references('id')->on('users');
         });
 
-        Schema::table('purchase_order_items', function (Blueprint $table) {
-            $table->foreign('purchase_order_id')->references('id')->on('purchase_orders')->onDelete('cascade');
+        Schema::table('import_order_items', function (Blueprint $table) {
+            $table->foreign('import_order_id')->references('id')->on('import_orders')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products');
+            $table->foreign('product_variation_id')->references('id')->on('product_variations');
         });
 
         // ----------------------------------------------------------------
@@ -315,10 +318,14 @@ return new class extends Migration
         });
 
         // ----------------------------------------------------------------
-        // 10. NHÓM ĐƠN HÀNG (ORDERS - DÙNG INDEX VÌ PARTITION)
+        // 10. NHÓM ĐƠN HÀNG (ORDERS) - CẬP NHẬT MỚI NHẤT
         // ----------------------------------------------------------------
         Schema::table('orders', function (Blueprint $table) {
-            $table->index('customer_id');
+            // Cập nhật: Index cho buyer_id và seller_id thay vì customer_id cũ
+            // Vì bảng orders dùng Partition, không thể dùng Foreign Key (Constraint) cứng
+            // Ta dùng Index để tối ưu truy vấn
+            $table->index('buyer_id');
+            $table->index('seller_id');
             $table->index('order_code');
             $table->index(['status', 'payment_status']);
             $table->index(['created_at', 'status']);
