@@ -1,11 +1,34 @@
-<div class="popup-grid">
+<div class="popup-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+    <div class="h5 mb-0 fw-bold" style="color: var(--text-color);">
+        <i class="fa-solid fa-bars-staggered me-2"></i>MENU QUẢN TRỊ
+    </div>
 
+    {{-- SWITCH BUTTON NGÀY ĐÊM --}}
+    <div class="theme-switch-wrapper">
+        <label for="theme" class="theme">
+            <span class="theme__toggle-wrap">
+                <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark">
+                <span class="theme__icon">
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                </span>
+            </span>
+        </label>
+    </div>
+</div>
+
+<div class="popup-grid">
     {{-- CỘT 1: TỔNG QUAN & BÁN HÀNG & HỆ THỐNG --}}
     <div class="menu-column">
-        {{-- Ví dụ phân quyền sau này: @if(Auth::user()->can('view_dashboard')) --}}
         <div class="group-title text-primary">TỔNG QUAN</div>
         <a href="{{ route('admin.dashboard') }}" class="menu-link"><i class="fa-solid fa-gauge"></i> Tổng Quan</a>
-        {{-- @endif --}}
 
         <div class="group-title text-success group-spacer">BÁN HÀNG</div>
         <a href="{{ route('admin.sales.orders.index') }}" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> Đơn Hàng</a>
@@ -14,7 +37,6 @@
         <a href="{{ route('admin.sales.invoices.index') }}" class="menu-link"><i class="fa-solid fa-file-invoice"></i> Hóa Đơn</a>
         <a href="{{ route('admin.sales.carts.index') }}" class="menu-link"><i class="fa-solid fa-cart-arrow-down"></i> Giỏ Hàng Treo</a>
 
-        {{-- Nhóm HỆ THỐNG (Thường chỉ dành cho Super Admin) --}}
         <div class="group-title text-dark group-spacer">HỆ THỐNG</div>
         <a href="{{ route('admin.system.settings.index') }}" class="menu-link"><i class="fa-solid fa-gear"></i> Cài Đặt</a>
         <a href="{{ route('admin.system.users.index') }}" class="menu-link"><i class="fa-solid fa-user-shield"></i> Quản Trị Viên</a>
