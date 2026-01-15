@@ -6,51 +6,81 @@
     <title>@yield('title', 'Admin Dashboard')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/all.css') }}" rel="stylesheet">
 
     <style>
-        /* --- 1. BIẾN MÀU & THEME --- */
-        :root {
-            --bg-body: #f0f2f5;
-            --text-color: #334155;
-            --text-muted: #94a3b8;
-            --popup-bg: rgba(255, 255, 255, 0.85);
-            --popup-border: rgba(255, 255, 255, 0.5);
-            --popup-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            --link-hover-bg: #eff6ff;
-            --link-hover-text: #2563eb;
-            --primary: #2563eb;
-        }
-        body.dark-mode {
-            --bg-body: #0f172a;
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
-            --popup-bg: rgba(30, 41, 59, 0.85);
-            --popup-border: rgba(255, 255, 255, 0.08);
-            --popup-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            --link-hover-bg: rgba(255, 255, 255, 0.1);
-            --link-hover-text: #60a5fa;
-            --primary: #60a5fa;
+        /* --- 1. RESET LAYOUT & FULL WIDTH --- */
+        html, body {
+            height: 100%; margin: 0; padding: 0; overflow-x: hidden;
         }
 
-        body { background-color: var(--bg-body); color: var(--text-color); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; transition: 0.3s; }
+        #main-wrapper {
+            width: 100% !important;
+            margin-left: 0 !important;
+            padding: 0 !important;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+            padding-bottom: 100px !important;
+        }
+
+        .admin-container {
+            width: 100%;
+            padding: 15px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 998px) {
+            .admin-container {
+                padding: 30px;
+                max-width: 1400px;
+            }
+        }
+
+        /* --- 2. BIẾN MÀU (GIỮ NGUYÊN) --- */
+        :root {
+            /* Light Mode */
+            --bg-body: #f8fafc;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --popup-bg: rgba(255, 255, 255, 0.98);
+            --popup-border: rgba(0, 0, 0, 0.06);
+            --popup-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+            --link-hover-bg: #f1f5f9;
+            --link-hover-text: #0284c7;
+            --primary: #0ea5e9;
+            --scrollbar-thumb: #cbd5e1;
+        }
+
+        body.dark-mode {
+            /* Dark Mode */
+            --bg-body: #020617;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --popup-bg: rgba(15, 23, 42, 0.98);
+            --popup-border: rgba(255, 255, 255, 0.08);
+            --popup-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            --link-hover-bg: rgba(255, 255, 255, 0.08);
+            --link-hover-text: #38bdf8;
+            --primary: #38bdf8;
+            --scrollbar-thumb: #334155;
+        }
+
+        body { background-color: var(--bg-body); color: var(--text-color); font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; }
         body.no-select { user-select: none; -webkit-user-select: none; }
 
-        #main-wrapper { width: 100%; min-height: 100vh; padding: 20px; }
-
-        /* --- 2. BACKDROP --- */
-        #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
+        /* --- 3. BONG BÓNG & POPUP --- */
+        #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
         #nav-backdrop.active { opacity: 1; visibility: visible; }
 
-        /* --- 3. BONG BÓNG --- */
-        #bubble-wrapper { position: fixed; bottom: 40px; right: 40px; z-index: 10000; }
+        #bubble-wrapper { position: fixed; bottom: 40px; right: 40px; z-index: 10000; transition: transform 0.1s; }
 
         #nav-bubble {
             width: 60px; height: 60px;
-            background: linear-gradient(135deg, #2563eb, #1e40af);
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
             color: #fff; border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
             display: flex; align-items: center; justify-content: center;
             font-size: 24px; cursor: pointer;
             transition: transform 0.2s;
@@ -61,72 +91,112 @@
 
         .sub-bubbles-container { position: absolute; left: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
         .sub-bubble { width: 45px; height: 45px; background-color: var(--popup-bg); border: 1px solid var(--popup-border); color: var(--text-color); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; opacity: 0; transform: scale(0); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .sub-bubble:hover { background-color: var(--primary); color: #fff; }
+        .sub-bubble:hover { background-color: var(--primary); color: #fff; border-color: var(--primary); }
         #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
-        .badge-counter { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
+        .badge-counter { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; border: 2px solid var(--popup-bg); }
 
-        /* --- 4. POPUP CONTAINER --- */
+        /* --- [FIX QUAN TRỌNG] POPUP CONTAINER --- */
         #nav-popup {
             position: fixed; z-index: 9999;
             background: var(--popup-bg);
             backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--popup-border);
             box-shadow: var(--popup-shadow);
-            border-radius: 16px;
+            border-radius: 20px;
             opacity: 0; visibility: hidden; transform: scale(0.95);
-            transition: opacity 0.2s, transform 0.2s;
-            width: max-content; max-width: 95vw;
-            overflow: hidden;
-        }
-        #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
+            transition: opacity 0.2s ease-out, transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 
-        /* --- MENU GRID --- */
-        #menu-interface .popup-grid { display: grid; padding: 25px; gap: 25px; }
+            /* SỬA LỖI SCROLL: Khóa cuộn ở thẻ cha, chuyển cuộn vào thẻ con */
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1) translateX(0) translateY(0); }
+
+        /* --- [FIX] MENU INTERFACE --- */
+        #menu-interface {
+            width: 100%;
+            /* Thêm cuộn riêng cho menu */
+            overflow-y: auto;
+            max-height: 80vh; /* Giới hạn chiều cao để không bị tràn */
+            scrollbar-width: thin;
+        }
+        #menu-interface::-webkit-scrollbar { width: 6px; }
+        #menu-interface::-webkit-scrollbar-track { background: transparent; }
+        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
+
+        #menu-interface .popup-grid { display: grid; padding: 25px; gap: 20px; }
         .grid-cols-1 { grid-template-columns: 1fr; }
         .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
         .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
         .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-        .menu-column { display: flex; flex-direction: column; }
-        .group-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; border-bottom: 2px solid rgba(148,163,184,0.2); }
-        .menu-link { display: flex; align-items: center; padding: 8px 10px; color: var(--text-color); text-decoration: none; border-radius: 8px; font-weight: 500; transition: 0.2s; white-space: nowrap; margin-bottom: 2px; }
-        .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateX(3px); }
-        .menu-link i { width: 24px; color: var(--text-muted); margin-right: 5px; text-align: center; }
-        .menu-link:hover i { color: var(--link-hover-text); }
-        .popup-header { padding: 15px 25px 0 25px; border-bottom: 1px solid var(--popup-border); }
 
-        /* --- CHAT CSS --- */
-        #chat-interface { max-width: 800px; width: 800px; height: 500px; max-height: 80vh; display: flex; flex-direction: column; }
-        .chat-layout { position: relative; width: 100%; height: 100%; }
-        .chat-sidebar { width: 300px; background: rgba(0,0,0,0.02); height: 100%; }
-        .chat-window { background: transparent; height: 100%; }
+        .menu-column { display: flex; flex-direction: column; gap: 4px; }
+        .group-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; letter-spacing: 0.5px; }
+        .group-title:first-child { margin-top: 0; }
+        .menu-link { display: flex; align-items: center; padding: 8px 12px; color: var(--text-color); text-decoration: none; border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; white-space: nowrap; }
+        .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateX(4px); }
+        .menu-link i { width: 24px; color: var(--text-muted); margin-right: 8px; text-align: center; transition: color 0.2s; }
+        .menu-link:hover i { color: var(--link-hover-text); }
+        .popup-header { padding: 15px 25px; border-bottom: 1px solid var(--popup-border); display: flex; align-items: center; justify-content: space-between; }
+
+        /* --- [FIX] CHAT INTERFACE --- */
+        #chat-interface {
+            max-width: 800px; width: 800px;
+            height: 500px; /* Chiều cao cố định */
+            max-height: 100%; /* Không cao hơn popup cha */
+            display: flex; flex-direction: column;
+        }
+
+        .chat-layout { position: relative; width: 100%; height: 100%; display: flex; overflow: hidden; }
+        .chat-sidebar { width: 300px; height: 100%; border-right: 1px solid var(--popup-border); display: flex; flex-direction: column; background: rgba(0,0,0,0.01); }
+        .chat-window { flex: 1; height: 100%; display: flex; flex-direction: column; background: transparent; }
         .chat-item:hover, .chat-item.active { background-color: var(--link-hover-bg); }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
 
-        @media (max-width: 991.98px) {
-            #chat-interface { width: 95vw !important; height: 70vh !important; max-width: none !important; }
-            .chat-sidebar { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 2; background: var(--popup-bg); transition: transform 0.3s ease-in-out; transform: translateX(0); }
-            .chat-window { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 2; background: var(--popup-bg); transition: transform 0.3s ease-in-out; transform: translateX(100%); }
-            #chat-interface.in-conversation .chat-sidebar { transform: translateX(-100%); }
+        .mobile-nav-btn { display: none; }
+        .desktop-nav-element { display: block; }
+
+        @media (max-width: 997.98px) {
+            #chat-interface { width: 100% !important; height: 70vh !important; max-width: none !important; }
+            .chat-sidebar { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; background: var(--popup-bg); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); border-right: none; }
+            .chat-window { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; background: var(--popup-bg); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
+
+            #chat-interface.in-conversation .chat-sidebar { transform: translateX(-20%); opacity: 0; pointer-events: none; }
             #chat-interface.in-conversation .chat-window { transform: translateX(0); }
+
+            .mobile-nav-btn { display: block !important; }
+            .desktop-nav-element { display: none !important; }
+            #bubble-wrapper.expanded .sub-bubbles-container { z-index: 9990; }
         }
 
+        /* Dark Mode overrides */
         body.dark-mode .text-dark { color: #f1f5f9 !important; }
-        body.dark-mode .text-primary { color: #60a5fa !important; }
+        body.dark-mode .text-primary { color: #38bdf8 !important; }
         body.dark-mode .text-secondary { color: #cbd5e1 !important; }
+        body.dark-mode .border-bottom { border-color: var(--popup-border) !important; }
+        body.dark-mode .form-control { background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #fff; }
+        body.dark-mode .form-control:focus { background-color: rgba(255,255,255,0.08); border-color: var(--primary); color: #fff; box-shadow: none; }
 
-        .theme { display: flex; align-items: center; } .theme__toggle { width: 4em; height: 2em; -webkit-appearance: none; background: #cbd5e1; border-radius: 2em; position: relative; cursor: pointer; transition: 0.3s; } .theme__toggle::after { content: ''; position: absolute; left: 0.2em; top: 0.2em; width: 1.6em; height: 1.6em; background: #fff; border-radius: 50%; transition: 0.3s; } .theme__toggle:checked { background: #0f172a; } .theme__toggle:checked::after { left: 2.2em; }
-        .theme-switch-wrapper { transform: scale(0.8); }
+        /* Theme Switch */
+        .theme { display: flex; align-items: center; }
+        .theme__toggle { width: 3.5em; height: 1.8em; -webkit-appearance: none; background: #cbd5e1; border-radius: 2em; position: relative; cursor: pointer; transition: 0.3s; }
+        .theme__toggle::after { content: ''; position: absolute; left: 0.2em; top: 0.2em; width: 1.4em; height: 1.4em; background: #fff; border-radius: 50%; transition: 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .theme__toggle:checked { background: #0f172a; }
+        .theme__toggle:checked::after { left: 1.9em; transform: translateX(0); }
+        .theme-switch-wrapper { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
-<div id="nav-backdrop"></div>
-
 <div id="main-wrapper">
-    @yield('content')
+    <div class="admin-container">
+        @yield('content')
+    </div>
 </div>
+
+<div id="nav-backdrop"></div>
 
 @include('admin.partials.bubbles')
 
@@ -139,7 +209,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. SETTING THEME ---
+        // --- LOGIC THEME ---
         const themeToggle = document.querySelector('#theme');
         const body = document.body;
         if(localStorage.getItem('admin_theme_preference') === 'dark') {
@@ -147,11 +217,16 @@
             if(themeToggle) themeToggle.checked = true;
         }
         if(themeToggle) themeToggle.addEventListener('change', (e) => {
-            body.classList.toggle('dark-mode', e.target.checked);
-            localStorage.setItem('admin_theme_preference', e.target.checked ? 'dark' : 'light');
+            if(e.target.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('admin_theme_preference', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('admin_theme_preference', 'light');
+            }
         });
 
-        // --- 2. LOGIC BONG BÓNG & MENU ---
+        // --- LOGIC BONG BÓNG & POPUP ---
         const wrapper = document.getElementById('bubble-wrapper');
         const mainBubble = document.getElementById('nav-bubble');
         const subBubblesContainer = wrapper.querySelector('.sub-bubbles-container');
@@ -166,7 +241,7 @@
         let isSystemOpen = false;
         let currentMode = 'menu';
 
-        const savedPos = localStorage.getItem('bubblePos');
+        const savedPos = localStorage.getItem('bubblePos_admin');
         if (savedPos) {
             const pos = JSON.parse(savedPos);
             wrapper.style.left = pos.left;
@@ -184,6 +259,7 @@
             initialLeft = rect.left; initialTop = rect.top;
 
             wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
+            wrapper.style.transition = 'none';
             document.body.classList.add('no-select');
             if(isSystemOpen) popup.style.transition = 'none';
 
@@ -199,9 +275,16 @@
                 isDragging = true;
                 if(e.cancelable) e.preventDefault();
 
-                wrapper.style.left = `${initialLeft + (pos.clientX - startX)}px`;
-                wrapper.style.top = `${initialTop + (pos.clientY - startY)}px`;
-                wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
+                let newLeft = initialLeft + (pos.clientX - startX);
+                let newTop = initialTop + (pos.clientY - startY);
+
+                const maxLeft = window.innerWidth - wrapper.offsetWidth;
+                const maxTop = window.innerHeight - wrapper.offsetHeight;
+                newLeft = Math.min(Math.max(0, newLeft), maxLeft);
+                newTop = Math.min(Math.max(0, newTop), maxTop);
+
+                wrapper.style.left = `${newLeft}px`;
+                wrapper.style.top = `${newTop}px`;
 
                 if (isSystemOpen) {
                     expandBubblesVisual();
@@ -214,8 +297,14 @@
             document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd);
             document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', onDragEnd);
             document.body.classList.remove('no-select');
-            popup.style.transition = 'opacity 0.2s, transform 0.2s';
-            if (isDragging) localStorage.setItem('bubblePos', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top }));
+
+            popup.style.transition = '';
+            wrapper.style.transition = 'transform 0.1s';
+
+            if (isDragging) {
+                localStorage.setItem('bubblePos_admin', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top }));
+                setTimeout(() => { isDragging = false; }, 50);
+            }
         };
 
         mainBubble.addEventListener('mousedown', onDragStart);
@@ -243,51 +332,46 @@
             popup.classList.remove('active');
             icon.classList.replace('fa-xmark', 'fa-bars');
             backdrop.classList.remove('active');
+            setTimeout(() => { backToChatList(); }, 300);
         }
 
         function expandBubblesVisual() {
             const rect = wrapper.getBoundingClientRect();
             const screenW = window.innerWidth;
             const screenH = window.innerHeight;
-            const isMobile = screenW < 992;
+            const isMobile = screenW < 998;
 
-            // Reset
-            subBubblesContainer.style.top = ''; subBubblesContainer.style.bottom = '';
-            subBubblesContainer.style.left = ''; subBubblesContainer.style.right = '';
-            subBubblesContainer.style.width = ''; subBubblesContainer.style.height = '';
-            subBubblesContainer.style.flexDirection = ''; subBubblesContainer.style.padding = '';
-            subBubblesContainer.style.justifyContent = '';
+            subBubblesContainer.style.cssText = '';
+            subBubblesContainer.style.position = 'absolute';
+            subBubblesContainer.style.display = 'flex';
+            subBubblesContainer.style.gap = '10px';
+            subBubblesContainer.style.pointerEvents = 'none';
 
             if (isMobile) {
-                // --- MOBILE: ĐỔ NGANG (Trái/Phải) ---
-                subBubblesContainer.style.width = 'max-content';
-                subBubblesContainer.style.height = '60px';
                 subBubblesContainer.style.flexDirection = 'row';
-                subBubblesContainer.style.top = '0'; // Căn theo bong bóng chính
+                subBubblesContainer.style.top = '7.5px';
+                subBubblesContainer.style.width = 'max-content';
 
                 if (rect.left > screenW / 2) {
-                    // Bong bóng bên PHẢI -> Đổ sang TRÁI
-                    subBubblesContainer.style.right = '100%';
-                    subBubblesContainer.style.paddingRight = '15px';
+                    subBubblesContainer.style.right = '70px';
+                    subBubblesContainer.style.left = 'auto';
                     subBubblesContainer.style.justifyContent = 'flex-end';
                 } else {
-                    // Bong bóng bên TRÁI -> Đổ sang PHẢI
-                    subBubblesContainer.style.left = '100%';
-                    subBubblesContainer.style.paddingLeft = '15px';
+                    subBubblesContainer.style.left = '70px';
+                    subBubblesContainer.style.right = 'auto';
                     subBubblesContainer.style.justifyContent = 'flex-start';
                 }
             } else {
-                // --- DESKTOP: ĐỔ DỌC (Trên/Dưới) ---
                 subBubblesContainer.style.width = '60px';
                 subBubblesContainer.style.left = '0';
                 subBubblesContainer.style.flexDirection = 'column';
 
                 if (rect.top > screenH / 2) {
-                    subBubblesContainer.style.bottom = '100%';
-                    subBubblesContainer.style.paddingBottom = '15px';
+                    subBubblesContainer.style.bottom = '70px';
+                    subBubblesContainer.style.top = 'auto';
                 } else {
-                    subBubblesContainer.style.top = '100%';
-                    subBubblesContainer.style.paddingTop = '15px';
+                    subBubblesContainer.style.top = '70px';
+                    subBubblesContainer.style.bottom = 'auto';
                 }
             }
         }
@@ -303,91 +387,88 @@
                 popup.classList.add('active');
             } else {
                 menuInterface.classList.remove('d-none');
+                calculateMenuGrid();
                 setTimeout(() => {
-                    calculateMenuGrid();
                     positionPopup('menu');
                     popup.classList.add('active');
                 }, 10);
             }
         }
 
-        // --- [NEW LOGIC] CĂN VỊ TRÍ POPUP ---
         function positionPopup(type) {
             const rect = wrapper.getBoundingClientRect();
             const screenW = window.innerWidth;
             const screenH = window.innerHeight;
-            const isMobile = screenW < 992;
-            const gap = 20; const edgePadding = 20;
+            const gap = 15;
+            const edgePadding = 20;
 
-            popup.style.display = 'block';
+            popup.style.removeProperty('inset');
+            popup.style.inset = '';
+            popup.style.left = ''; popup.style.right = '';
+            popup.style.top = ''; popup.style.bottom = '';
+            popup.style.width = ''; popup.style.height = '';
+            popup.style.maxWidth = ''; popup.style.maxHeight = '';
+            popup.style.transformOrigin = '';
+            popup.style.margin = '';
+            popup.style.transform = '';
+
             if (type === 'chat') chatInterface.style.width = '';
 
-            if (isMobile) {
-                // --- MOBILE: POPUP NẰM TRÊN HOẶC DƯỚI BONG BÓNG ---
-                // 1. Reset Left/Right để full màn
-                popup.style.left = '20px';
-                popup.style.right = '20px';
-                popup.style.width = 'auto'; // Tự co giãn theo left/right
-                popup.style.maxWidth = 'none'; // Bỏ giới hạn max-width
+            if (screenW < 998) {
+                let vwUnit = 92;
+                if (screenW >= 450) vwUnit = 88;
+                popup.style.width = `${vwUnit}vw`;
+                popup.style.maxWidth = `${vwUnit}vw`;
+                popup.style.left = '50%';
+                popup.style.transform = 'translateX(-50%)';
 
-                // 2. Tính Trên/Dưới
-                // Nếu bong bóng ở nửa dưới màn hình -> Popup hiện lên TRÊN bong bóng
+                let maxH = 0;
                 if (rect.top > screenH / 2) {
-                    // bottom của popup = khoảng cách từ đáy màn hình đến đỉnh bong bóng + gap
                     popup.style.bottom = (screenH - rect.top + gap) + 'px';
                     popup.style.top = 'auto';
                     popup.style.transformOrigin = 'bottom center';
-                    // Giới hạn chiều cao popup để không tràn lên nóc
-                    popup.style.maxHeight = (rect.top - gap - edgePadding) + 'px';
+                    maxH = rect.top - gap - edgePadding;
                 } else {
-                    // Nếu bong bóng ở nửa trên -> Popup hiện xuống DƯỚI bong bóng
                     popup.style.top = (rect.bottom + gap) + 'px';
                     popup.style.bottom = 'auto';
                     popup.style.transformOrigin = 'top center';
-                    // Giới hạn chiều cao popup để không tràn đáy
-                    popup.style.maxHeight = (screenH - rect.bottom - gap - edgePadding) + 'px';
+                    maxH = screenH - rect.bottom - gap - edgePadding;
                 }
-
-                // Chat width reset cho mobile
-                chatInterface.style.width = '';
-
+                popup.style.maxHeight = maxH + 'px';
             } else {
-                // --- DESKTOP: GIỮ NGUYÊN LOGIC CŨ (Bên cạnh) ---
-                popup.style.width = 'max-content'; // Reset width
+                popup.style.width = 'max-content';
                 popup.style.maxWidth = '95vw';
-                popup.style.maxHeight = 'none';
 
-                let availableWidth = 0;
-                if (rect.left > screenW / 2) {
-                    popup.style.right = (screenW - rect.left + gap) + 'px';
-                    popup.style.left = 'auto';
-                    popup.style.transformOrigin = 'right center';
-                    availableWidth = rect.left - gap - edgePadding;
-                } else {
-                    popup.style.left = (rect.right + gap) + 'px';
-                    popup.style.right = 'auto';
-                    popup.style.transformOrigin = 'left center';
-                    availableWidth = screenW - rect.right - gap - edgePadding;
-                }
-
-                // Chat Width Desktop
                 if (type === 'chat') {
-                    let targetWidth = Math.min(availableWidth, 800);
+                    let availW = (rect.left > screenW / 2)
+                        ? (rect.left - gap - edgePadding)
+                        : (screenW - rect.right - gap - edgePadding);
+                    let targetWidth = Math.min(availW, 800);
                     if (targetWidth < 350) targetWidth = 350;
                     chatInterface.style.width = `${targetWidth}px`;
                 }
 
-                // Vertical Center Desktop
+                if (rect.left > screenW / 2) {
+                    popup.style.right = (screenW - rect.left + gap) + 'px';
+                    popup.style.left = 'auto';
+                    popup.style.transformOrigin = 'right center';
+                } else {
+                    popup.style.left = (rect.right + gap) + 'px';
+                    popup.style.right = 'auto';
+                    popup.style.transformOrigin = 'left center';
+                }
+
                 const pHeight = popup.scrollHeight;
                 const bubbleCenterY = rect.top + (rect.height / 2);
-                let top = bubbleCenterY - (pHeight / 2);
-                if (top < 20) top = 20;
-                if (top + pHeight > screenH - 20) top = screenH - pHeight - 20;
-                popup.style.top = top + 'px';
-                popup.style.bottom = 'auto';
-            }
+                let idealTop = bubbleCenterY - (pHeight / 2);
+                const minTop = 20;
+                const maxTop = screenH - pHeight - 20;
+                let finalTop = Math.max(minTop, Math.min(idealTop, maxTop));
 
-            popup.style.display = '';
+                popup.style.top = finalTop + 'px';
+                popup.style.bottom = 'auto';
+                popup.style.maxHeight = (screenH - 40) + 'px';
+            }
         }
 
         function calculateMenuGrid() {
@@ -396,28 +477,50 @@
                 grid.classList.remove('grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4');
                 const rect = wrapper.getBoundingClientRect();
                 const screenW = window.innerWidth;
-                const minColWidth = 180;
+                const minColWidth = 160;
                 const gap = 20;
 
-                // Logic tính cột (Desktop)
-                let availW = (rect.left > screenW/2) ? (rect.left - gap) : (screenW - rect.right - gap);
-
-                // Mobile: availW là full màn hình
-                if(screenW < 992) availW = screenW - 40;
-
-                let cols = Math.floor(availW / minColWidth);
-                if (cols > 4) cols = 4; if (cols < 1) cols = 1;
-                grid.classList.add(`grid-cols-${cols}`);
+                if (screenW < 576) {
+                    grid.classList.add('grid-cols-1');
+                } else if (screenW < 998) {
+                    grid.classList.add('grid-cols-2');
+                } else {
+                    let availW = (rect.left > screenW/2) ? (rect.left - gap) : (screenW - rect.right - gap);
+                    let cols = Math.floor(availW / minColWidth);
+                    if (cols > 4) cols = 4; if (cols < 1) cols = 1;
+                    grid.classList.add(`grid-cols-${cols}`);
+                }
             }
         }
 
-        document.getElementById('btn-scroll-top').addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); closeAll(); });
-        document.getElementById('btn-scroll-bottom').addEventListener('click', () => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); closeAll(); });
-        document.getElementById('btn-open-chat').addEventListener('click', () => { openPopupContent('chat'); });
+        const btnTop = document.getElementById('btn-scroll-top');
+        const btnBottom = document.getElementById('btn-scroll-bottom');
+        const btnChat = document.getElementById('btn-open-chat');
+
+        if(btnTop) btnTop.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); closeAll(); });
+        if(btnBottom) btnBottom.addEventListener('click', () => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); closeAll(); });
+        if(btnChat) btnChat.addEventListener('click', () => { openPopupContent('chat'); });
+
         backdrop.addEventListener('click', closeAll);
 
-        window.openChat = function(id) { chatInterface.classList.add('in-conversation'); }
-        window.backToChatList = function() { chatInterface.classList.remove('in-conversation'); }
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (isSystemOpen) {
+                    expandBubblesVisual();
+                    positionPopup(currentMode);
+                    if(currentMode === 'menu') calculateMenuGrid();
+                }
+            }, 100);
+        });
+
+        window.openChat = function(id) {
+            chatInterface.classList.add('in-conversation');
+        }
+        window.backToChatList = function() {
+            chatInterface.classList.remove('in-conversation');
+        }
     });
 </script>
 </body>
