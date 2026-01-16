@@ -8,6 +8,8 @@
 
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/all.css') }}" rel="stylesheet">
+    {{-- Đảm bảo bạn đã include Bootstrap JS Bundle để Dropdown hoạt động --}}
+    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
     <style>
         /* --- 1. RESET LAYOUT & FULL WIDTH --- */
@@ -38,19 +40,25 @@
             }
         }
 
-        /* --- 2. BIẾN MÀU (GIỮ NGUYÊN) --- */
+        /* --- 2. BIẾN MÀU (ĐÃ CẬP NHẬT THEO CLIENT - GLASSMORPHISM) --- */
         :root {
             /* Light Mode */
             --bg-body: #f8fafc;
             --text-color: #0f172a;
             --text-muted: #64748b;
-            --popup-bg: rgba(255, 255, 255, 0.98);
-            --popup-border: rgba(0, 0, 0, 0.06);
+
+            /* Nền trong suốt giống Client */
+            --popup-bg: rgba(255, 255, 255, 0.95);
+            --popup-border: rgba(0, 0, 0, 0.08);
             --popup-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+
             --link-hover-bg: #f1f5f9;
-            --link-hover-text: #0284c7;
+            --link-hover-text: #0ea5e9;
             --primary: #0ea5e9;
             --scrollbar-thumb: #cbd5e1;
+
+            /* Input tối hơn nền */
+            --input-darker: #f1f5f9;
         }
 
         body.dark-mode {
@@ -58,17 +66,32 @@
             --bg-body: #020617;
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
-            --popup-bg: rgba(15, 23, 42, 0.98);
-            --popup-border: rgba(255, 255, 255, 0.08);
+
+            /* Nền tối trong suốt giống Client */
+            --popup-bg: rgba(15, 23, 42, 0.95);
+            --popup-border: rgba(255, 255, 255, 0.1);
             --popup-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+
             --link-hover-bg: rgba(255, 255, 255, 0.08);
             --link-hover-text: #38bdf8;
             --primary: #38bdf8;
             --scrollbar-thumb: #334155;
+
+            /* Input tối hơn nền */
+            --input-darker: #0b1120;
         }
 
         body { background-color: var(--bg-body); color: var(--text-color); font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; }
         body.no-select { user-select: none; -webkit-user-select: none; }
+
+        /* Utility Class */
+        .cursor-pointer { cursor: pointer !important; }
+
+        /* Class hiệu ứng kính mờ (Glassmorphism) */
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
 
         /* --- 3. BONG BÓNG & POPUP --- */
         #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
@@ -89,6 +112,24 @@
         #nav-bubble:hover { transform: scale(1.05); }
         #nav-bubble:active { transform: scale(0.95); }
 
+        /* Styles cho chấm đỏ thông báo chính */
+        .main-bubble-badge {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 18px;
+            height: 18px;
+            background-color: #ef4444; /* Màu đỏ */
+            border: 2px solid #fff; /* Viền trắng để tách biệt */
+            border-radius: 50%;
+            display: block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        body.dark-mode .main-bubble-badge {
+            border-color: #0f172a;
+        }
+
         .sub-bubbles-container { position: absolute; left: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
         .sub-bubble { width: 45px; height: 45px; background-color: var(--popup-bg); border: 1px solid var(--popup-border); color: var(--text-color); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; opacity: 0; transform: scale(0); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .sub-bubble:hover { background-color: var(--primary); color: #fff; border-color: var(--primary); }
@@ -105,8 +146,6 @@
             border-radius: 20px;
             opacity: 0; visibility: hidden; transform: scale(0.95);
             transition: opacity 0.2s ease-out, transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-
-            /* SỬA LỖI SCROLL: Khóa cuộn ở thẻ cha, chuyển cuộn vào thẻ con */
             overflow: hidden;
             display: flex; flex-direction: column;
         }
@@ -115,9 +154,8 @@
         /* --- [FIX] MENU INTERFACE --- */
         #menu-interface {
             width: 100%;
-            /* Thêm cuộn riêng cho menu */
             overflow-y: auto;
-            max-height: 80vh; /* Giới hạn chiều cao để không bị tràn */
+            max-height: 80vh;
             scrollbar-width: thin;
         }
         #menu-interface::-webkit-scrollbar { width: 6px; }
@@ -142,8 +180,8 @@
         /* --- [FIX] CHAT INTERFACE --- */
         #chat-interface {
             max-width: 800px; width: 800px;
-            height: 500px; /* Chiều cao cố định */
-            max-height: 100%; /* Không cao hơn popup cha */
+            height: 500px;
+            max-height: 100%;
             display: flex; flex-direction: column;
         }
 
@@ -151,9 +189,20 @@
         .chat-sidebar { width: 300px; height: 100%; border-right: 1px solid var(--popup-border); display: flex; flex-direction: column; background: rgba(0,0,0,0.01); }
         .chat-window { flex: 1; height: 100%; display: flex; flex-direction: column; background: transparent; }
         .chat-item:hover, .chat-item.active { background-color: var(--link-hover-bg); }
+
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+
+        /* Chat Dropdown Menu Override */
+        .chat-sidebar .dropdown-menu {
+            border: 1px solid var(--popup-border);
+            box-shadow: var(--popup-shadow);
+            background-color: var(--popup-bg);
+            backdrop-filter: blur(10px);
+        }
+        .chat-sidebar .dropdown-item { color: var(--text-color); }
+        .chat-sidebar .dropdown-item:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); }
 
         .mobile-nav-btn { display: none; }
         .desktop-nav-element { display: block; }
@@ -251,14 +300,24 @@
 
         const getClientPos = (e) => e.touches ? e.touches[0] : e;
 
+        // --- HÀM DRAG START ---
         const onDragStart = (e) => {
             isDragging = false;
             const pos = getClientPos(e);
             startX = pos.clientX; startY = pos.clientY;
-            const rect = wrapper.getBoundingClientRect();
-            initialLeft = rect.left; initialTop = rect.top;
 
-            wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
+            const rect = wrapper.getBoundingClientRect();
+
+            // Gán cứng vị trí left/top NGAY LẬP TỨC
+            wrapper.style.left = rect.left + 'px';
+            wrapper.style.top = rect.top + 'px';
+
+            initialLeft = rect.left;
+            initialTop = rect.top;
+
+            wrapper.style.bottom = 'auto';
+            wrapper.style.right = 'auto';
+
             wrapper.style.transition = 'none';
             document.body.classList.add('no-select');
             if(isSystemOpen) popup.style.transition = 'none';
@@ -271,7 +330,7 @@
 
         const onDragMove = (e) => {
             const pos = getClientPos(e);
-            if (Math.abs(pos.clientX - startX) > 5 || Math.abs(pos.clientY - startY) > 5) {
+            if (Math.abs(pos.clientX - startX) > 3 || Math.abs(pos.clientY - startY) > 3) {
                 isDragging = true;
                 if(e.cancelable) e.preventDefault();
 

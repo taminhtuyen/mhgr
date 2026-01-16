@@ -24,5 +24,9 @@
     {{-- BONG BÓNG CHÍNH (MAIN BUBBLE) --}}
     <div id="nav-bubble" title="Menu">
         <i class="fa-solid fa-bars" id="bubble-icon"></i>
+
+        {{-- CHẤM ĐỎ BÁO TIN NHẮN CHƯA ĐỌC --}}
+        {{-- Logic: Chỉ hiện khi có tin nhắn chưa đọc. class .main-bubble-badge đã được định nghĩa trong master.blade.php --}}
+        <span class="main-bubble-badge"></span>
     </div>
 </div>

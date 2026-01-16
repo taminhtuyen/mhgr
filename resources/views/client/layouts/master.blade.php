@@ -8,83 +8,104 @@
 
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/all.css') }}" rel="stylesheet">
+    {{-- Thêm Bootstrap JS Bundle để Dropdown hoạt động --}}
+    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
     @livewireStyles
 
     <style>
-        /* --- 1. RESET LAYOUT THEO PHONG CÁCH ADMIN (QUAN TRỌNG) --- */
+        /* --- 1. RESET LAYOUT & FULL WIDTH --- */
         html, body {
-            height: 100%; /* Chiếm toàn bộ chiều cao màn hình */
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Tắt thanh cuộn của trình duyệt */
-            font-family: 'Segoe UI', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            height: 100%; margin: 0; padding: 0; overflow: hidden;
+            font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s;
         }
 
         /* --- 2. MAIN WRAPPER: CHỊU TRÁCH NHIỆM CUỘN --- */
         #main-wrapper {
-            width: 100%;
-            height: 100%; /* Full chiều cao cha */
-            overflow-y: auto; /* Thanh cuộn nằm ở đây */
-            overflow-x: hidden;
-            position: relative;
-            z-index: 1;
-            padding-bottom: 100px; /* Khoảng trống chân trang */
-
-            /* Giúp cuộn mượt hơn trên mobile */
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
+            width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden;
+            position: relative; z-index: 1; padding-bottom: 100px;
+            -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
         }
-
-        /* Tùy chỉnh thanh cuộn cho Main Wrapper đẹp hơn */
         #main-wrapper::-webkit-scrollbar { width: 8px; }
         #main-wrapper::-webkit-scrollbar-track { background: transparent; }
         #main-wrapper::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
 
-        /* --- 3. BIẾN MÀU --- */
+        /* --- 3. BIẾN MÀU (CẬP NHẬT THEO ADMIN - GLASSMORPHISM) --- */
         :root {
+            /* Light Mode */
             --bg-body: #ffffff;
             --text-color: #1e293b;
             --text-muted: #64748b;
+
+            /* Nền trong suốt */
             --popup-bg: rgba(255, 255, 255, 0.95);
             --popup-border: rgba(0, 0, 0, 0.08);
             --popup-shadow: 0 20px 50px rgba(0,0,0,0.12);
+
             --link-hover-bg: #f0f9ff;
             --link-hover-text: #0ea5e9;
             --primary: #0ea5e9;
             --scrollbar-thumb: #cbd5e1;
+
+            /* Input tối hơn nền [MỚI] */
+            --input-darker: #f1f5f9;
         }
+
         body.dark-mode {
+            /* Dark Mode */
             --bg-body: #0f172a;
             --text-color: #f1f5f9;
             --text-muted: #94a3b8;
+
+            /* Nền tối trong suốt */
             --popup-bg: rgba(15, 23, 42, 0.95);
             --popup-border: rgba(255, 255, 255, 0.1);
             --popup-shadow: 0 20px 50px rgba(0,0,0,0.5);
+
             --link-hover-bg: rgba(255, 255, 255, 0.05);
             --link-hover-text: #38bdf8;
             --primary: #38bdf8;
             --scrollbar-thumb: #334155;
+
+            /* Input tối hơn nền [MỚI] */
+            --input-darker: #0b1120;
         }
+
         body { background-color: var(--bg-body); color: var(--text-color); }
         body.no-select { user-select: none; -webkit-user-select: none; }
 
-        /* --- 4. CÁC THÀNH PHẦN NỔI (POPUP/BUBBLES) --- */
-        /* Các thành phần này nằm NGOÀI #main-wrapper nên không bị ảnh hưởng bởi thanh cuộn của wrapper */
+        /* Utility Class */
+        .cursor-pointer { cursor: pointer !important; }
 
+        /* Class hiệu ứng kính mờ (Glassmorphism) [MỚI] */
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* --- 4. CÁC THÀNH PHẦN NỔI (POPUP/BUBBLES) --- */
         #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
         #nav-backdrop.active { opacity: 1; visibility: visible; }
 
-        #bubble-wrapper { position: fixed; bottom: 30px; right: 30px; z-index: 10000; }
+        #bubble-wrapper { position: fixed; bottom: 30px; right: 30px; z-index: 10000; transition: transform 0.1s; }
         #nav-bubble { width: 60px; height: 60px; background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; border-radius: 50%; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4); display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: transform 0.2s; position: relative; z-index: 2; }
         #nav-bubble:hover { transform: scale(1.05); } #nav-bubble:active { transform: scale(0.95); }
+
+        /* Styles cho chấm đỏ thông báo */
+        .main-bubble-badge {
+            position: absolute; top: 0px; right: 0px; width: 18px; height: 18px;
+            background-color: #ef4444; border: 2px solid #fff; border-radius: 50%;
+            display: block; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;
+        }
+        body.dark-mode .main-bubble-badge { border-color: #0f172a; }
+
         .sub-bubbles-container { position: absolute; left: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
         .sub-bubble { width: 45px; height: 45px; background-color: var(--popup-bg); border: 1px solid var(--popup-border); color: var(--text-color); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; opacity: 0; transform: scale(0); transition: all 0.3s; }
         .sub-bubble:hover { background-color: var(--primary); color: #fff; }
         #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
         .badge-counter { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
 
+        /* Popup Container - Có glass-effect */
         #nav-popup {
             position: fixed; z-index: 9999;
             background: var(--popup-bg);
@@ -95,13 +116,7 @@
             opacity: 0; visibility: hidden; transform: scale(0.95);
             transition: opacity 0.2s, transform 0.2s;
             width: max-content; max-width: 95vw;
-
-            /* Popup tự quản lý cuộn nội dung của nó */
-            overflow: hidden;
-            display: flex; flex-direction: column;
-
-            /* Ngăn sự kiện cuộn lan xuống main-wrapper */
-            overscroll-behavior: contain;
+            overflow: hidden; display: flex; flex-direction: column; overscroll-behavior: contain;
         }
         #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
 
@@ -122,6 +137,12 @@
         .chat-window { background: transparent; height: 100%; display: flex; flex-direction: column; }
         .chat-list, .chat-messages { overscroll-behavior: contain; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; } .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+
+        /* Dropdown custom */
+        .chat-sidebar .dropdown-menu { border: 1px solid var(--popup-border); box-shadow: var(--popup-shadow); background-color: var(--popup-bg); backdrop-filter: blur(10px); }
+        .chat-sidebar .dropdown-item { color: var(--text-color); }
+        .chat-sidebar .dropdown-item:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); }
+
         .mobile-nav-btn { display: none; } .desktop-nav-element { display: block; }
 
         @media (max-width: 997.98px) {
@@ -138,7 +159,7 @@
 </head>
 <body>
 
-{{-- CÁC THÀNH PHẦN NỔI (ĐẶT TRƯỚC HOẶC SAU ĐỀU ĐƯỢC VÌ FIXED POS) --}}
+{{-- CÁC THÀNH PHẦN NỔI --}}
 <div id="nav-backdrop"></div>
 @include('client.partials.bubbles')
 
@@ -149,7 +170,7 @@
     @include('client.partials.chat-popup')
 </div>
 
-{{-- VÙNG NỘI DUNG CHÍNH (CÓ SCROLL RIÊNG) --}}
+{{-- VÙNG NỘI DUNG CHÍNH --}}
 <div id="main-wrapper">
     {{ $slot ?? '' }}
     @yield('content')
@@ -173,7 +194,6 @@
         const icon = document.getElementById('bubble-icon');
         const menuInterface = document.getElementById('menu-interface');
         const chatInterface = document.getElementById('chat-interface');
-        // [QUAN TRỌNG] Lấy tham chiếu đến main-wrapper để xử lý scroll
         const mainWrapper = document.getElementById('main-wrapper');
 
         let isDragging = false; let startX, startY, initialLeft, initialTop;
@@ -182,34 +202,70 @@
         const savedPos = localStorage.getItem('client_bubblePos');
         if (savedPos) { const pos = JSON.parse(savedPos); wrapper.style.left = pos.left; wrapper.style.top = pos.top; wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto'; }
         const getClientPos = (e) => e.touches ? e.touches[0] : e;
+
+        // --- HÀM DRAG START ---
         const onDragStart = (e) => {
-            isDragging = false; const pos = getClientPos(e); startX = pos.clientX; startY = pos.clientY;
-            const rect = wrapper.getBoundingClientRect(); initialLeft = rect.left; initialTop = rect.top;
-            wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto'; document.body.classList.add('no-select'); if(isSystemOpen) popup.style.transition = 'none';
-            document.addEventListener('mousemove', onDragMove); document.addEventListener('mouseup', onDragEnd);
-            document.addEventListener('touchmove', onDragMove, { passive: false }); document.addEventListener('touchend', onDragEnd);
+            isDragging = false;
+            const pos = getClientPos(e);
+            startX = pos.clientX; startY = pos.clientY;
+
+            const rect = wrapper.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+
+            wrapper.style.left = rect.left + 'px';
+            wrapper.style.top = rect.top + 'px';
+            wrapper.style.bottom = 'auto';
+            wrapper.style.right = 'auto';
+
+            wrapper.style.transition = 'none';
+            document.body.classList.add('no-select');
+            if(isSystemOpen) popup.style.transition = 'none';
+
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup', onDragEnd);
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('touchend', onDragEnd);
         };
+
         const onDragMove = (e) => {
             const pos = getClientPos(e);
             if (Math.abs(pos.clientX - startX) > 5 || Math.abs(pos.clientY - startY) > 5) {
                 isDragging = true; if(e.cancelable) e.preventDefault();
-                wrapper.style.left = `${initialLeft + (pos.clientX - startX)}px`; wrapper.style.top = `${initialTop + (pos.clientY - startY)}px`;
-                wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
+
+                let newLeft = initialLeft + (pos.clientX - startX);
+                let newTop = initialTop + (pos.clientY - startY);
+
+                const maxLeft = window.innerWidth - wrapper.offsetWidth;
+                const maxTop = window.innerHeight - wrapper.offsetHeight;
+                newLeft = Math.min(Math.max(0, newLeft), maxLeft);
+                newTop = Math.min(Math.max(0, newTop), maxTop);
+
+                wrapper.style.left = `${newLeft}px`;
+                wrapper.style.top = `${newTop}px`;
+
                 if (isSystemOpen) { expandBubblesVisual(); positionPopup(currentMode); }
             }
         };
+
         const onDragEnd = () => {
             document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd);
             document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', onDragEnd);
-            document.body.classList.remove('no-select'); popup.style.transition = 'opacity 0.2s, transform 0.2s';
-            if (isDragging) localStorage.setItem('client_bubblePos', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top }));
+            document.body.classList.remove('no-select');
+
+            popup.style.transition = 'opacity 0.2s, transform 0.2s';
+            wrapper.style.transition = 'transform 0.1s';
+
+            if (isDragging) {
+                localStorage.setItem('client_bubblePos', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top }));
+                setTimeout(() => { isDragging = false; }, 50);
+            }
         };
+
         mainBubble.addEventListener('mousedown', onDragStart); mainBubble.addEventListener('touchstart', onDragStart, { passive: false });
         mainBubble.onclick = (e) => { if (isDragging) return; if (e.cancelable && e.type === 'touchend') e.preventDefault(); if (isSystemOpen) closeAll(); else openAll('menu'); };
 
-        // --- 3. OPEN/CLOSE LOGIC (KHÔNG CẦN LOCK SCROLL NỮA) ---
-        // Vì scroll thuộc về main-wrapper, việc mở popup (fixed) bên trên nó
-        // sẽ không làm main-wrapper bị mất thanh cuộn -> Không giật layout.
+        // --- 3. OPEN/CLOSE LOGIC ---
         function openAll(mode) {
             isSystemOpen = true; currentMode = mode;
             expandBubblesVisual(); openPopupContent(mode);
@@ -222,7 +278,7 @@
             icon.classList.replace('fa-xmark', 'fa-bars'); backdrop.classList.remove('active');
         }
 
-        // --- CÁC HÀM TÍNH TOÁN VỊ TRÍ (GIỮ NGUYÊN) ---
+        // --- CÁC HÀM TÍNH TOÁN VỊ TRÍ ---
         function expandBubblesVisual() {
             const rect = wrapper.getBoundingClientRect(); const screenW = window.innerWidth; const screenH = window.innerHeight; const isMobile = screenW < 998;
             subBubblesContainer.style.cssText = ''; subBubblesContainer.style.position = 'absolute'; subBubblesContainer.style.width = 'max-content'; subBubblesContainer.style.height = '60px'; subBubblesContainer.style.display = 'flex'; subBubblesContainer.style.gap = '10px'; subBubblesContainer.style.pointerEvents = 'none';
@@ -266,8 +322,6 @@
             }
         }
 
-        // --- 4. SCROLL BUTTONS (UPDATE) ---
-        // Thay vì window.scrollTo, ta phải scroll mainWrapper
         const btnTop = document.getElementById('btn-scroll-top');
         const btnBottom = document.getElementById('btn-scroll-bottom');
         const btnChat = document.getElementById('btn-open-chat');
@@ -284,7 +338,6 @@
 
         backdrop.addEventListener('click', closeAll);
 
-        // Resize logic
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);

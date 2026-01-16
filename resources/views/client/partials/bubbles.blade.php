@@ -5,9 +5,10 @@
             <i class="fa-solid fa-arrow-up"></i>
         </div>
 
-        {{-- Chat hỗ trợ --}}
-        <div class="sub-bubble" id="btn-open-chat" title="Hỗ trợ">
-            <i class="fa-solid fa-headset"></i>
+        {{-- Nút Chat (Đã đổi icon thành comments để giống Admin) --}}
+        <div class="sub-bubble" id="btn-open-chat" title="Tin nhắn">
+            <i class="fa-solid fa-comments"></i>
+            {{-- Badge đếm số tin nhắn chưa đọc --}}
             <span class="badge-counter">1</span>
         </div>
 
@@ -20,5 +21,8 @@
     {{-- Bong bóng chính --}}
     <div id="nav-bubble" title="Menu">
         <i class="fa-solid fa-bars" id="bubble-icon"></i>
+
+        {{-- CHẤM ĐỎ BÁO TIN NHẮN --}}
+        <span class="main-bubble-badge"></span>
     </div>
 </div>
