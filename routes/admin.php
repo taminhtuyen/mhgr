@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Events\SystemNotification; // Import sự kiện thông báo
 
 // --- IMPORT CONTROLLERS ---
 use App\Http\Controllers\Admin\DashboardController;
@@ -59,6 +60,13 @@ use App\Http\Controllers\Admin\SystemLogController;
 | Ví dụ: admin.sales.orders.index
 */
 
+// --- ROUTE TEST THÔNG BÁO REAL-TIME (Chạy thử: /admin/test-notification) ---
+Route::get('/test-notification', function () {
+    $message = "Hệ thống: Có đơn hàng mới #MB" . rand(1000, 9999) . " vừa được tạo lúc " . date('H:i:s');
+    event(new SystemNotification($message));
+    return "<h1>Đã gửi thông báo: $message</h1><p>Hãy kiểm tra Tab Admin Dashboard.</p>";
+});
+
 // Dashboard (Không thuộc nhóm nào)
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -104,7 +112,7 @@ Route::prefix('finance')->name('finance.')->group(function () {
 // 5. NHÓM KÝ GỬI (Consignment)
 // URL: /admin/consignment/... | Name: admin.consignment....
 Route::prefix('consignment')->name('consignment.')->group(function () {
-    Route::resource('orders', ConsignmentController::class); // Đặt tên resource là 'orders' cho ngắn gọn trong nhóm này
+    Route::resource('orders', ConsignmentController::class);
     Route::resource('customers', ConsignmentCustomerController::class);
 });
 

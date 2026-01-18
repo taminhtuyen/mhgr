@@ -1,66 +1,64 @@
 <div id="chat-interface" class="d-none">
 
     <style>
-        /* --- 1. Tinh chỉnh màu sắc Placeholder & Metadata --- */
+        /* --- CHAT MODULE CSS --- */
+
+        /* 1. Layout & Scrollbars */
+        #chat-interface { max-width: 800px; width: 800px; height: 500px; max-height: 100%; display: flex; flex-direction: column; }
+        .chat-layout { position: relative; width: 100%; height: 100%; display: flex; overflow: hidden; }
+        .chat-sidebar { width: 300px; background: rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; }
+        .chat-window { background: transparent; height: 100%; display: flex; flex-direction: column; }
+        .chat-list, .chat-messages { overscroll-behavior: contain; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+
+        /* 2. Colors & Inputs */
         .chat-search-input::placeholder { color: var(--text-muted); opacity: 0.8; }
         .msg-meta { font-size: 0.65rem; margin-top: 4px; color: var(--text-muted); font-weight: 500; }
-        body.dark-mode .msg-meta { color: #94a3b8; } /* Sáng hơn trong darkmode */
+        body.dark-mode .msg-meta { color: #94a3b8; }
 
-        /* --- 2. Custom Tabs --- */
-        .nav-tabs-custom .nav-link {
-            color: var(--text-muted); border: none; border-bottom: 2px solid transparent;
-            font-size: 0.85rem; font-weight: 600; padding: 10px 0; margin-right: 20px; background: transparent;
-        }
+        /* 3. Custom Tabs */
+        .nav-tabs-custom .nav-link { color: var(--text-muted); border: none; border-bottom: 2px solid transparent; font-size: 0.85rem; font-weight: 600; padding: 10px 0; margin-right: 20px; background: transparent; }
         .nav-tabs-custom .nav-link:hover { color: var(--primary); }
-        .nav-tabs-custom .nav-link.active {
-            color: var(--primary); background: transparent; border-bottom: 2px solid var(--primary);
-        }
+        .nav-tabs-custom .nav-link.active { color: var(--primary); background: transparent; border-bottom: 2px solid var(--primary); }
 
-        /* --- 3. Nút 3 chấm (Actions) --- */
-        .chat-actions-btn {
-            position: absolute; top: 50%; right: 10px; transform: translateY(-50%); z-index: 10;
-        }
-        .chat-actions-btn .btn-icon {
-            color: #94a3b8; background: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(0,0,0,0.05); transition: all 0.2s;
-            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-        }
+        /* 4. Action Buttons (3 dots) */
+        .chat-actions-btn { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); z-index: 10; }
+        .chat-actions-btn .btn-icon { color: #94a3b8; background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0,0,0,0.05); transition: all 0.2s; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .chat-actions-btn .btn-icon:hover { color: var(--primary); background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         body.dark-mode .chat-actions-btn .btn-icon { color: #cbd5e1; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.1); }
         body.dark-mode .chat-actions-btn .btn-icon:hover { background: var(--primary); color: #fff; }
 
-        /* --- 4. Nút Back Mobile (Bo tròn đẹp hơn) --- */
-        .btn-back-mobile {
-            width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50% !important; /* Tròn hoàn hảo */
-            padding: 0;
-            background-color: var(--bg-body);
-            border: 1px solid var(--popup-border);
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-        .btn-back-mobile:hover {
-            color: var(--primary);
-            border-color: var(--primary);
-            background-color: var(--link-hover-bg);
-            transform: translateX(-2px);
-        }
+        /* 5. Mobile Navigation */
+        .btn-back-mobile { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50% !important; padding: 0; background-color: var(--bg-body); border: 1px solid var(--popup-border); color: var(--text-muted); transition: all 0.2s; }
+        .btn-back-mobile:hover { color: var(--primary); border-color: var(--primary); background-color: var(--link-hover-bg); transform: translateX(-2px); }
+        .mobile-nav-btn { display: none; } .desktop-nav-element { display: block; }
 
-        /* Helpers */
-        .no-arrow::after { display: none; }
-        .dropdown-menu.show { z-index: 10050 !important; }
+        .chat-sidebar .dropdown-menu { border: 1px solid var(--popup-border); box-shadow: var(--popup-shadow); background-color: var(--popup-bg); backdrop-filter: blur(10px); }
+        .chat-sidebar .dropdown-item { color: var(--text-color); }
+        .chat-sidebar .dropdown-item:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); }
+        .no-arrow::after { display: none; } .dropdown-menu.show { z-index: 10050 !important; }
+
+        /* Mobile Responsive Logic */
+        @media (max-width: 997.98px) {
+            #chat-interface { width: 100% !important; height: 70vh !important; max-width: none !important; }
+            .chat-sidebar { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 2; background: var(--popup-bg); transition: transform 0.3s; transform: translateX(0); }
+            .chat-window { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 2; background: var(--popup-bg); transition: transform 0.3s; transform: translateX(100%); }
+            #chat-interface.in-conversation .chat-sidebar { transform: translateX(-100%); }
+            #chat-interface.in-conversation .chat-window { transform: translateX(0); }
+            .mobile-nav-btn { display: block !important; } .desktop-nav-element { display: none !important; }
+        }
     </style>
 
     <div class="chat-layout h-100 d-flex overflow-hidden">
 
         {{-- ========================================================= --}}
-        {{-- CỘT TRÁI: DANH SÁCH --}}
+        {{-- CỘT TRÁI: DANH SÁCH (DEMO FULL DATA) --}}
         {{-- ========================================================= --}}
         <div class="chat-sidebar d-flex flex-column border-end h-100" id="chat-list-col" style="border-color: var(--popup-border) !important;">
 
-            {{-- HEADER --}}
+            {{-- HEADER SIDEBAR --}}
             <div class="p-3 border-bottom flex-shrink-0" style="border-color: var(--popup-border) !important;">
                 <div class="d-flex align-items-center mb-3">
                     <div class="dropdown me-2">
@@ -98,7 +96,7 @@
                     {{-- TAB 1: NGƯỜI BÁN (Seller) --}}
                     <div class="tab-pane fade show active" id="seller-pane" role="tabpanel">
                         @for($k = 1; $k <= 3; $k++)
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative {{ $k == 1 ? 'active' : '' }}" onclick="openChat('seller_{{ $k }}')">
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative {{ $k == 1 ? 'active' : '' }}" onclick="openChatDetail('seller_{{ $k }}')">
                             <div class="flex-shrink-0 position-relative">
                                 <img src="https://ui-avatars.com/api/?name=Seller+{{ $k }}&background=0ea5e9&color=fff" class="rounded-circle me-2" width="45" height="45">
                             </div>
@@ -128,7 +126,7 @@
                     {{-- TAB 2: NGƯỜI MUA (Buyer) --}}
                     <div class="tab-pane fade" id="buyer-pane" role="tabpanel">
                         @for($i = 1; $i <= 5; $i++)
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChat('buyer_{{ $i }}')">
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChatDetail('buyer_{{ $i }}')">
                             <div class="flex-shrink-0 position-relative">
                                 <img src="https://ui-avatars.com/api/?name=Buyer+{{ $i }}&background=random" class="rounded-circle me-2" width="45" height="45">
                                 <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle" style="margin-bottom: 2px; margin-right: 8px;"></span>
@@ -163,7 +161,7 @@
                         {{-- 1. TIN NHẮN HỆ THỐNG CHÍNH --}}
                         <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative"
                              style="border-bottom: 1px solid var(--popup-border); background-color: rgba(var(--primary), 0.03);"
-                             onclick="openChat('system_main')">
+                             onclick="openChatDetail('system_main')">
                             <div class="flex-shrink-0 position-relative">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white"
                                      style="width: 45px; height: 45px; background: linear-gradient(45deg, #ff416c, #ff4b2b);">
@@ -181,7 +179,7 @@
 
                         {{-- 2. DANH SÁCH NHÂN VIÊN --}}
                         @for($s = 1; $s <= 3; $s++)
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChat('staff_{{ $s }}')">
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChatDetail('staff_{{ $s }}')">
                             <div class="flex-shrink-0 position-relative">
                                 <img src="https://ui-avatars.com/api/?name=Staff+{{ $s }}&background=64748b&color=fff" class="rounded-circle me-2" width="45" height="45">
                                 <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle" style="margin-bottom: 2px; margin-right: 8px;"></span>
@@ -215,15 +213,15 @@
         </div>
 
         {{-- ========================================================= --}}
-        {{-- CỘT PHẢI: CỬA SỔ CHAT --}}
+        {{-- CỘT PHẢI: CỬA SỔ CHAT (DEMO FULL DATA) --}}
         {{-- ========================================================= --}}
         <div class="chat-window flex-grow-1 d-flex flex-column h-100" id="chat-content-col">
 
-            {{-- HEADER --}}
+            {{-- HEADER WINDOW --}}
             <div class="chat-header p-3 border-bottom d-flex align-items-center flex-shrink-0"
                  style="background: var(--popup-bg); backdrop-filter: blur(5px); border-color: var(--popup-border) !important; z-index: 5;">
 
-                {{-- Nút Back Mobile (Đã sửa: Bo tròn) --}}
+                {{-- Nút Back Mobile --}}
                 <button class="btn btn-back-mobile me-3 mobile-nav-btn shadow-sm" onclick="backToChatList()">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
@@ -242,7 +240,7 @@
                 </div>
             </div>
 
-            {{-- MESSAGES --}}
+            {{-- MESSAGES LIST --}}
             <div class="chat-messages flex-grow-1 p-3 overflow-auto custom-scrollbar bg-transparent">
                 @for($j = 1; $j <= 3; $j++)
                 {{-- A. Người khác gửi (Seller) --}}
@@ -279,7 +277,7 @@
                 @endfor
             </div>
 
-            {{-- INPUT --}}
+            {{-- INPUT AREA --}}
             <div class="chat-input-area p-3 border-top flex-shrink-0"
                  style="background: var(--popup-bg); border-color: var(--popup-border) !important; z-index: 5;">
                 <div class="input-group">
@@ -298,3 +296,32 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- CHAT LOGIC ---
+        const chatInterface = document.getElementById('chat-interface');
+
+        // Hàm mở chi tiết chat (Demo: chỉ cần thêm class để mobile hiển thị đè lên)
+        window.openChatDetail = function(id) {
+            chatInterface.classList.add('in-conversation');
+            console.log("Opening chat with ID:", id); // Log để debug sau này
+        }
+
+        // Hàm quay lại danh sách (Cho Mobile)
+        window.backToChatList = function() {
+            chatInterface.classList.remove('in-conversation');
+        }
+
+        // --- EXPORT RENDER FUNCTION ---
+        // Hàm này được gọi từ bubbles.blade.php khi click vào bong bóng Chat
+        window.renderChatContent = function() {
+            const menuInterface = document.getElementById('menu-interface');
+            const chatInterface = document.getElementById('chat-interface');
+
+            // Ẩn Menu, Hiện Chat
+            if(menuInterface) menuInterface.classList.add('d-none');
+            if(chatInterface) chatInterface.classList.remove('d-none');
+        }
+    });
+</script>

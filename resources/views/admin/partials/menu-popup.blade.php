@@ -1,98 +1,323 @@
-<div class="popup-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-    <div class="h5 mb-0 fw-bold" style="color: var(--text-color);">
-        <i class="fa-solid fa-bars-staggered me-2"></i>MENU QUẢN TRỊ
+{{-- 1. THƯ VIỆN SORTABLE (LOCAL) --}}
+<script src="{{ asset('js/Sortable.min.js') }}"></script>
+
+<div id="menu-interface" class="d-none">
+    {{-- HEADER MENU --}}
+    <div class="popup-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div class="h5 mb-0 fw-bold d-flex align-items-center" style="color: var(--text-color);">
+            <i class="fa-solid fa-bars-staggered me-2"></i>MENU
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            {{-- NÚT RESET VỊ TRÍ --}}
+            <div class="view-switcher cursor-pointer" id="admin-btn-reset-ask" title="Khôi phục vị trí mặc định">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+            </div>
+
+            {{-- VIEW SWITCHER --}}
+            <div class="view-switcher cursor-pointer" id="admin-btn-switch-view" title="Đổi giao diện">
+                <i class="fa-solid fa-list" id="admin-icon-view-mode"></i>
+            </div>
+
+            {{-- THEME SWITCH --}}
+            <div class="theme-switch-wrapper">
+                <label for="theme" class="theme">
+                    <span class="theme__toggle-wrap">
+                        <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark">
+                        <span class="theme__icon">
+                            <span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span>
+                            <span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span>
+                        </span>
+                    </span>
+                </label>
+            </div>
+        </div>
     </div>
 
-    {{-- SWITCH BUTTON NGÀY ĐÊM (NEW DESIGN) --}}
-    <div class="theme-switch-wrapper">
-        <label for="theme" class="theme">
-            <span class="theme__toggle-wrap">
-                <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark">
-                {{-- Icon Mặt trời / Mặt trăng --}}
-                <span class="theme__icon">
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                    <span class="theme__icon-part"></span>
-                </span>
-            </span>
-        </label>
+    {{-- CONTAINER CHÍNH --}}
+    <div class="menu-main-wrapper view-mode-list" id="admin-menu-container">
+        {{-- === NHÓM 1: TỔNG QUAN === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-primary">TỔNG QUAN</div>
+            <div class="menu-items-container" data-group-id="overview">
+                <a href="{{ route('admin.dashboard') }}" class="menu-link" data-id="dashboard"><i class="fa-solid fa-gauge"></i> <span>Tổng Quan</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 2: BÁN HÀNG === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-success">BÁN HÀNG</div>
+            <div class="menu-items-container" data-group-id="sales">
+                <a href="{{ route('admin.sales.orders.index') }}" class="menu-link" data-id="orders"><i class="fa-solid fa-cart-shopping"></i> <span>Đơn Hàng</span></a>
+                <a href="{{ route('admin.sales.deliveries.index') }}" class="menu-link" data-id="deliveries"><i class="fa-solid fa-truck"></i> <span>Vận Chuyển</span></a>
+                <a href="{{ route('admin.sales.returns.index') }}" class="menu-link" data-id="returns"><i class="fa-solid fa-rotate-left"></i> <span>Trả Hàng</span></a>
+                <a href="{{ route('admin.sales.invoices.index') }}" class="menu-link" data-id="invoices"><i class="fa-solid fa-file-invoice"></i> <span>Hóa Đơn</span></a>
+                <a href="{{ route('admin.sales.carts.index') }}" class="menu-link" data-id="carts"><i class="fa-solid fa-cart-arrow-down"></i> <span>Giỏ Treo</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 3: HỆ THỐNG === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-dark">HỆ THỐNG</div>
+            <div class="menu-items-container" data-group-id="system">
+                <a href="{{ route('admin.system.settings.index') }}" class="menu-link" data-id="settings"><i class="fa-solid fa-gear"></i> <span>Cài Đặt</span></a>
+                <a href="{{ route('admin.system.users.index') }}" class="menu-link" data-id="users"><i class="fa-solid fa-user-shield"></i> <span>Quản Trị</span></a>
+                <a href="{{ route('admin.system.roles.index') }}" class="menu-link" data-id="roles"><i class="fa-solid fa-user-lock"></i> <span>Phân Quyền</span></a>
+                <a href="{{ route('admin.system.locations.index') }}" class="menu-link" data-id="locations"><i class="fa-solid fa-map-location-dot"></i> <span>Vị Trí</span></a>
+                <a href="{{ route('admin.system.logs.index') }}" class="menu-link" data-id="logs"><i class="fa-solid fa-terminal"></i> <span>Logs</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 4: SẢN PHẨM === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-warning">SẢN PHẨM</div>
+            <div class="menu-items-container" data-group-id="products">
+                <a href="{{ route('admin.catalog.products.index') }}" class="menu-link" data-id="products_list"><i class="fa-solid fa-box-open"></i> <span>Sản Phẩm</span></a>
+                <a href="{{ route('admin.catalog.categories.index') }}" class="menu-link" data-id="categories"><i class="fa-solid fa-layer-group"></i> <span>Danh Mục</span></a>
+                <a href="{{ route('admin.catalog.attributes.index') }}" class="menu-link" data-id="attributes"><i class="fa-solid fa-tags"></i> <span>Thuộc Tính</span></a>
+                <a href="{{ route('admin.catalog.suppliers.index') }}" class="menu-link" data-id="suppliers"><i class="fa-solid fa-handshake"></i> <span>Nhà Cung Cấp</span></a>
+                <a href="{{ route('admin.catalog.reviews.index') }}" class="menu-link" data-id="reviews"><i class="fa-solid fa-star"></i> <span>Đánh Giá</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 5: KHO HÀNG === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-danger">KHO HÀNG</div>
+            <div class="menu-items-container" data-group-id="inventory">
+                <a href="{{ route('admin.inventory.stocks.index') }}" class="menu-link" data-id="stocks"><i class="fa-solid fa-cubes"></i> <span>Tồn Kho</span></a>
+                <a href="{{ route('admin.inventory.warehouses.index') }}" class="menu-link" data-id="warehouses"><i class="fa-solid fa-warehouse"></i> <span>Danh Sách Kho</span></a>
+                <a href="{{ route('admin.inventory.purchase-orders.index') }}" class="menu-link" data-id="po"><i class="fa-solid fa-file-import"></i> <span>Nhập (PO)</span></a>
+                <a href="{{ route('admin.inventory.transactions.index') }}" class="menu-link" data-id="transactions"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch Sử Kho</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 6: TÀI CHÍNH === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-primary">TÀI CHÍNH</div>
+            <div class="menu-items-container" data-group-id="finance">
+                <a href="{{ route('admin.finance.profits.index') }}" class="menu-link" data-id="profits"><i class="fa-solid fa-percent"></i> <span>Lợi Nhuận</span></a>
+                <a href="{{ route('admin.finance.wallets.index') }}" class="menu-link" data-id="wallets"><i class="fa-solid fa-wallet"></i> <span>Ví Tiền</span></a>
+                <a href="{{ route('admin.finance.commissions.index') }}" class="menu-link" data-id="commissions"><i class="fa-solid fa-money-bill-transfer"></i> <span>Hoa Hồng</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 7: KÝ GỬI === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-secondary">KÝ GỬI</div>
+            <div class="menu-items-container" data-group-id="consignment">
+                <a href="{{ route('admin.consignment.orders.index') }}" class="menu-link" data-id="consignment_orders"><i class="fa-solid fa-clipboard-list"></i> <span>Đơn Ký Gửi</span></a>
+                <a href="{{ route('admin.consignment.customers.index') }}" class="menu-link" data-id="consignment_customers"><i class="fa-solid fa-users-rectangle"></i> <span>Khách Ký Gửi</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 8: MARKETING === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-info">MARKETING</div>
+            <div class="menu-items-container" data-group-id="marketing">
+                <a href="{{ route('admin.marketing.promotions.index') }}" class="menu-link" data-id="promotions"><i class="fa-solid fa-bullhorn"></i> <span>Chiến Dịch</span></a>
+                <a href="{{ route('admin.marketing.coupons.index') }}" class="menu-link" data-id="coupons"><i class="fa-solid fa-ticket"></i> <span>Voucher</span></a>
+                <a href="{{ route('admin.marketing.flash-sales.index') }}" class="menu-link" data-id="flash"><i class="fa-solid fa-bolt"></i> <span>Flash Sale</span></a>
+                <a href="{{ route('admin.marketing.affiliates.index') }}" class="menu-link" data-id="affiliates"><i class="fa-solid fa-network-wired"></i> <span>Affiliate</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 9: NỘI DUNG === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-secondary">NỘI DUNG</div>
+            <div class="menu-items-container" data-group-id="content">
+                <a href="{{ route('admin.content.posts.index') }}" class="menu-link" data-id="posts"><i class="fa-solid fa-newspaper"></i> <span>Tin Tức</span></a>
+                <a href="{{ route('admin.content.banners.index') }}" class="menu-link" data-id="banners"><i class="fa-solid fa-image"></i> <span>Banner</span></a>
+                <a href="{{ route('admin.content.menus.index') }}" class="menu-link" data-id="menus"><i class="fa-solid fa-bars"></i> <span>Menu Web</span></a>
+                <a href="{{ route('admin.content.pages.index') }}" class="menu-link" data-id="pages"><i class="fa-solid fa-file-lines"></i> <span>Trang Tĩnh</span></a>
+                <a href="{{ route('admin.content.images.index') }}" class="menu-link" data-id="images"><i class="fa-solid fa-images"></i> <span>Thư Viện</span></a>
+                <a href="{{ route('admin.content.game-subjects.index') }}" class="menu-link" data-id="games"><i class="fa-solid fa-gamepad"></i> <span>Game/Học</span></a>
+            </div>
+        </div>
+        {{-- === NHÓM 10: KHÁCH HÀNG (CRM) === --}}
+        <div class="menu-group-box">
+            <div class="group-title text-warning">KHÁCH HÀNG (CRM)</div>
+            <div class="menu-items-container" data-group-id="crm">
+                <a href="{{ route('admin.crm.customers.index') }}" class="menu-link" data-id="customers"><i class="fa-solid fa-user-group"></i> <span>Khách Hàng</span></a>
+                <a href="{{ route('admin.crm.chats.index') }}" class="menu-link" data-id="chats"><i class="fa-solid fa-comments"></i> <span>Hội Thoại</span></a>
+                <a href="{{ route('admin.crm.requests.index') }}" class="menu-link" data-id="requests"><i class="fa-solid fa-envelope-open-text"></i> <span>Yêu Cầu</span></a>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="popup-grid">
-    {{-- CỘT 1: TỔNG QUAN & BÁN HÀNG & HỆ THỐNG --}}
-    <div class="menu-column">
-        <div class="group-title text-primary">TỔNG QUAN</div>
-        <a href="{{ route('admin.dashboard') }}" class="menu-link"><i class="fa-solid fa-gauge"></i> Tổng Quan</a>
+<style>
+    /* 1. LAYOUT CHUNG & SCROLL */
+    #menu-interface { width: 100%; overflow-y: auto; max-height: 80vh; scrollbar-width: thin; overscroll-behavior: contain; }
+    #menu-interface::-webkit-scrollbar { width: 6px; }
+    #menu-interface::-webkit-scrollbar-track { background: transparent; }
+    #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
+    .popup-header { padding: 15px 25px 0 25px; border-bottom: 1px solid var(--popup-border); }
 
-        <div class="group-title text-success group-spacer">BÁN HÀNG</div>
-        <a href="{{ route('admin.sales.orders.index') }}" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> Đơn Hàng</a>
-        <a href="{{ route('admin.sales.deliveries.index') }}" class="menu-link"><i class="fa-solid fa-truck"></i> Vận Chuyển</a>
-        <a href="{{ route('admin.sales.returns.index') }}" class="menu-link"><i class="fa-solid fa-rotate-left"></i> Trả Hàng</a>
-        <a href="{{ route('admin.sales.invoices.index') }}" class="menu-link"><i class="fa-solid fa-file-invoice"></i> Hóa Đơn</a>
-        <a href="{{ route('admin.sales.carts.index') }}" class="menu-link"><i class="fa-solid fa-cart-arrow-down"></i> Giỏ Hàng Treo</a>
+    /* 2. CẤU TRÚC CONTAINER CHÍNH */
+    .menu-main-wrapper { padding: 25px; gap: 20px; }
+    .menu-group-box { display: flex; flex-direction: column; margin-bottom: 5px; }
 
-        <div class="group-title text-dark group-spacer">HỆ THỐNG</div>
-        <a href="{{ route('admin.system.settings.index') }}" class="menu-link"><i class="fa-solid fa-gear"></i> Cài Đặt</a>
-        <a href="{{ route('admin.system.users.index') }}" class="menu-link"><i class="fa-solid fa-user-shield"></i> Quản Trị Viên</a>
-        <a href="{{ route('admin.system.roles.index') }}" class="menu-link"><i class="fa-solid fa-user-lock"></i> Phân Quyền</a>
-        <a href="{{ route('admin.system.locations.index') }}" class="menu-link"><i class="fa-solid fa-map-location-dot"></i> Vị Trí</a>
-        <a href="{{ route('admin.system.logs.index') }}" class="menu-link"><i class="fa-solid fa-terminal"></i> Logs</a>
-    </div>
+    /* Tiêu đề nhóm */
+    .group-title {
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px;
+        padding-bottom: 4px; border-bottom: 2px solid rgba(0,0,0,0.03);
+    }
+    body.dark-mode .group-title { border-bottom-color: rgba(255,255,255,0.05); }
 
-    {{-- CỘT 2: SẢN PHẨM & KHO --}}
-    <div class="menu-column">
-        <div class="group-title text-warning">SẢN PHẨM</div>
-        <a href="{{ route('admin.catalog.products.index') }}" class="menu-link"><i class="fa-solid fa-box-open"></i> Danh Sách SP</a>
-        <a href="{{ route('admin.catalog.categories.index') }}" class="menu-link"><i class="fa-solid fa-layer-group"></i> Danh Mục</a>
-        <a href="{{ route('admin.catalog.attributes.index') }}" class="menu-link"><i class="fa-solid fa-tags"></i> Thuộc Tính</a>
-        <a href="{{ route('admin.catalog.suppliers.index') }}" class="menu-link"><i class="fa-solid fa-handshake"></i> Nhà Cung Cấp</a>
-        <a href="{{ route('admin.catalog.reviews.index') }}" class="menu-link"><i class="fa-solid fa-star"></i> Đánh Giá</a>
+    /* 3. MENU ITEMS CONTAINER */
+    .menu-items-container { min-height: 10px; }
 
-        <div class="group-title text-danger group-spacer">KHO HÀNG</div>
-        <a href="{{ route('admin.inventory.stocks.index') }}" class="menu-link"><i class="fa-solid fa-cubes"></i> Tồn Kho</a>
-        <a href="{{ route('admin.inventory.warehouses.index') }}" class="menu-link"><i class="fa-solid fa-warehouse"></i> Danh Sách Kho</a>
-        <a href="{{ route('admin.inventory.purchase-orders.index') }}" class="menu-link"><i class="fa-solid fa-file-import"></i> Nhập Hàng (PO)</a>
-        <a href="{{ route('admin.inventory.transactions.index') }}" class="menu-link"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Kho</a>
-    </div>
+    /* ====== MODE 1: LIST VIEW ====== */
+    .view-mode-list { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .view-mode-list .menu-group-box { break-inside: avoid; margin-bottom: 0; }
+    .view-mode-list .menu-items-container { display: flex; flex-direction: column; gap: 4px; }
+    .view-mode-list .menu-link {
+        display: flex; align-items: center; padding: 8px 12px;
+        color: var(--text-color); text-decoration: none; border-radius: 8px;
+        font-weight: 500; font-size: 0.95rem; transition: background 0.2s, transform 0.2s; white-space: nowrap;
+    }
+    .view-mode-list .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateX(4px); }
+    .view-mode-list .menu-link i { width: 24px; color: var(--text-muted); margin-right: 8px; text-align: center; transition: color 0.2s; }
+    .view-mode-list .menu-link:hover i { color: var(--link-hover-text); }
+    @media (max-width: 998px) { .view-mode-list { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px) { .view-mode-list { grid-template-columns: 1fr; } }
 
-    {{-- CỘT 3: TÀI CHÍNH & KÝ GỬI & MARKETING --}}
-    <div class="menu-column">
-        <div class="group-title text-primary">TÀI CHÍNH</div>
-        <a href="{{ route('admin.finance.profits.index') }}" class="menu-link"><i class="fa-solid fa-percent"></i> Chia Lợi Nhuận</a>
-        <a href="{{ route('admin.finance.wallets.index') }}" class="menu-link"><i class="fa-solid fa-wallet"></i> Ví Tiền</a>
-        <a href="{{ route('admin.finance.commissions.index') }}" class="menu-link"><i class="fa-solid fa-money-bill-transfer"></i> Hoa Hồng</a>
+    /* ====== MODE 2: GRID VIEW ====== */
+    .view-mode-grid { display: block; }
+    .view-mode-grid .menu-group-box { margin-bottom: 25px; width: 100%; }
+    .view-mode-grid .menu-items-container { display: flex; flex-wrap: wrap; gap: 15px; }
 
-        <div class="group-title text-secondary group-spacer">KÝ GỬI</div>
-        <a href="{{ route('admin.consignment.orders.index') }}" class="menu-link"><i class="fa-solid fa-clipboard-list"></i> Đơn Ký Gửi</a>
-        <a href="{{ route('admin.consignment.customers.index') }}" class="menu-link"><i class="fa-solid fa-users-rectangle"></i> Khách Ký Gửi</a>
+    .view-mode-grid .menu-link {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 10px 5px; color: var(--text-color); text-decoration: none; border-radius: 12px;
+        transition: all 0.2s; text-align: center; width: 90px; height: 90px;
+        background: rgba(127, 127, 127, 0.05); border: 1px solid transparent;
+    }
+    .view-mode-grid .menu-link:hover {
+        background-color: var(--link-hover-bg); color: var(--link-hover-text);
+        transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-color: var(--popup-border);
+    }
+    .view-mode-grid .menu-link i { font-size: 28px; margin-bottom: 8px; color: var(--primary); margin-right: 0; width: auto; }
+    .view-mode-grid .menu-link span {
+        font-size: 0.75rem; font-weight: 600; line-height: 1.1;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        overflow: hidden; max-width: 100%; padding: 0 2px;
+    }
 
-        <div class="group-title text-info group-spacer">MARKETING</div>
-        <a href="{{ route('admin.marketing.promotions.index') }}" class="menu-link"><i class="fa-solid fa-bullhorn"></i> Chiến Dịch</a>
-        <a href="{{ route('admin.marketing.coupons.index') }}" class="menu-link"><i class="fa-solid fa-ticket"></i> Mã Giảm Giá</a>
-        <a href="{{ route('admin.marketing.flash-sales.index') }}" class="menu-link"><i class="fa-solid fa-bolt"></i> Flash Sale</a>
-        <a href="{{ route('admin.marketing.affiliates.index') }}" class="menu-link"><i class="fa-solid fa-network-wired"></i> Affiliate</a>
-    </div>
+    /* DRAG & DROP EFFECTS */
+    .sortable-ghost { opacity: 0.4; background: var(--link-hover-bg); border: 1px dashed var(--primary); }
+    .sortable-drag { cursor: grabbing; opacity: 1; background: var(--popup-bg); box-shadow: 0 10px 20px rgba(0,0,0,0.2); transform: scale(1.05); }
 
-    {{-- CỘT 4: NỘI DUNG & CRM --}}
-    <div class="menu-column">
-        <div class="group-title text-secondary">NỘI DUNG</div>
-        <a href="{{ route('admin.content.posts.index') }}" class="menu-link"><i class="fa-solid fa-newspaper"></i> Tin Tức</a>
-        <a href="{{ route('admin.content.banners.index') }}" class="menu-link"><i class="fa-solid fa-image"></i> Banner</a>
-        <a href="{{ route('admin.content.menus.index') }}" class="menu-link"><i class="fa-solid fa-bars"></i> Menu Web</a>
-        <a href="{{ route('admin.content.pages.index') }}" class="menu-link"><i class="fa-solid fa-file-lines"></i> Trang Tĩnh</a>
-        <a href="{{ route('admin.content.images.index') }}" class="menu-link"><i class="fa-solid fa-images"></i> Thư Viện Ảnh</a>
-        <a href="{{ route('admin.content.game-subjects.index') }}" class="menu-link"><i class="fa-solid fa-gamepad"></i> Game / Học Tập</a>
+    /* SWITCHERS */
+    .view-switcher { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--popup-border); background: var(--popup-bg); color: var(--text-muted); transition: 0.2s; }
+    .view-switcher:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        <div class="group-title text-warning group-spacer">CRM (KHÁCH HÀNG)</div>
-        <a href="{{ route('admin.crm.customers.index') }}" class="menu-link"><i class="fa-solid fa-user-group"></i> Khách Hàng</a>
-        <a href="{{ route('admin.crm.chats.index') }}" class="menu-link"><i class="fa-solid fa-comments"></i> Hội Thoại</a>
-        <a href="{{ route('admin.crm.requests.index') }}" class="menu-link"><i class="fa-solid fa-envelope-open-text"></i> Yêu Cầu & Góp Ý</a>
-    </div>
-</div>
+    /* THEME TOGGLE (STYLE ONLY) */
+    .theme { display: flex; align-items: center; font-size: 10px; } .theme__icon { transition: 0.3s; } .theme__icon, .theme__toggle { z-index: 1; } .theme__icon, .theme__icon-part { position: absolute; } .theme__icon { display: block; top: 0.5em; left: 0.5em; width: 1.5em; height: 1.5em; } .theme__icon-part { border-radius: 50%; box-shadow: 0.4em -0.4em 0 0.5em hsl(0,0%,100%) inset; top: calc(50% - 0.5em); left: calc(50% - 0.5em); width: 1em; height: 1em; transition: box-shadow var(--transDur) ease-in-out, opacity var(--transDur) ease-in-out, transform var(--transDur) ease-in-out; transform: scale(0.5); } .theme__icon-part ~ .theme__icon-part { background-color: hsl(0,0%,100%); border-radius: 0.05em; top: 50%; left: calc(50% - 0.05em); transform: rotate(0deg) translateY(0.5em); transform-origin: 50% 0; width: 0.1em; height: 0.2em; } .theme__icon-part:nth-child(3) { transform: rotate(45deg) translateY(0.45em); } .theme__icon-part:nth-child(4) { transform: rotate(90deg) translateY(0.45em); } .theme__icon-part:nth-child(5) { transform: rotate(135deg) translateY(0.45em); } .theme__icon-part:nth-child(6) { transform: rotate(180deg) translateY(0.45em); } .theme__icon-part:nth-child(7) { transform: rotate(225deg) translateY(0.45em); } .theme__icon-part:nth-child(8) { transform: rotate(270deg) translateY(0.5em); } .theme__icon-part:nth-child(9) { transform: rotate(315deg) translateY(0.5em); } .theme__label, .theme__toggle, .theme__toggle-wrap { position: relative; } .theme__toggle, .theme__toggle:before { display: block; } .theme__toggle { background-color: hsl(48,90%,85%); border-radius: 25% / 50%; box-shadow: 0 0 0 0.125em rgba(255,255,255,0.5); padding: 0.25em; width: 6em; height: 3em; -webkit-appearance: none; appearance: none; transition: background-color var(--transDur) ease-in-out, box-shadow 0.15s ease-in-out, transform var(--transDur) ease-in-out; cursor: pointer; } .theme__toggle:before { background-color: hsl(48,90%,55%); border-radius: 50%; content: ""; width: 2.5em; height: 2.5em; transition: 0.3s; } .theme__toggle:focus { box-shadow: 0 0 0 0.125em var(--primary); outline: transparent; } .theme__toggle:checked { background-color: hsl(198,90%,15%); } .theme__toggle:checked:before, .theme__toggle:checked ~ .theme__icon { transform: translateX(3em); } .theme__toggle:checked:before { background-color: hsl(198,90%,55%); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(1) { box-shadow: 0.2em -0.2em 0 0.2em hsl(0,0%,100%) inset; transform: scale(1); top: 0.2em; left: -0.2em; } .theme__toggle:checked ~ .theme__icon .theme__icon-part ~ .theme__icon-part { opacity: 0; } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(2) { transform: rotate(45deg) translateY(0.8em); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(3) { transform: rotate(90deg) translateY(0.8em); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(4) { transform: rotate(135deg) translateY(0.8em); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(5) { transform: rotate(180deg) translateY(0.8em); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(6) { transform: rotate(225deg) translateY(0.8em); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(7) { transform: rotate(270deg) translateY(0.8em); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(8) { transform: rotate(315deg) translateY(0.8em); } .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(9) { transform: rotate(360deg) translateY(0.8em); } .theme__toggle-wrap { margin: 0 0.75em; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. THEME LOGIC ---
+        const themeToggle = document.querySelector('#theme');
+        const body = document.body;
+        if(localStorage.getItem('admin_theme_preference') === 'dark') { body.classList.add('dark-mode'); if(themeToggle) themeToggle.checked = true; }
+        if(themeToggle) themeToggle.addEventListener('change', (e) => { body.classList.toggle('dark-mode', e.target.checked); localStorage.setItem('admin_theme_preference', e.target.checked ? 'dark' : 'light'); });
+
+        // --- 2. SWITCH VIEW LOGIC ---
+        const btnSwitch = document.getElementById('admin-btn-switch-view');
+        const iconSwitch = document.getElementById('admin-icon-view-mode');
+        const menuWrapper = document.getElementById('admin-menu-container');
+
+        const savedView = localStorage.getItem('admin_menu_view') || 'list';
+        setMenuView(savedView);
+
+        if(btnSwitch) {
+            btnSwitch.addEventListener('click', () => {
+                const current = menuWrapper.classList.contains('view-mode-grid') ? 'grid' : 'list';
+                const newState = current === 'grid' ? 'list' : 'grid';
+                setMenuView(newState);
+                setTimeout(() => { if(window.isSystemOpen) window.positionPopup('menu'); }, 50);
+            });
+        }
+
+        function setMenuView(mode) {
+            if(mode === 'grid') {
+                menuWrapper.classList.remove('view-mode-list');
+                menuWrapper.classList.add('view-mode-grid');
+                iconSwitch.classList.replace('fa-table-cells', 'fa-list');
+            } else {
+                menuWrapper.classList.remove('view-mode-grid');
+                menuWrapper.classList.add('view-mode-list');
+                iconSwitch.classList.replace('fa-list', 'fa-table-cells');
+            }
+            localStorage.setItem('admin_menu_view', mode);
+        }
+
+        // --- 3. GỌI MODAL RESET (SỬ DỤNG BIẾN ĐỂ TRUYỀN THAM SỐ) ---
+        const btnAsk = document.getElementById('admin-btn-reset-ask');
+
+        if(btnAsk) {
+            btnAsk.addEventListener('click', () => {
+                // Định nghĩa các biến nội dung (Dùng Backtick ` ` để viết nhiều dòng thoải mái)
+                const confirmTitle = 'Xác nhận đặt lại?';
+
+                const confirmContent = `
+                    <div style="text-align: center;">
+                        <div style="margin-bottom: 10px; font-size: 40px; color: #f59e0b;">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <p>Vị trí các icon menu sẽ quay về mặc định.</p>
+                        <p style="color: #ef4444; font-weight: 600; margin-top: 5px;">
+                            Hành động này không thể hoàn tác!
+                        </p>
+                    </div>
+                `;
+
+                const btnCancelText = 'Huỷ bỏ';
+                const btnConfirmText = 'Đặt lại ngay';
+
+                // Gọi hàm Global với các biến đã định nghĩa
+                window.showConfirm(
+                    confirmTitle,
+                    confirmContent,
+                    btnCancelText,
+                    btnConfirmText,
+                    function() {
+                        // Callback hành động
+                        Object.keys(localStorage).forEach(key => {
+                            if (key.startsWith('admin_menu_order_')) {
+                                localStorage.removeItem(key);
+                            }
+                        });
+                        location.reload();
+                    }
+                );
+            });
+        }
+
+        // --- 4. SORTABLE JS LOGIC ---
+        const groups = document.querySelectorAll('.menu-items-container');
+        groups.forEach(group => {
+            const groupId = group.getAttribute('data-group-id');
+            new Sortable(group, {
+                group: { name: groupId, pull: false, put: false },
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                delay: 100, delayOnTouchOnly: true,
+                store: {
+                    get: function (sortable) {
+                        const order = localStorage.getItem('admin_menu_order_' + groupId);
+                        return order ? order.split('|') : [];
+                    },
+                    set: function (sortable) {
+                        const order = sortable.toArray();
+                        localStorage.setItem('admin_menu_order_' + groupId, order.join('|'));
+                    }
+                }
+            });
+        });
+
+        // --- 5. EXPORT RENDER FUNCTION ---
+        window.renderMenuContent = function() {
+            const menuInterface = document.getElementById('menu-interface');
+            const chatInterface = document.getElementById('chat-interface');
+            menuInterface.classList.remove('d-none');
+            chatInterface.classList.add('d-none');
+        }
+    });
+</script>

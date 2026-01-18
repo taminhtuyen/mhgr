@@ -8,60 +8,33 @@
 
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/all.css') }}" rel="stylesheet">
-    {{-- Đảm bảo bạn đã include Bootstrap JS Bundle để Dropdown hoạt động --}}
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
+    @livewireStyles
+
     <style>
-        /* --- 1. RESET LAYOUT & FULL WIDTH --- */
-        html, body {
-            height: 100%; margin: 0; padding: 0; overflow-x: hidden;
-        }
-
-        #main-wrapper {
-            width: 100% !important;
-            margin-left: 0 !important;
-            padding: 0 !important;
-            min-height: 100vh;
-            position: relative;
-            z-index: 1;
-            padding-bottom: 100px !important;
-        }
-
-        .admin-container {
-            width: 100%;
-            padding: 15px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 998px) {
-            .admin-container {
-                padding: 30px;
-                max-width: 1400px;
-            }
-        }
-
-        /* --- 2. BIẾN MÀU (ĐÃ CẬP NHẬT THEO CLIENT - GLASSMORPHISM) --- */
+        /* --- GLOBAL VARIABLES --- */
         :root {
             /* Light Mode */
             --bg-body: #f8fafc;
             --text-color: #0f172a;
             --text-muted: #64748b;
-
-            /* Nền trong suốt giống Client */
             --popup-bg: rgba(255, 255, 255, 0.95);
             --popup-border: rgba(0, 0, 0, 0.08);
             --popup-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
-
             --link-hover-bg: #f1f5f9;
             --link-hover-text: #0ea5e9;
             --primary: #0ea5e9;
             --scrollbar-thumb: #cbd5e1;
-
-            /* Input tối hơn nền */
             --input-darker: #f1f5f9;
-
-            /* NEW: Biến cho Switch Button Animation */
             --transDur: 0.3s;
+
+            /* Modal Colors Light */
+            --modal-bg: rgba(255, 255, 255, 0.9);
+            --modal-text: #000;
+            --modal-border: rgba(60, 60, 67, 0.29);
+            --modal-btn-cancel: #007aff;
+            --modal-btn-confirm: #ff3b30;
         }
 
         body.dark-mode {
@@ -69,161 +42,41 @@
             --bg-body: #020617;
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
-
-            /* Nền tối trong suốt giống Client */
             --popup-bg: rgba(15, 23, 42, 0.95);
             --popup-border: rgba(255, 255, 255, 0.1);
             --popup-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-
             --link-hover-bg: rgba(255, 255, 255, 0.08);
             --link-hover-text: #38bdf8;
             --primary: #38bdf8;
             --scrollbar-thumb: #334155;
-
-            /* Input tối hơn nền */
             --input-darker: #0b1120;
+
+            /* Modal Colors Dark */
+            --modal-bg: rgba(30, 30, 30, 0.9);
+            --modal-text: #fff;
+            --modal-border: rgba(84, 84, 88, 0.65);
+            --modal-btn-cancel: #0a84ff;
+            --modal-btn-confirm: #ff453a;
         }
 
-        body { background-color: var(--bg-body); color: var(--text-color); font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        /* UPDATED: Cấu trúc cuộn cố định (Fixed Body, Scroll Wrapper) */
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; background-color: var(--bg-body); color: var(--text-color); }
         body.no-select { user-select: none; -webkit-user-select: none; }
 
-        /* Utility Class */
+        /* UPDATED: Main Wrapper là khung cuộn chính */
+        #main-wrapper { width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; position: relative; z-index: 1; padding-bottom: 100px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        #main-wrapper::-webkit-scrollbar { width: 8px; }
+        #main-wrapper::-webkit-scrollbar-track { background: transparent; }
+        #main-wrapper::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
+
+        .admin-container { width: 100%; padding: 15px; margin: 0 auto; }
+        @media (min-width: 998px) { .admin-container { padding: 30px; max-width: 1400px; } }
+
+        /* Utility */
+        .glass-effect { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .cursor-pointer { cursor: pointer !important; }
 
-        /* Class hiệu ứng kính mờ (Glassmorphism) */
-        .glass-effect {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-        /* --- 3. BONG BÓNG & POPUP --- */
-        #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
-        #nav-backdrop.active { opacity: 1; visibility: visible; }
-
-        #bubble-wrapper { position: fixed; bottom: 40px; right: 40px; z-index: 10000; transition: transform 0.1s; }
-
-        #nav-bubble {
-            width: 60px; height: 60px;
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: #fff; border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; cursor: pointer;
-            transition: transform 0.2s;
-            position: relative; z-index: 2;
-        }
-        #nav-bubble:hover { transform: scale(1.05); }
-        #nav-bubble:active { transform: scale(0.95); }
-
-        /* Styles cho chấm đỏ thông báo chính */
-        .main-bubble-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            width: 18px;
-            height: 18px;
-            background-color: #ef4444; /* Màu đỏ */
-            border: 2px solid #fff; /* Viền trắng để tách biệt */
-            border-radius: 50%;
-            display: block;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
-        body.dark-mode .main-bubble-badge {
-            border-color: #0f172a;
-        }
-
-        .sub-bubbles-container { position: absolute; left: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
-        .sub-bubble { width: 45px; height: 45px; background-color: var(--popup-bg); border: 1px solid var(--popup-border); color: var(--text-color); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; opacity: 0; transform: scale(0); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .sub-bubble:hover { background-color: var(--primary); color: #fff; border-color: var(--primary); }
-        #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
-        .badge-counter { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; border: 2px solid var(--popup-bg); }
-
-        /* --- [FIX QUAN TRỌNG] POPUP CONTAINER --- */
-        #nav-popup {
-            position: fixed; z-index: 9999;
-            background: var(--popup-bg);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--popup-border);
-            box-shadow: var(--popup-shadow);
-            border-radius: 20px;
-            opacity: 0; visibility: hidden; transform: scale(0.95);
-            transition: opacity 0.2s ease-out, transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-            overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-        #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1) translateX(0) translateY(0); }
-
-        /* --- [FIX] MENU INTERFACE --- */
-        #menu-interface {
-            width: 100%;
-            overflow-y: auto;
-            max-height: 80vh;
-            scrollbar-width: thin;
-        }
-        #menu-interface::-webkit-scrollbar { width: 6px; }
-        #menu-interface::-webkit-scrollbar-track { background: transparent; }
-        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
-
-        #menu-interface .popup-grid { display: grid; padding: 25px; gap: 20px; }
-        .grid-cols-1 { grid-template-columns: 1fr; }
-        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-
-        .menu-column { display: flex; flex-direction: column; gap: 4px; }
-        .group-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; letter-spacing: 0.5px; }
-        .group-title:first-child { margin-top: 0; }
-        .menu-link { display: flex; align-items: center; padding: 8px 12px; color: var(--text-color); text-decoration: none; border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; white-space: nowrap; }
-        .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateX(4px); }
-        .menu-link i { width: 24px; color: var(--text-muted); margin-right: 8px; text-align: center; transition: color 0.2s; }
-        .menu-link:hover i { color: var(--link-hover-text); }
-        .popup-header { padding: 15px 25px; border-bottom: 1px solid var(--popup-border); display: flex; align-items: center; justify-content: space-between; }
-
-        /* --- [FIX] CHAT INTERFACE --- */
-        #chat-interface {
-            max-width: 800px; width: 800px;
-            height: 500px;
-            max-height: 100%;
-            display: flex; flex-direction: column;
-        }
-
-        .chat-layout { position: relative; width: 100%; height: 100%; display: flex; overflow: hidden; }
-        .chat-sidebar { width: 300px; height: 100%; border-right: 1px solid var(--popup-border); display: flex; flex-direction: column; background: rgba(0,0,0,0.01); }
-        .chat-window { flex: 1; height: 100%; display: flex; flex-direction: column; background: transparent; }
-        .chat-item:hover, .chat-item.active { background-color: var(--link-hover-bg); }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
-
-        /* Chat Dropdown Menu Override */
-        .chat-sidebar .dropdown-menu {
-            border: 1px solid var(--popup-border);
-            box-shadow: var(--popup-shadow);
-            background-color: var(--popup-bg);
-            backdrop-filter: blur(10px);
-        }
-        .chat-sidebar .dropdown-item { color: var(--text-color); }
-        .chat-sidebar .dropdown-item:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); }
-
-        .mobile-nav-btn { display: none; }
-        .desktop-nav-element { display: block; }
-
-        @media (max-width: 997.98px) {
-            #chat-interface { width: 100% !important; height: 70vh !important; max-width: none !important; }
-            .chat-sidebar { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; background: var(--popup-bg); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); border-right: none; }
-            .chat-window { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; background: var(--popup-bg); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
-
-            #chat-interface.in-conversation .chat-sidebar { transform: translateX(-20%); opacity: 0; pointer-events: none; }
-            #chat-interface.in-conversation .chat-window { transform: translateX(0); }
-
-            .mobile-nav-btn { display: block !important; }
-            .desktop-nav-element { display: none !important; }
-            #bubble-wrapper.expanded .sub-bubbles-container { z-index: 9990; }
-        }
-
-        /* Dark Mode overrides */
+        /* Dark Mode overrides common */
         body.dark-mode .text-dark { color: #f1f5f9 !important; }
         body.dark-mode .text-primary { color: #38bdf8 !important; }
         body.dark-mode .text-secondary { color: #cbd5e1 !important; }
@@ -231,145 +84,44 @@
         body.dark-mode .form-control { background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #fff; }
         body.dark-mode .form-control:focus { background-color: rgba(255,255,255,0.08); border-color: var(--primary); color: #fff; box-shadow: none; }
 
-        /* --- [NEW] THEME SWITCH BUTTON STYLES --- */
-        .theme {
-            display: flex;
-            align-items: center;
-            -webkit-tap-highlight-color: transparent;
-            font-size: 10px; /* Điều chỉnh size nút bấm tại đây */
-        }
+        /* ====== GLOBAL CONFIRM MODAL (iOS STYLE - DYNAMIC) ====== */
+        #global-confirm-modal { position: fixed; inset: 0; z-index: 20000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.2s; }
+        #global-confirm-modal.active { opacity: 1; visibility: visible; }
 
-        .theme__icon {
+        .modal-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.4);
             transition: 0.3s;
-        }
-
-        .theme__icon,
-        .theme__toggle {
             z-index: 1;
         }
 
-        .theme__icon,
-        .theme__icon-part {
-            position: absolute;
+        .modal-box {
+            position: relative; width: 300px;
+            background: var(--modal-bg);
+            backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 14px; text-align: center; overflow: hidden;
+            transform: scale(0.95); transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 0.5px solid var(--modal-border);
+            z-index: 2;
         }
 
-        .theme__icon {
-            display: block;
-            top: 0.5em;
-            left: 0.5em;
-            width: 1.5em;
-            height: 1.5em;
+        #global-confirm-modal.active .modal-box { transform: scale(1); }
+
+        .modal-content-box { padding: 20px 16px 20px; }
+        .modal-title { font-weight: 700; font-size: 17px; margin-bottom: 6px; color: var(--modal-text); }
+        .modal-desc { font-size: 13px; line-height: 1.4; color: var(--modal-text); opacity: 0.8; word-wrap: break-word; }
+
+        .modal-actions { display: flex; border-top: 0.5px solid var(--modal-border); }
+
+        .btn-modal {
+            flex: 1; border: none; background: transparent; padding: 12px;
+            font-size: 17px; cursor: pointer; transition: 0.2s;
         }
+        .btn-modal:active { background: rgba(127,127,127,0.15); }
 
-        .theme__icon-part {
-            border-radius: 50%;
-            box-shadow: 0.4em -0.4em 0 0.5em hsl(0,0%,100%) inset;
-            top: calc(50% - 0.5em);
-            left: calc(50% - 0.5em);
-            width: 1em;
-            height: 1em;
-            transition: box-shadow var(--transDur) ease-in-out,
-            opacity var(--transDur) ease-in-out,
-            transform var(--transDur) ease-in-out;
-            transform: scale(0.5);
-        }
-
-        .theme__icon-part ~ .theme__icon-part {
-            background-color: hsl(0,0%,100%);
-            border-radius: 0.05em;
-            top: 50%;
-            left: calc(50% - 0.05em);
-            transform: rotate(0deg) translateY(0.5em);
-            transform-origin: 50% 0;
-            width: 0.1em;
-            height: 0.2em;
-        }
-
-        .theme__icon-part:nth-child(3) { transform: rotate(45deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(4) { transform: rotate(90deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(5) { transform: rotate(135deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(6) { transform: rotate(180deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(7) { transform: rotate(225deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(8) { transform: rotate(270deg) translateY(0.5em); }
-        .theme__icon-part:nth-child(9) { transform: rotate(315deg) translateY(0.5em); }
-
-        .theme__label,
-        .theme__toggle,
-        .theme__toggle-wrap {
-            position: relative;
-        }
-
-        .theme__toggle,
-        .theme__toggle:before {
-            display: block;
-        }
-
-        .theme__toggle {
-            background-color: hsl(48,90%,85%);
-            border-radius: 25% / 50%;
-            box-shadow: 0 0 0 0.125em rgba(255,255,255,0.5);
-            padding: 0.25em;
-            width: 6em;
-            height: 3em;
-            -webkit-appearance: none;
-            appearance: none;
-            transition: background-color var(--transDur) ease-in-out,
-            box-shadow 0.15s ease-in-out,
-            transform var(--transDur) ease-in-out;
-            cursor: pointer;
-        }
-
-        .theme__toggle:before {
-            background-color: hsl(48,90%,55%);
-            border-radius: 50%;
-            content: "";
-            width: 2.5em;
-            height: 2.5em;
-            transition: 0.3s;
-        }
-
-        .theme__toggle:focus {
-            box-shadow: 0 0 0 0.125em var(--primary);
-            outline: transparent;
-        }
-
-        /* Checked State (Dark Mode) */
-        .theme__toggle:checked {
-            background-color: hsl(198,90%,15%);
-        }
-
-        .theme__toggle:checked:before,
-        .theme__toggle:checked ~ .theme__icon {
-            transform: translateX(3em);
-        }
-
-        .theme__toggle:checked:before {
-            background-color: hsl(198,90%,55%);
-        }
-
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(1) {
-            box-shadow: 0.2em -0.2em 0 0.2em hsl(0,0%,100%) inset;
-            transform: scale(1);
-            top: 0.2em;
-            left: -0.2em;
-        }
-
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part ~ .theme__icon-part {
-            opacity: 0;
-        }
-
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(2) { transform: rotate(45deg) translateY(0.8em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(3) { transform: rotate(90deg) translateY(0.8em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(4) { transform: rotate(135deg) translateY(0.8em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(5) { transform: rotate(180deg) translateY(0.8em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(6) { transform: rotate(225deg) translateY(0.8em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(7) { transform: rotate(270deg) translateY(0.8em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(8) { transform: rotate(315deg) translateY(0.8em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(9) { transform: rotate(360deg) translateY(0.8em); }
-
-        .theme__toggle-wrap {
-            margin: 0 0.75em;
-        }
+        .btn-cancel { color: var(--modal-btn-cancel); border-right: 0.5px solid var(--modal-border); font-weight: 400; }
+        .btn-confirm { color: var(--modal-btn-confirm); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -380,342 +132,143 @@
     </div>
 </div>
 
+{{-- SYSTEM POPUP & BUBBLES --}}
 <div id="nav-backdrop"></div>
 
 @include('admin.partials.bubbles')
 
 <div id="nav-popup">
-    <div id="menu-interface">
-        @include('admin.partials.menu-popup')
-    </div>
+    @include('admin.partials.menu-popup')
     @include('admin.partials.chat-popup')
 </div>
 
+{{-- GLOBAL MODAL DYNAMIC --}}
+<div id="global-confirm-modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+        <div class="modal-content-box">
+            <div id="global-modal-title" class="modal-title"></div>
+            <div id="global-modal-desc" class="modal-desc"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-modal btn-cancel" id="btn-global-cancel"></button>
+            <button class="btn-modal btn-confirm" id="btn-global-confirm"></button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // --- 1. KHỞI TẠO THEME ---
+    (function() {
+        const savedTheme = localStorage.getItem('admin_theme_preference');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    })();
+
+    // --- 2. LOGIC SCROLL ẨN/HIỆN BUBBLE (FIXED) ---
     document.addEventListener('DOMContentLoaded', () => {
-        // --- LOGIC THEME ---
-        const themeToggle = document.querySelector('#theme');
-        const body = document.body;
-        if(localStorage.getItem('admin_theme_preference') === 'dark') {
-            body.classList.add('dark-mode');
-            if(themeToggle) themeToggle.checked = true;
-        }
-        if(themeToggle) themeToggle.addEventListener('change', (e) => {
-            if(e.target.checked) {
-                body.classList.add('dark-mode');
-                localStorage.setItem('admin_theme_preference', 'dark');
-            } else {
-                body.classList.remove('dark-mode');
-                localStorage.setItem('admin_theme_preference', 'light');
-            }
-        });
+        const mainWrapper = document.getElementById('main-wrapper');
+        const bubbleWrapper = document.getElementById('bubble-wrapper');
 
-        // --- LOGIC BONG BÓNG & POPUP ---
-        const wrapper = document.getElementById('bubble-wrapper');
-        const mainBubble = document.getElementById('nav-bubble');
-        const subBubblesContainer = wrapper.querySelector('.sub-bubbles-container');
-        const popup = document.getElementById('nav-popup');
-        const backdrop = document.getElementById('nav-backdrop');
-        const icon = document.getElementById('bubble-icon');
-        const menuInterface = document.getElementById('menu-interface');
-        const chatInterface = document.getElementById('chat-interface');
+        if(mainWrapper && bubbleWrapper) {
+            let lastScrollTop = 0;
+            const scrollThreshold = 50;
 
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        let isSystemOpen = false;
-        let currentMode = 'menu';
+            mainWrapper.addEventListener('scroll', () => {
+                if (window.isSystemOpen || document.body.classList.contains('no-select')) return;
 
-        const savedPos = localStorage.getItem('bubblePos_admin');
-        if (savedPos) {
-            const pos = JSON.parse(savedPos);
-            wrapper.style.left = pos.left;
-            wrapper.style.top = pos.top;
-            wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
-        }
+                const currentScroll = mainWrapper.scrollTop;
 
-        const getClientPos = (e) => e.touches ? e.touches[0] : e;
-
-        // --- HÀM DRAG START ---
-        const onDragStart = (e) => {
-            isDragging = false;
-            const pos = getClientPos(e);
-            startX = pos.clientX; startY = pos.clientY;
-
-            const rect = wrapper.getBoundingClientRect();
-
-            // Gán cứng vị trí left/top NGAY LẬP TỨC
-            wrapper.style.left = rect.left + 'px';
-            wrapper.style.top = rect.top + 'px';
-
-            initialLeft = rect.left;
-            initialTop = rect.top;
-
-            wrapper.style.bottom = 'auto';
-            wrapper.style.right = 'auto';
-
-            wrapper.style.transition = 'none';
-            document.body.classList.add('no-select');
-            if(isSystemOpen) popup.style.transition = 'none';
-
-            document.addEventListener('mousemove', onDragMove);
-            document.addEventListener('mouseup', onDragEnd);
-            document.addEventListener('touchmove', onDragMove, { passive: false });
-            document.addEventListener('touchend', onDragEnd);
-        };
-
-        const onDragMove = (e) => {
-            const pos = getClientPos(e);
-            if (Math.abs(pos.clientX - startX) > 3 || Math.abs(pos.clientY - startY) > 3) {
-                isDragging = true;
-                if(e.cancelable) e.preventDefault();
-
-                let newLeft = initialLeft + (pos.clientX - startX);
-                let newTop = initialTop + (pos.clientY - startY);
-
-                const maxLeft = window.innerWidth - wrapper.offsetWidth;
-                const maxTop = window.innerHeight - wrapper.offsetHeight;
-                newLeft = Math.min(Math.max(0, newLeft), maxLeft);
-                newTop = Math.min(Math.max(0, newTop), maxTop);
-
-                wrapper.style.left = `${newLeft}px`;
-                wrapper.style.top = `${newTop}px`;
-
-                if (isSystemOpen) {
-                    expandBubblesVisual();
-                    positionPopup(currentMode);
+                if (currentScroll <= scrollThreshold) {
+                    bubbleWrapper.classList.remove('scroll-hidden');
+                } else {
+                    if (currentScroll > lastScrollTop) {
+                        bubbleWrapper.classList.add('scroll-hidden'); // Cuộn xuống -> Ẩn
+                    } else {
+                        bubbleWrapper.classList.remove('scroll-hidden'); // Cuộn lên -> Hiện
+                    }
                 }
+                lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+            });
+        }
+    });
+
+    // --- 3. HỆ THỐNG POPUP TOÀN CỤC ---
+    function showGlobalModal(type, titleHtml, descHtml, cancelText, confirmText, onConfirm) {
+        const modal = document.getElementById('global-confirm-modal');
+        const elTitle = document.getElementById('global-modal-title');
+        const elDesc = document.getElementById('global-modal-desc');
+        const btnCancel = document.getElementById('btn-global-cancel');
+        const btnConfirm = document.getElementById('btn-global-confirm');
+
+        btnCancel.style.display = 'block';
+        btnConfirm.style.width = 'auto';
+
+        elTitle.innerHTML = titleHtml || 'Thông báo';
+        elDesc.innerHTML = descHtml || '';
+        btnCancel.innerText = cancelText || 'Hủy';
+        btnConfirm.innerText = confirmText || 'Đồng ý';
+
+        if (type === 'alert') {
+            btnCancel.style.display = 'none';
+        }
+
+        modal.classList.add('active');
+
+        const closeModal = () => { modal.classList.remove('active'); };
+
+        btnCancel.onclick = closeModal;
+
+        modal.onclick = (e) => {
+            if(e.target === modal || e.target.classList.contains('modal-backdrop')) {
+                closeModal();
             }
         };
 
-        const onDragEnd = () => {
-            document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd);
-            document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', onDragEnd);
-            document.body.classList.remove('no-select');
-
-            popup.style.transition = '';
-            wrapper.style.transition = 'transform 0.1s';
-
-            if (isDragging) {
-                localStorage.setItem('bubblePos_admin', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top }));
-                setTimeout(() => { isDragging = false; }, 50);
+        btnConfirm.onclick = () => {
+            if (typeof onConfirm === 'function') {
+                onConfirm();
             }
+            closeModal();
         };
+    }
 
-        mainBubble.addEventListener('mousedown', onDragStart);
-        mainBubble.addEventListener('touchstart', onDragStart, { passive: false });
+    window.showConfirm = function(title, desc, txtCancel, txtConfirm, callback) {
+        showGlobalModal('confirm', title, desc, txtCancel, txtConfirm, callback);
+    };
 
-        mainBubble.onclick = (e) => {
-            if (isDragging) return;
-            if (e.cancelable && e.type === 'touchend') e.preventDefault();
-            if (isSystemOpen) closeAll(); else openAll('menu');
-        };
+    window.showAlert = function(title, desc, txtBtn = 'Đóng', callback = null) {
+        showGlobalModal('alert', title, desc, null, txtBtn, callback);
+    };
+</script>
 
-        function openAll(mode) {
-            isSystemOpen = true;
-            currentMode = mode;
-            expandBubblesVisual();
-            openPopupContent(mode);
-            wrapper.classList.add('expanded');
-            icon.classList.replace('fa-bars', 'fa-xmark');
-            backdrop.classList.add('active');
-        }
+{{-- --- REAL-TIME NOTIFICATION SYSTEM (PUSHER) --- --}}
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+<script>
+    // 1. Khởi tạo kết nối Pusher (Key của bạn)
+    var pusher = new Pusher('bbd581278169e135dc72', {
+        cluster: 'ap1'
+    });
 
-        function closeAll() {
-            isSystemOpen = false;
-            wrapper.classList.remove('expanded');
-            popup.classList.remove('active');
-            icon.classList.replace('fa-xmark', 'fa-bars');
-            backdrop.classList.remove('active');
-            setTimeout(() => { backToChatList(); }, 300);
-        }
+    // 2. Đăng ký kênh 'notifications' (Khớp với file PHP SystemNotification)
+    var channel = pusher.subscribe('notifications');
 
-        function expandBubblesVisual() {
-            const rect = wrapper.getBoundingClientRect();
-            const screenW = window.innerWidth;
-            const screenH = window.innerHeight;
-            const isMobile = screenW < 998;
-
-            subBubblesContainer.style.cssText = '';
-            subBubblesContainer.style.position = 'absolute';
-            subBubblesContainer.style.display = 'flex';
-            subBubblesContainer.style.gap = '10px';
-            subBubblesContainer.style.pointerEvents = 'none';
-
-            if (isMobile) {
-                subBubblesContainer.style.flexDirection = 'row';
-                subBubblesContainer.style.top = '7.5px';
-                subBubblesContainer.style.width = 'max-content';
-
-                if (rect.left > screenW / 2) {
-                    subBubblesContainer.style.right = '70px';
-                    subBubblesContainer.style.left = 'auto';
-                    subBubblesContainer.style.justifyContent = 'flex-end';
-                } else {
-                    subBubblesContainer.style.left = '70px';
-                    subBubblesContainer.style.right = 'auto';
-                    subBubblesContainer.style.justifyContent = 'flex-start';
-                }
-            } else {
-                subBubblesContainer.style.width = '60px';
-                subBubblesContainer.style.left = '0';
-                subBubblesContainer.style.flexDirection = 'column';
-
-                if (rect.top > screenH / 2) {
-                    subBubblesContainer.style.bottom = '70px';
-                    subBubblesContainer.style.top = 'auto';
-                } else {
-                    subBubblesContainer.style.top = '70px';
-                    subBubblesContainer.style.bottom = 'auto';
-                }
-            }
-        }
-
-        function openPopupContent(type) {
-            currentMode = type;
-            menuInterface.classList.add('d-none');
-            chatInterface.classList.add('d-none');
-
-            if (type === 'chat') {
-                chatInterface.classList.remove('d-none');
-                positionPopup('chat');
-                popup.classList.add('active');
-            } else {
-                menuInterface.classList.remove('d-none');
-                calculateMenuGrid();
-                setTimeout(() => {
-                    positionPopup('menu');
-                    popup.classList.add('active');
-                }, 10);
-            }
-        }
-
-        function positionPopup(type) {
-            const rect = wrapper.getBoundingClientRect();
-            const screenW = window.innerWidth;
-            const screenH = window.innerHeight;
-            const gap = 15;
-            const edgePadding = 20;
-
-            popup.style.removeProperty('inset');
-            popup.style.inset = '';
-            popup.style.left = ''; popup.style.right = '';
-            popup.style.top = ''; popup.style.bottom = '';
-            popup.style.width = ''; popup.style.height = '';
-            popup.style.maxWidth = ''; popup.style.maxHeight = '';
-            popup.style.transformOrigin = '';
-            popup.style.margin = '';
-            popup.style.transform = '';
-
-            if (type === 'chat') chatInterface.style.width = '';
-
-            if (screenW < 998) {
-                let vwUnit = 92;
-                if (screenW >= 450) vwUnit = 88;
-                popup.style.width = `${vwUnit}vw`;
-                popup.style.maxWidth = `${vwUnit}vw`;
-                popup.style.left = '50%';
-                popup.style.transform = 'translateX(-50%)';
-
-                let maxH = 0;
-                if (rect.top > screenH / 2) {
-                    popup.style.bottom = (screenH - rect.top + gap) + 'px';
-                    popup.style.top = 'auto';
-                    popup.style.transformOrigin = 'bottom center';
-                    maxH = rect.top - gap - edgePadding;
-                } else {
-                    popup.style.top = (rect.bottom + gap) + 'px';
-                    popup.style.bottom = 'auto';
-                    popup.style.transformOrigin = 'top center';
-                    maxH = screenH - rect.bottom - gap - edgePadding;
-                }
-                popup.style.maxHeight = maxH + 'px';
-            } else {
-                popup.style.width = 'max-content';
-                popup.style.maxWidth = '95vw';
-
-                if (type === 'chat') {
-                    let availW = (rect.left > screenW / 2)
-                        ? (rect.left - gap - edgePadding)
-                        : (screenW - rect.right - gap - edgePadding);
-                    let targetWidth = Math.min(availW, 800);
-                    if (targetWidth < 350) targetWidth = 350;
-                    chatInterface.style.width = `${targetWidth}px`;
-                }
-
-                if (rect.left > screenW / 2) {
-                    popup.style.right = (screenW - rect.left + gap) + 'px';
-                    popup.style.left = 'auto';
-                    popup.style.transformOrigin = 'right center';
-                } else {
-                    popup.style.left = (rect.right + gap) + 'px';
-                    popup.style.right = 'auto';
-                    popup.style.transformOrigin = 'left center';
-                }
-
-                const pHeight = popup.scrollHeight;
-                const bubbleCenterY = rect.top + (rect.height / 2);
-                let idealTop = bubbleCenterY - (pHeight / 2);
-                const minTop = 20;
-                const maxTop = screenH - pHeight - 20;
-                let finalTop = Math.max(minTop, Math.min(idealTop, maxTop));
-
-                popup.style.top = finalTop + 'px';
-                popup.style.bottom = 'auto';
-                popup.style.maxHeight = (screenH - 40) + 'px';
-            }
-        }
-
-        function calculateMenuGrid() {
-            const grid = menuInterface.querySelector('.popup-grid');
-            if(grid) {
-                grid.classList.remove('grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4');
-                const rect = wrapper.getBoundingClientRect();
-                const screenW = window.innerWidth;
-                const minColWidth = 160;
-                const gap = 20;
-
-                if (screenW < 576) {
-                    grid.classList.add('grid-cols-1');
-                } else if (screenW < 998) {
-                    grid.classList.add('grid-cols-2');
-                } else {
-                    let availW = (rect.left > screenW/2) ? (rect.left - gap) : (screenW - rect.right - gap);
-                    let cols = Math.floor(availW / minColWidth);
-                    if (cols > 4) cols = 4; if (cols < 1) cols = 1;
-                    grid.classList.add(`grid-cols-${cols}`);
-                }
-            }
-        }
-
-        const btnTop = document.getElementById('btn-scroll-top');
-        const btnBottom = document.getElementById('btn-scroll-bottom');
-        const btnChat = document.getElementById('btn-open-chat');
-
-        if(btnTop) btnTop.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); closeAll(); });
-        if(btnBottom) btnBottom.addEventListener('click', () => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); closeAll(); });
-        if(btnChat) btnChat.addEventListener('click', () => { openPopupContent('chat'); });
-
-        backdrop.addEventListener('click', closeAll);
-
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                if (isSystemOpen) {
-                    expandBubblesVisual();
-                    positionPopup(currentMode);
-                    if(currentMode === 'menu') calculateMenuGrid();
-                }
-            }, 100);
-        });
-
-        window.openChat = function(id) {
-            chatInterface.classList.add('in-conversation');
-        }
-        window.backToChatList = function() {
-            chatInterface.classList.remove('in-conversation');
+    // 3. Lắng nghe sự kiện 'system.message'
+    channel.bind('system.message', function(data) {
+        // Khi có tin nhắn, dùng showAlert để hiện Popup
+        if (typeof window.showAlert === 'function') {
+            window.showAlert(
+                '<i class="fa-solid fa-bell text-warning"></i> THÔNG BÁO MỚI',
+                data.message,
+                'Đã xem'
+            );
+        } else {
+            alert('Thông báo: ' + data.message);
         }
     });
 </script>
+
+@livewireScripts
 </body>
 </html>
