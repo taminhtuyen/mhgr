@@ -1,172 +1,296 @@
 <div id="chat-interface" class="d-none">
-    {{-- LAYOUT CHÍNH: Cố định chiều cao, chia 2 cột trên Desktop, chồng hàng trên Mobile --}}
+
+    <style>
+        /* --- 1. Tinh chỉnh màu sắc Placeholder & Metadata --- */
+        .chat-search-input::placeholder { color: var(--text-muted); opacity: 0.8; }
+        .msg-meta { font-size: 0.65rem; margin-top: 4px; color: var(--text-muted); font-weight: 500; }
+        body.dark-mode .msg-meta { color: #94a3b8; } /* Sáng hơn trong darkmode */
+
+        /* --- 2. Custom Tabs --- */
+        .nav-tabs-custom .nav-link {
+            color: var(--text-muted); border: none; border-bottom: 2px solid transparent;
+            font-size: 0.85rem; font-weight: 600; padding: 10px 0; margin-right: 20px; background: transparent;
+        }
+        .nav-tabs-custom .nav-link:hover { color: var(--primary); }
+        .nav-tabs-custom .nav-link.active {
+            color: var(--primary); background: transparent; border-bottom: 2px solid var(--primary);
+        }
+
+        /* --- 3. Nút 3 chấm (Actions) --- */
+        .chat-actions-btn {
+            position: absolute; top: 50%; right: 10px; transform: translateY(-50%); z-index: 10;
+        }
+        .chat-actions-btn .btn-icon {
+            color: #94a3b8; background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0,0,0,0.05); transition: all 0.2s;
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .chat-actions-btn .btn-icon:hover { color: var(--primary); background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        body.dark-mode .chat-actions-btn .btn-icon { color: #cbd5e1; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.1); }
+        body.dark-mode .chat-actions-btn .btn-icon:hover { background: var(--primary); color: #fff; }
+
+        /* --- 4. Nút Back Mobile (Bo tròn đẹp hơn) --- */
+        .btn-back-mobile {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50% !important; /* Tròn hoàn hảo */
+            padding: 0;
+            background-color: var(--bg-body);
+            border: 1px solid var(--popup-border);
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .btn-back-mobile:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background-color: var(--link-hover-bg);
+            transform: translateX(-2px);
+        }
+
+        /* Helpers */
+        .no-arrow::after { display: none; }
+        .dropdown-menu.show { z-index: 10050 !important; }
+    </style>
+
     <div class="chat-layout h-100 d-flex overflow-hidden">
 
         {{-- ========================================================= --}}
-        {{-- CỘT 1: DANH SÁCH NGƯỜI HỖ TRỢ (SIDEBAR) --}}
+        {{-- CỘT TRÁI: DANH SÁCH --}}
         {{-- ========================================================= --}}
         <div class="chat-sidebar d-flex flex-column border-end h-100" id="chat-list-col" style="border-color: var(--popup-border) !important;">
 
-            {{-- 1. HEADER DANH SÁCH --}}
-            <div class="p-3 border-bottom flex-shrink-0 d-flex align-items-center" style="border-color: var(--popup-border) !important;">
-
-                {{-- Dropdown Menu: Đánh dấu đã đọc --}}
-                <div class="dropdown me-2">
-                    <button class="btn btn-sm btn-icon text-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu shadow-sm border-0 glass-effect">
-                        <li>
-                            <a class="dropdown-item small" href="#">
-                                <i class="fa-solid fa-check-double me-2 text-primary"></i>Đánh dấu tất cả đã đọc
-                            </a>
-                        </li>
-                    </ul>
+            {{-- HEADER --}}
+            <div class="p-3 border-bottom flex-shrink-0" style="border-color: var(--popup-border) !important;">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-sm btn-icon text-primary no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu shadow-sm border-0 glass-effect">
+                            <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-check-double me-2 text-primary"></i>Đánh dấu tất cả đã đọc</a></li>
+                            <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-gear me-2 text-muted"></i>Cài đặt chat</a></li>
+                        </ul>
+                    </div>
+                    <input type="text" class="form-control rounded-pill chat-search-input" placeholder="Tìm kiếm..."
+                           style="background-color: var(--input-darker); color: var(--text-color); border-color: var(--popup-border); font-size: 0.9rem;">
                 </div>
 
-                {{-- Ô tìm kiếm --}}
-                <input type="text" class="form-control rounded-pill" placeholder="Tìm kiếm tin nhắn..."
-                       style="background-color: var(--input-darker); color: var(--text-color); border-color: var(--popup-border); font-size: 0.9rem;">
+                {{-- TABS: NGƯỜI BÁN -> NGƯỜI MUA -> HỆ THỐNG --}}
+                <ul class="nav nav-tabs nav-tabs-custom" id="chatTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="seller-tab" data-bs-toggle="tab" data-bs-target="#seller-pane" type="button" role="tab">Người bán</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="buyer-tab" data-bs-toggle="tab" data-bs-target="#buyer-pane" type="button" role="tab">Người mua</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system-pane" type="button" role="tab">Hệ thống</button>
+                    </li>
+                </ul>
             </div>
 
-            {{-- 2. DANH SÁCH USER/SUPPORT (CUỘN) --}}
-            <div class="chat-list flex-grow-1 overflow-auto custom-scrollbar">
+            {{-- DANH SÁCH CUỘN --}}
+            <div class="chat-list flex-grow-1 overflow-auto custom-scrollbar" style="position: relative;">
 
-                {{-- Item: Support Trung Tâm (Mặc định) --}}
-                <div class="chat-item p-3 d-flex align-items-center cursor-pointer active" onclick="openChat(1)">
-                    <div class="position-relative">
-                        <img src="https://ui-avatars.com/api/?name=Support&background=0ea5e9&color=fff"
-                             class="rounded-circle me-2" width="45" height="45" alt="Avatar">
-                        <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle"
-                              style="margin-bottom: 2px; margin-right: 8px;"></span>
+                <div class="tab-content" id="chatTabContent">
+
+                    {{-- TAB 1: NGƯỜI BÁN (Seller) --}}
+                    <div class="tab-pane fade show active" id="seller-pane" role="tabpanel">
+                        @for($k = 1; $k <= 3; $k++)
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative {{ $k == 1 ? 'active' : '' }}" onclick="openChat('seller_{{ $k }}')">
+                            <div class="flex-shrink-0 position-relative">
+                                <img src="https://ui-avatars.com/api/?name=Seller+{{ $k }}&background=0ea5e9&color=fff" class="rounded-circle me-2" width="45" height="45">
+                            </div>
+
+                            <div class="flex-grow-1 overflow-hidden pe-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người bán {{ $k }}</h6>
+                                    <small class="text-muted" style="font-size: 0.7rem;">Hôm qua</small>
+                                </div>
+                                <p class="mb-0 text-truncate small mt-1 fw-bold" style="color: var(--text-color);">Đã xác nhận đơn hàng của bạn...</p>
+                            </div>
+
+                            <div class="dropdown chat-actions-btn">
+                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
+                                    <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell-slash me-2 text-muted"></i>Tắt thông báo</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item small text-danger" href="#"><i class="fa-solid fa-trash me-2"></i>Xóa hội thoại</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        @endfor
                     </div>
-                    <div class="flex-grow-1 overflow-hidden">
-                        <div class="d-flex justify-content-between align-items-center">
-                            {{-- Màu chữ sử dụng var(--text-color) để tự động đổi theo theme --}}
-                            <h6 class="mb-0 text-truncate" style="font-size: 0.95rem; font-weight: 700; color: var(--text-color);">Hỗ Trợ Trực Tuyến</h6>
-                            <small class="text-muted" style="font-size: 0.7rem;">Vừa xong</small>
+
+                    {{-- TAB 2: NGƯỜI MUA (Buyer) --}}
+                    <div class="tab-pane fade" id="buyer-pane" role="tabpanel">
+                        @for($i = 1; $i <= 5; $i++)
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChat('buyer_{{ $i }}')">
+                            <div class="flex-shrink-0 position-relative">
+                                <img src="https://ui-avatars.com/api/?name=Buyer+{{ $i }}&background=random" class="rounded-circle me-2" width="45" height="45">
+                                <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle" style="margin-bottom: 2px; margin-right: 8px;"></span>
+                            </div>
+
+                            <div class="flex-grow-1 overflow-hidden pe-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người mua {{ $i }}</h6>
+                                    <small class="text-muted" style="font-size: 0.7rem;">10:30</small>
+                                </div>
+                                <p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Sản phẩm này còn hàng không ạ...</p>
+                            </div>
+
+                            <div class="dropdown chat-actions-btn">
+                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
+                                    <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell-slash me-2 text-muted"></i>Tắt thông báo</a></li>
+                                    <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell me-2 text-success"></i>Bật thông báo</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item small text-danger" href="#"><i class="fa-solid fa-trash me-2"></i>Xóa hội thoại</a></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <p class="mb-0 text-truncate small" style="color: var(--text-muted);">Chào bạn, shop có thể giúp gì...</p>
-                            <span class="badge bg-danger rounded-pill" style="font-size: 0.6rem;">1</span>
+                        @endfor
+                    </div>
+
+                    {{-- TAB 3: HỆ THỐNG (SYSTEM) --}}
+                    <div class="tab-pane fade" id="system-pane" role="tabpanel">
+
+                        {{-- 1. TIN NHẮN HỆ THỐNG CHÍNH --}}
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative"
+                             style="border-bottom: 1px solid var(--popup-border); background-color: rgba(var(--primary), 0.03);"
+                             onclick="openChat('system_main')">
+                            <div class="flex-shrink-0 position-relative">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white"
+                                     style="width: 45px; height: 45px; background: linear-gradient(45deg, #ff416c, #ff4b2b);">
+                                    <i class="fa-solid fa-robot"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden pe-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 text-truncate fw-bold" style="color: var(--text-color); font-size: 0.9rem;">HỆ THỐNG</h6>
+                                    <small class="text-muted" style="font-size: 0.7rem;">Vừa xong</small>
+                                </div>
+                                <p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Chào mừng bạn đến với sàn thương mại...</p>
+                            </div>
                         </div>
+
+                        {{-- 2. DANH SÁCH NHÂN VIÊN --}}
+                        @for($s = 1; $s <= 3; $s++)
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChat('staff_{{ $s }}')">
+                            <div class="flex-shrink-0 position-relative">
+                                <img src="https://ui-avatars.com/api/?name=Staff+{{ $s }}&background=64748b&color=fff" class="rounded-circle me-2" width="45" height="45">
+                                <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle" style="margin-bottom: 2px; margin-right: 8px;"></span>
+                            </div>
+
+                            <div class="flex-grow-1 overflow-hidden pe-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Nhân Viên {{ $s }}</h6>
+                                    <small class="text-muted" style="font-size: 0.7rem;">08:00</small>
+                                </div>
+                                <p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Hỗ trợ vấn đề đơn hàng...</p>
+                            </div>
+
+                            <div class="dropdown chat-actions-btn">
+                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
+                                    <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell-slash me-2 text-muted"></i>Tắt thông báo</a></li>
+                                    <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell me-2 text-success"></i>Bật thông báo</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item small text-danger" href="#"><i class="fa-solid fa-trash me-2"></i>Xóa hội thoại</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        @endfor
+
                     </div>
                 </div>
-
-                {{-- Giả lập các tư vấn viên khác --}}
-                @for ($i = 2; $i <= 5; $i++)
-                <div class="chat-item p-3 d-flex align-items-center cursor-pointer border-top"
-                     style="border-color: var(--popup-border) !important;" onclick="openChat({{ $i }})">
-                    <div class="position-relative">
-                        <img src="https://ui-avatars.com/api/?name=Staff+{{ $i }}&background=64748b&color=fff"
-                             class="rounded-circle me-2" width="45" height="45">
-                    </div>
-                    <div class="flex-grow-1 overflow-hidden">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0 text-truncate" style="font-size: 0.9rem; font-weight: 600; color: var(--text-color);">Tư vấn viên {{ $i }}</h6>
-                            <small class="text-muted" style="font-size: 0.7rem;">2 giờ</small>
-                        </div>
-                        <p class="mb-0 text-truncate small" style="color: var(--text-muted);">Đã xem</p>
-                    </div>
-                </div>
-                @endfor
             </div>
         </div>
 
         {{-- ========================================================= --}}
-        {{-- CỘT 2: CỬA SỔ CHAT CHI TIẾT --}}
+        {{-- CỘT PHẢI: CỬA SỔ CHAT --}}
         {{-- ========================================================= --}}
-        <div class="chat-window d-flex flex-column flex-grow-1 h-100">
+        <div class="chat-window flex-grow-1 d-flex flex-column h-100" id="chat-content-col">
 
-            {{-- 1. HEADER CHI TIẾT (ĐÃ CẬP NHẬT BIỂU TƯỢNG) --}}
-            <div class="p-3 border-bottom flex-shrink-0 d-flex align-items-center" style="border-color: var(--popup-border) !important;">
-                {{-- Nút quay lại (Mobile) --}}
-                <button class="btn btn-sm btn-icon me-2 mobile-nav-btn text-primary" onclick="backToChatList()">
+            {{-- HEADER --}}
+            <div class="chat-header p-3 border-bottom d-flex align-items-center flex-shrink-0"
+                 style="background: var(--popup-bg); backdrop-filter: blur(5px); border-color: var(--popup-border) !important; z-index: 5;">
+
+                {{-- Nút Back Mobile (Đã sửa: Bo tròn) --}}
+                <button class="btn btn-back-mobile me-3 mobile-nav-btn shadow-sm" onclick="backToChatList()">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
 
-                <img src="https://ui-avatars.com/api/?name=Support&background=0ea5e9&color=fff" class="rounded-circle me-2" width="35" height="35">
-                <div class="flex-grow-1">
-                    <h6 class="mb-0" style="font-size: 0.9rem; font-weight: 700; color: var(--text-color);">Hỗ Trợ Trực Tuyến</h6>
-                    <small class="text-success" style="font-size: 0.75rem;">Đang hoạt động</small>
+                <img src="https://ui-avatars.com/api/?name=Seller+1&background=random" class="rounded-circle me-2" width="35" height="35">
+                <div>
+                    <div class="fw-bold lh-1" style="color: var(--text-color); font-size: 0.95rem;">Người bán 1</div>
+                    <small class="text-success desktop-nav-element" style="font-size: 0.75rem;"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Online</small>
                 </div>
 
-                {{-- KHU VỰC BIỂU TƯỢNG: Đã đổi màu và thêm Info/Warning --}}
-                <div class="chat-actions d-flex align-items-center">
-                    <button class="btn btn-sm btn-icon text-primary me-1" title="Gọi điện">
-                        <i class="fa-solid fa-phone"></i>
-                    </button>
-                    <button class="btn btn-sm btn-icon text-primary me-1" title="Video call">
-                        <i class="fa-solid fa-video"></i>
-                    </button>
-                    {{-- Thêm biểu tượng Thông tin --}}
-                    <button class="btn btn-sm btn-icon text-primary me-1" title="Thông tin">
-                        <i class="fa-solid fa-circle-info"></i>
-                    </button>
-                    {{-- Thêm biểu tượng Cảnh báo --}}
-                    <button class="btn btn-sm btn-icon text-danger" title="Báo cáo">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </button>
+                <div class="ms-auto d-flex align-items-center gap-1">
+                    <button class="btn btn-sm btn-icon text-primary" title="Gọi điện"><i class="fa-solid fa-phone"></i></button>
+                    <button class="btn btn-sm btn-icon text-primary" title="Video call"><i class="fa-solid fa-video"></i></button>
+                    <button class="btn btn-sm btn-icon text-primary" title="Thông tin"><i class="fa-solid fa-circle-info"></i></button>
+                    <button class="btn btn-sm btn-icon text-danger ms-1" title="Báo cáo xấu"><i class="fa-solid fa-triangle-exclamation"></i></button>
                 </div>
             </div>
 
-            {{-- 2. KHU VỰC TIN NHẮN (CUỘN) --}}
-            <div class="chat-messages flex-grow-1 p-3 overflow-auto custom-scrollbar" style="background-color: rgba(0,0,0,0.01);">
-
-                {{-- Support gửi --}}
-                <div class="message-row d-flex mb-4">
-                    <img src="https://ui-avatars.com/api/?name=Support&background=0ea5e9&color=fff"
-                         class="rounded-circle me-2 flex-shrink-0" width="30" height="30">
-                    <div class="message-content" style="max-width: 75%;">
-                        <div class="message-bubble p-2 px-3 rounded shadow-sm mb-1"
-                             style="background-color: var(--input-darker); color: var(--text-color); border: 1px solid var(--popup-border);">
-                            Xin chào! Shop có thể hỗ trợ gì cho bạn không ạ?
-                        </div>
-                        <small class="text-muted" style="font-size: 0.65rem;">10:00 AM</small>
-                    </div>
-                </div>
-
-                {{-- Khách hàng gửi --}}
-                <div class="message-row d-flex mb-4 flex-row-reverse text-end">
-                    <div class="message-content" style="max-width: 75%;">
-                        <div class="message-bubble p-2 px-3 rounded shadow-sm text-white mb-1"
-                             style="background-color: var(--primary);">
-                            Mình muốn hỏi về phí vận chuyển đơn hàng ạ.
-                        </div>
-                        <small class="text-muted" style="font-size: 0.65rem;">10:01 AM <i class="fa-solid fa-check-double text-primary"></i></small>
-                    </div>
-                </div>
-
-                {{-- Tin nhắn quan trọng từ Support (Viền primary) --}}
-                <div class="message-row d-flex mb-4">
-                    <img src="https://ui-avatars.com/api/?name=Support&background=0ea5e9&color=fff"
-                         class="rounded-circle me-2 flex-shrink-0" width="30" height="30">
-                    <div class="message-content" style="max-width: 75%;">
+            {{-- MESSAGES --}}
+            <div class="chat-messages flex-grow-1 p-3 overflow-auto custom-scrollbar bg-transparent">
+                @for($j = 1; $j <= 3; $j++)
+                {{-- A. Người khác gửi (Seller) --}}
+                <div class="message-row d-flex mb-3">
+                    <img src="https://ui-avatars.com/api/?name=User&background=random" class="rounded-circle me-2 mt-1" width="30" height="30">
+                    <div class="message-wrapper" style="max-width: 75%;">
                         <div class="message-bubble p-2 px-3 rounded shadow-sm"
+                             style="background-color: var(--link-hover-bg); color: var(--text-color); border: 1px solid transparent;">
+                            Chào bạn, sản phẩm này bên mình vẫn còn hàng ạ.
+                        </div>
+                        <div class="msg-meta ms-1">10:0{{ $j }} AM</div>
+                    </div>
+                </div>
+
+                {{-- B. Mình gửi (Client) --}}
+                <div class="message-row d-flex mb-3 flex-row-reverse">
+                    <div class="message-wrapper text-end" style="max-width: 75%;">
+                        <div class="message-bubble p-2 px-3 rounded shadow-sm text-start"
                              style="background-color: var(--link-hover-bg); color: var(--text-color); border: 1.5px solid var(--primary);">
-                            Chào bạn, shop đang kiểm tra ạ. Vui lòng đợi chút nhé!
+                            Vâng, shop giao sớm giúp mình nhé!
+                        </div>
+                        <div class="msg-meta me-1">
+                            10:0{{ $j + 1 }} AM &bull;
+                            @if($j == 3)
+                            <span class="text-primary"><i class="fa-solid fa-check-double"></i> Đã xem</span>
+                            @elseif($j == 2)
+                            <span><i class="fa-solid fa-check-double"></i> Đã nhận</span>
+                            @else
+                            <span><i class="fa-solid fa-check"></i> Đã gửi</span>
+                            @endif
                         </div>
                     </div>
                 </div>
+                @endfor
             </div>
 
-            {{-- 3. INPUT NHẬP LIỆU (CỐ ĐỊNH Ở ĐÁY) --}}
+            {{-- INPUT --}}
             <div class="chat-input-area p-3 border-top flex-shrink-0"
                  style="background: var(--popup-bg); border-color: var(--popup-border) !important; z-index: 5;">
                 <div class="input-group">
-                    {{-- Nút đính kèm --}}
                     <button class="btn btn-outline-secondary border-end-0 text-primary"
-                            style="background-color: var(--input-darker); border-color: var(--popup-border);">
+                            style="background-color: var(--bg-body); border-color: var(--popup-border);">
                         <i class="fa-solid fa-plus"></i>
                     </button>
-
-                    {{-- Ô nhập tin nhắn --}}
-                    <input type="text" class="form-control border-start-0 border-end-0"
+                    <input type="text" class="form-control border-start-0 border-end-0 chat-search-input"
                            placeholder="Nhập tin nhắn..."
-                           style="background-color: var(--input-darker); color: var(--text-color); border-color: var(--popup-border);">
-
-                    {{-- Nút gửi --}}
-                    <button class="btn btn-primary px-3 shadow-sm">
+                           style="background-color: var(--bg-body); color: var(--text-color); border-color: var(--popup-border);">
+                    <button class="btn btn-primary px-3">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>

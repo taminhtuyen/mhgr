@@ -49,6 +49,9 @@
 
             /* Input tối hơn nền [MỚI] */
             --input-darker: #f1f5f9;
+
+            /* [NEW] Biến cho Switch Button Animation */
+            --transDur: 0.3s;
         }
 
         body.dark-mode {
@@ -105,7 +108,7 @@
         #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
         .badge-counter { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
 
-        /* Popup Container - Có glass-effect */
+        /* Popup Container - Có glass-effect - CẬP NHẬT WIDTH */
         #nav-popup {
             position: fixed; z-index: 9999;
             background: var(--popup-bg);
@@ -115,7 +118,8 @@
             border-radius: 16px;
             opacity: 0; visibility: hidden; transform: scale(0.95);
             transition: opacity 0.2s, transform 0.2s;
-            width: max-content; max-width: 95vw;
+            /* Thay max-content bằng fit-content để ôm sát nội dung hơn */
+            width: fit-content; max-width: 95vw;
             overflow: hidden; display: flex; flex-direction: column; overscroll-behavior: contain;
         }
         #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
@@ -154,7 +158,83 @@
             .mobile-nav-btn { display: block !important; } .desktop-nav-element { display: none !important; }
         }
 
-        .theme { display: flex; align-items: center; } .theme__toggle { width: 4em; height: 2em; -webkit-appearance: none; background: #cbd5e1; border-radius: 2em; position: relative; cursor: pointer; transition: 0.3s; } .theme__toggle::after { content: ''; position: absolute; left: 0.2em; top: 0.2em; width: 1.6em; height: 1.6em; background: #fff; border-radius: 50%; transition: 0.3s; } .theme__toggle:checked { background: #0f172a; } .theme__toggle:checked::after { left: 2.2em; } .theme-switch-wrapper { transform: scale(0.8); }
+        /* --- [NEW] THEME SWITCH BUTTON STYLES (CLIENT) --- */
+        .theme {
+            display: flex;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+            font-size: 10px; /* Điều chỉnh kích thước nút */
+        }
+
+        .theme__icon { transition: 0.3s; }
+        .theme__icon, .theme__toggle { z-index: 1; }
+        .theme__icon, .theme__icon-part { position: absolute; }
+        .theme__icon { display: block; top: 0.5em; left: 0.5em; width: 1.5em; height: 1.5em; }
+
+        .theme__icon-part {
+            border-radius: 50%;
+            box-shadow: 0.4em -0.4em 0 0.5em hsl(0,0%,100%) inset;
+            top: calc(50% - 0.5em); left: calc(50% - 0.5em);
+            width: 1em; height: 1em;
+            transition: box-shadow var(--transDur) ease-in-out, opacity var(--transDur) ease-in-out, transform var(--transDur) ease-in-out;
+            transform: scale(0.5);
+        }
+
+        .theme__icon-part ~ .theme__icon-part {
+            background-color: hsl(0,0%,100%);
+            border-radius: 0.05em;
+            top: 50%; left: calc(50% - 0.05em);
+            transform: rotate(0deg) translateY(0.5em);
+            transform-origin: 50% 0;
+            width: 0.1em; height: 0.2em;
+        }
+
+        .theme__icon-part:nth-child(3) { transform: rotate(45deg) translateY(0.45em); }
+        .theme__icon-part:nth-child(4) { transform: rotate(90deg) translateY(0.45em); }
+        .theme__icon-part:nth-child(5) { transform: rotate(135deg) translateY(0.45em); }
+        .theme__icon-part:nth-child(6) { transform: rotate(180deg) translateY(0.45em); }
+        .theme__icon-part:nth-child(7) { transform: rotate(225deg) translateY(0.45em); }
+        .theme__icon-part:nth-child(8) { transform: rotate(270deg) translateY(0.5em); }
+        .theme__icon-part:nth-child(9) { transform: rotate(315deg) translateY(0.5em); }
+
+        .theme__label, .theme__toggle, .theme__toggle-wrap { position: relative; }
+        .theme__toggle, .theme__toggle:before { display: block; }
+
+        .theme__toggle {
+            background-color: hsl(48,90%,85%);
+            border-radius: 25% / 50%;
+            box-shadow: 0 0 0 0.125em rgba(255,255,255,0.5);
+            padding: 0.25em; width: 6em; height: 3em;
+            -webkit-appearance: none; appearance: none;
+            transition: background-color var(--transDur) ease-in-out, box-shadow 0.15s ease-in-out, transform var(--transDur) ease-in-out;
+            cursor: pointer;
+        }
+
+        .theme__toggle:before {
+            background-color: hsl(48,90%,55%);
+            border-radius: 50%; content: "";
+            width: 2.5em; height: 2.5em;
+            transition: 0.3s;
+        }
+
+        .theme__toggle:focus { box-shadow: 0 0 0 0.125em var(--primary); outline: transparent; }
+
+        /* Checked State (Dark Mode) */
+        .theme__toggle:checked { background-color: hsl(198,90%,15%); }
+        .theme__toggle:checked:before, .theme__toggle:checked ~ .theme__icon { transform: translateX(3em); }
+        .theme__toggle:checked:before { background-color: hsl(198,90%,55%); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(1) { box-shadow: 0.2em -0.2em 0 0.2em hsl(0,0%,100%) inset; transform: scale(1); top: 0.2em; left: -0.2em; }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part ~ .theme__icon-part { opacity: 0; }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(2) { transform: rotate(45deg) translateY(0.8em); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(3) { transform: rotate(90deg) translateY(0.8em); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(4) { transform: rotate(135deg) translateY(0.8em); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(5) { transform: rotate(180deg) translateY(0.8em); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(6) { transform: rotate(225deg) translateY(0.8em); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(7) { transform: rotate(270deg) translateY(0.8em); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(8) { transform: rotate(315deg) translateY(0.8em); }
+        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(9) { transform: rotate(360deg) translateY(0.8em); }
+
+        .theme__toggle-wrap { margin: 0 0.75em; }
     </style>
 </head>
 <body>
@@ -295,9 +375,21 @@
             if (type === 'chat') { chatInterface.classList.remove('d-none'); positionPopup('chat'); popup.classList.add('active'); } else { menuInterface.classList.remove('d-none'); setTimeout(() => { calculateMenuGrid(); positionPopup('menu'); popup.classList.add('active'); }, 10); }
         }
         function positionPopup(type) {
+            // Reset width to allow calculation based on content
+            if(type === 'menu') popup.style.width = 'fit-content';
+
             const rect = wrapper.getBoundingClientRect(); const screenW = window.innerWidth; const screenH = window.innerHeight; const gap = 20; const edgePadding = 20;
-            popup.style.display = 'flex'; popup.style.removeProperty('inset'); popup.style.inset = ''; popup.style.left = ''; popup.style.right = ''; popup.style.top = ''; popup.style.bottom = ''; popup.style.width = ''; popup.style.height = ''; popup.style.maxWidth = ''; popup.style.maxHeight = ''; popup.style.margin = ''; popup.style.transformOrigin = '';
-            if (type === 'chat') chatInterface.style.width = '';
+            popup.style.display = 'flex'; popup.style.removeProperty('inset'); popup.style.inset = ''; popup.style.left = ''; popup.style.right = ''; popup.style.top = ''; popup.style.bottom = '';
+            // KHÔNG reset width ở đây nữa nếu là PC menu để giữ fit-content
+            if (screenW < 998) { popup.style.width = ''; popup.style.maxWidth = ''; }
+
+            popup.style.height = ''; popup.style.maxHeight = ''; popup.style.margin = ''; popup.style.transformOrigin = '';
+
+            if (type === 'chat') {
+                chatInterface.style.width = '';
+                popup.style.width = 'max-content'; // Chat thì cần rộng
+            }
+
             if (screenW < 998) {
                 let vwUnit = 88; if (screenW < 400) vwUnit = 92; else if (screenW >= 400 && screenW <= 450) vwUnit = 90;
                 popup.style.width = `${vwUnit}vw`; popup.style.maxWidth = `${vwUnit}vw`; popup.style.left = '50%'; popup.style.transform = 'translateX(-50%)';
@@ -305,7 +397,15 @@
                 if (rect.top > screenH / 2) { popup.style.bottom = (screenH - rect.top + gap) + 'px'; popup.style.top = 'auto'; popup.style.transformOrigin = 'bottom center'; maxH = rect.top - gap - edgePadding; } else { popup.style.top = (rect.bottom + gap) + 'px'; popup.style.bottom = 'auto'; popup.style.transformOrigin = 'top center'; maxH = screenH - rect.bottom - gap - edgePadding; }
                 popup.style.maxHeight = maxH + 'px';
             } else {
-                popup.style.width = 'max-content'; popup.style.maxWidth = '95vw';
+                if(type === 'menu') {
+                    // Đảm bảo width là fit-content cho menu PC
+                    popup.style.width = 'fit-content';
+                    popup.style.maxWidth = '95vw';
+                } else {
+                    popup.style.width = 'max-content';
+                    popup.style.maxWidth = '95vw';
+                }
+
                 let availableWidth = 0;
                 if (rect.left > screenW / 2) { popup.style.right = (screenW - rect.left + gap) + 'px'; popup.style.left = 'auto'; popup.style.transformOrigin = 'right center'; availableWidth = rect.left - gap - edgePadding; } else { popup.style.left = (rect.right + gap) + 'px'; popup.style.right = 'auto'; popup.style.transformOrigin = 'left center'; availableWidth = screenW - rect.right - gap - edgePadding; }
                 if (type === 'chat') { let targetWidth = Math.min(availableWidth, 800); if (targetWidth < 350) targetWidth = 350; chatInterface.style.width = `${targetWidth}px`; }
@@ -313,12 +413,30 @@
                 popup.style.top = finalTop + 'px'; popup.style.bottom = 'auto'; popup.style.maxHeight = (screenH - 40) + 'px';
             }
         }
+
+        // --- CẬP NHẬT HÀM TÍNH GRID ĐỂ VỪA VẶN SỐ CỘT ---
         function calculateMenuGrid() {
             const grid = menuInterface.querySelector('.popup-grid');
             if(grid) {
                 grid.classList.remove('grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4');
-                const rect = wrapper.getBoundingClientRect(); const screenW = window.innerWidth; const minColWidth = 180; const gap = 20;
-                if (screenW < 576) { grid.classList.add('grid-cols-1'); } else if (screenW < 998) { grid.classList.add('grid-cols-2'); } else { let availW = (rect.left > screenW/2) ? (rect.left - gap) : (screenW - rect.right - gap); let cols = Math.floor(availW / minColWidth); if (cols > 4) cols = 4; if (cols < 1) cols = 1; grid.classList.add(`grid-cols-${cols}`); }
+                const screenW = window.innerWidth;
+
+                // Đếm số lượng cột thực tế có trong HTML
+                const actualColumnsCount = grid.querySelectorAll('.menu-column').length;
+
+                if (screenW < 576) {
+                    grid.classList.add('grid-cols-1');
+                } else if (screenW < 998) {
+                    grid.classList.add('grid-cols-2');
+                } else {
+                    // Trên PC: Không bao giờ chia quá số cột thực tế
+                    // Nếu có 2 cột nội dung -> grid-cols-2
+                    // Nếu có 4 cột nội dung -> grid-cols-4
+                    let cols = actualColumnsCount;
+                    if (cols > 4) cols = 4;
+                    if (cols < 1) cols = 1;
+                    grid.classList.add(`grid-cols-${cols}`);
+                }
             }
         }
 

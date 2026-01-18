@@ -3,12 +3,21 @@
         <i class="fa-solid fa-compass me-2"></i>MENU KHÁCH HÀNG
     </div>
 
+    {{-- SWITCH BUTTON NGÀY ĐÊM (NEW DESIGN) --}}
     <div class="theme-switch-wrapper">
         <label for="theme" class="theme">
             <span class="theme__toggle-wrap">
                 <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark">
                 <span class="theme__icon">
-                    <span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
+                    <span class="theme__icon-part"></span>
                 </span>
             </span>
         </label>

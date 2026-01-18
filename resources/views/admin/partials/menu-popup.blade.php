@@ -3,11 +3,12 @@
         <i class="fa-solid fa-bars-staggered me-2"></i>MENU QUẢN TRỊ
     </div>
 
-    {{-- SWITCH BUTTON NGÀY ĐÊM --}}
+    {{-- SWITCH BUTTON NGÀY ĐÊM (NEW DESIGN) --}}
     <div class="theme-switch-wrapper">
         <label for="theme" class="theme">
             <span class="theme__toggle-wrap">
                 <input id="theme" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark">
+                {{-- Icon Mặt trời / Mặt trăng --}}
                 <span class="theme__icon">
                     <span class="theme__icon-part"></span>
                     <span class="theme__icon-part"></span>
