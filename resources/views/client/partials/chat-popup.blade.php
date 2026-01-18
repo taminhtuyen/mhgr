@@ -27,11 +27,17 @@
         .nav-tabs-custom .nav-link:hover { color: var(--primary); }
         .nav-tabs-custom .nav-link.active { color: var(--primary); background: transparent; border-bottom: 2px solid var(--primary); }
 
-        /* --- 3. SIDEBAR ACTIONS (ĐỒNG BỘ STYLE) --- */
+        /* --- 3. SIDEBAR ACTIONS (FIX STACKING CONTEXT) --- */
         .chat-actions-btn {
             position: absolute; top: 50%; right: 10px;
             transform: translateY(-50%); z-index: 10;
         }
+
+        /* Đẩy z-index lên cao nhất khi mở menu để không bị đè bởi các nút khác */
+        .chat-actions-btn.show {
+            z-index: 1000 !important;
+        }
+
         .chat-actions-btn .btn-icon {
             color: #94a3b8;
             background: rgba(255, 255, 255, 0.9);
@@ -56,7 +62,7 @@
 
         /* --- 4. HEADER DROPDOWN --- */
         .header-dropdown-menu {
-            width: 220px;
+            width: 260px;
             background-color: var(--popup-bg);
             border: 1px solid var(--popup-border);
             box-shadow: var(--popup-shadow);
@@ -96,16 +102,28 @@
         @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 6. AUTO-EXPAND TEXTAREA --- */
+        /* --- 6. AUTO-EXPAND TEXTAREA & SCALABLE INPUT --- */
         #chat-input-field {
             resize: none;
             overflow-y: hidden;
-            min-height: 40px;
+            min-height: 2.6rem; /* Co giãn theo rem */
             max-height: 120px;
             line-height: 1.5;
             padding-top: 8px; padding-bottom: 8px;
         }
         #chat-input-field.scroll-active { overflow-y: auto; }
+
+        /* Style cho các nút nhập liệu co giãn theo font-size */
+        .chat-input-btn {
+            height: 2.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .chat-input-btn i {
+            font-size: 1.1rem; /* Icon cũng phóng to theo rem */
+        }
 
         /* --- 7. MOBILE RESPONSIVE --- */
         .mobile-nav-btn { display: none; }
@@ -135,7 +153,6 @@
 
         {{-- CỘT TRÁI: DANH SÁCH --}}
         <div class="chat-sidebar d-flex flex-column border-end h-100" id="chat-list-col" style="border-color: var(--popup-border) !important;">
-            {{-- Tabs --}}
             <div class="p-3 border-bottom flex-shrink-0" style="border-color: var(--popup-border) !important;">
                 <div class="d-flex align-items-center mb-3">
                     <div class="dropdown me-2">
@@ -154,7 +171,6 @@
                 </ul>
             </div>
 
-            {{-- List Items --}}
             <div class="chat-list flex-grow-1 overflow-auto custom-scrollbar" style="position: relative;">
                 <div class="tab-content" id="chatTabContent">
                     {{-- TAB 1: SELLER --}}
@@ -166,7 +182,6 @@
                                 <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người bán {{ $k }}</h6><small class="text-muted" style="font-size: 0.7rem;">Hôm qua</small></div>
                                 <p class="mb-0 text-truncate small mt-1 fw-bold" style="color: var(--text-color);">Đã xác nhận đơn hàng...</p>
                             </div>
-                            {{-- MENU NGƯỜI BÁN (Full Option) --}}
                             <div class="dropdown chat-actions-btn">
                                 <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
                                     <i class="fa-solid fa-ellipsis"></i>
@@ -192,7 +207,6 @@
                                 <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người mua {{ $i }}</h6><small class="text-muted" style="font-size: 0.7rem;">10:30</small></div>
                                 <p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Sản phẩm này còn hàng...</p>
                             </div>
-                            {{-- MENU NGƯỜI MUA (Full Option) --}}
                             <div class="dropdown chat-actions-btn">
                                 <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
                                     <i class="fa-solid fa-ellipsis"></i>
@@ -215,16 +229,12 @@
                             <div class="flex-shrink-0 position-relative"><div class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white" style="width: 45px; height: 45px; background: linear-gradient(45deg, #ff416c, #ff4b2b);"><i class="fa-solid fa-robot"></i></div></div>
                             <div class="flex-grow-1 overflow-hidden pe-4"><div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate fw-bold" style="color: var(--text-color); font-size: 0.9rem;">HỆ THỐNG</h6><small class="text-muted" style="font-size: 0.7rem;">Vừa xong</small></div><p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Chào mừng bạn...</p></div>
 
-                            {{-- MENU HỆ THỐNG (KHÔNG CÓ CHẶN) --}}
                             <div class="dropdown chat-actions-btn">
-                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
+                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
                                     <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell me-2 text-primary"></i>Bật thông báo</a></li>
                                     <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell-slash me-2 text-muted"></i>Tắt thông báo</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    {{-- Không có nút Chặn ở đây --}}
                                     <li><a class="dropdown-item small text-danger" href="#"><i class="fa-solid fa-trash me-2"></i>Xóa hội thoại</a></li>
                                 </ul>
                             </div>
@@ -237,22 +247,23 @@
         {{-- CỘT PHẢI: CỬA SỔ CHAT --}}
         <div class="chat-window flex-grow-1 d-flex flex-column h-100" id="chat-content-col">
 
-            {{-- HEADER --}}
+            {{-- HEADER (FIXED OVERFLOW & TRUNCATE) --}}
             <div class="chat-header p-3 border-bottom d-flex align-items-center flex-shrink-0"
                  style="background: var(--popup-bg); backdrop-filter: blur(5px); border-color: var(--popup-border) !important; z-index: 5;">
                 <button class="btn btn-back-mobile me-3 mobile-nav-btn shadow-sm" onclick="backToChatList()"><i class="fa-solid fa-chevron-left"></i></button>
 
                 <img src="https://ui-avatars.com/api/?name=Seller+1&background=random" class="rounded-circle me-2" width="40" height="40">
 
-                <div style="line-height: 1.4;">
-                    <div class="fw-bold mb-1" style="color: var(--text-color); font-size: 0.95rem;">Người bán 1</div>
-                    <div class="small text-success d-flex align-items-center" style="font-size: 0.7rem;">
-                        <i class="fa-solid fa-circle me-1" style="font-size: 6px;"></i> Đang hoạt động
+                {{-- Ép tiêu đề không tràn dòng khi font-size tăng --}}
+                <div style="line-height: 1.4; min-width: 0; flex: 1;">
+                    <div class="fw-bold text-truncate" style="color: var(--text-color); font-size: 0.95rem;">Người bán 1</div>
+                    <div class="small text-success d-flex align-items-center text-truncate" style="font-size: 0.7rem;">
+                        <i class="fa-solid fa-circle me-1 flex-shrink-0" style="font-size: 0.4rem;"></i>
+                        <span class="text-truncate">Đang hoạt động</span>
                     </div>
                 </div>
 
-                <div class="ms-auto d-flex align-items-center gap-2">
-                    {{-- Dropdown Header --}}
+                <div class="ms-auto d-flex align-items-center gap-2 flex-shrink-0">
                     <div class="dropdown">
                         <button class="btn btn-sm btn-icon text-secondary no-arrow" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Tuỳ chọn">
                             <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -268,7 +279,6 @@
                             <li><a class="dropdown-item header-dropdown-item text-danger" href="#"><i class="fa-solid fa-ban"></i> Chặn người này</a></li>
                         </ul>
                     </div>
-                    {{-- Nút Đóng --}}
                     <button class="btn btn-sm btn-icon text-muted" onclick="closeAll()" title="Đóng chat">
                         <i class="fa-solid fa-xmark" style="font-size: 1.1rem;"></i>
                     </button>
@@ -294,11 +304,10 @@
                 @endfor
             </div>
 
-            {{-- INPUT AREA --}}
+            {{-- INPUT AREA (SCALABLE) --}}
             <div class="chat-input-area p-3 border-top flex-shrink-0 position-relative"
                  style="background: var(--popup-bg); border-color: var(--popup-border) !important; z-index: 5;">
 
-                {{-- Typing Indicator --}}
                 <div id="typing-indicator" class="chat-typing-indicator d-none">
                     <div class="typing-dots">
                         <span></span><span></span><span></span>
@@ -306,17 +315,23 @@
                     <small class="text-muted ms-2" style="font-size: 0.75rem;">Người bán đang soạn tin...</small>
                 </div>
 
-                {{-- Input Group --}}
-                <div class="input-group align-items-end">
-                    <button class="btn btn-outline-secondary border-end-0 text-primary" style="background-color: var(--bg-body); border-color: var(--popup-border); height: 40px;"><i class="fa-solid fa-plus"></i></button>
+                <div class="input-group align-items-end" style="gap: 2px;">
+                    {{-- Nút thêm tệp co giãn theo rem --}}
+                    <button class="btn btn-outline-secondary border-end-0 text-primary chat-input-btn"
+                            style="background-color: var(--bg-body); border-color: var(--popup-border); width: 2.6rem; border-radius: 8px 0 0 8px !important;">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
 
-                    {{-- TEXTAREA AUTO-GROW --}}
                     <textarea id="chat-input-field" class="form-control border-start-0 border-end-0 chat-search-input"
                               rows="1"
                               placeholder="Nhập tin nhắn..."
                               style="background-color: var(--bg-body); color: var(--text-color); border-color: var(--popup-border);"></textarea>
 
-                    <button id="btn-send-message" class="btn btn-primary px-3" style="height: 40px;"><i class="fa-solid fa-paper-plane"></i></button>
+                    {{-- Nút gửi co giãn theo rem --}}
+                    <button id="btn-send-message" class="btn btn-primary chat-input-btn"
+                            style="width: 3.2rem; border-radius: 0 8px 8px 0 !important;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -331,16 +346,13 @@
         const typingIndicator = document.getElementById('typing-indicator');
         const btnSend = document.getElementById('btn-send-message');
 
-        // --- 1. CONFIG: CHAT SETTINGS ---
-        let chatSettings = {
-            enterToSend: false
-        };
+        // --- 1. CONFIG ---
+        let chatSettings = { enterToSend: false };
 
         // --- 2. SEND MESSAGE LOGIC ---
         function sendMessage() {
             const msg = inputField.value.trim();
             if (!msg) return;
-
             console.log('Client sending message:', msg);
             inputField.value = '';
             inputField.style.height = 'auto';
@@ -351,17 +363,14 @@
             inputField.addEventListener('input', function() {
                 this.style.height = 'auto';
                 this.style.height = (this.scrollHeight) + 'px';
-
                 if (this.scrollHeight > 120) this.classList.add('scroll-active');
                 else this.classList.remove('scroll-active');
             });
 
             inputField.addEventListener('keydown', function(e) {
-                if (chatSettings.enterToSend) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
+                if (chatSettings.enterToSend && e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
                 }
             });
         }
@@ -373,25 +382,29 @@
             });
         }
 
-        // --- 4. LOGIC TỰ ĐỘNG ĐÓNG MENU KHÁC (SINGLE DROPDOWN) ---
-        // Lấy tất cả nút ba chấm trong sidebar
+        // --- 4. DROPDOWN FIX (STACKING CONTEXT) ---
         const actionButtons = document.querySelectorAll('.chat-actions-btn [data-bs-toggle="dropdown"]');
 
         actionButtons.forEach(btn => {
             btn.addEventListener('show.bs.dropdown', function () {
-                // Khi một menu mở ra, lặp qua tất cả các menu khác để đóng chúng
                 actionButtons.forEach(otherBtn => {
                     if (otherBtn !== btn) {
                         const dropdown = bootstrap.Dropdown.getInstance(otherBtn);
-                        if (dropdown) {
-                            dropdown.hide();
-                        }
+                        if (dropdown) dropdown.hide();
                     }
                 });
+
+                const parentDiv = btn.closest('.chat-actions-btn');
+                if(parentDiv) parentDiv.classList.add('show');
+            });
+
+            btn.addEventListener('hidden.bs.dropdown', function () {
+                const parentDiv = btn.closest('.chat-actions-btn');
+                if(parentDiv) parentDiv.classList.remove('show');
             });
         });
 
-        // --- 5. LOGIC MOBILE FIX ---
+        // --- 5. MOBILE FIX ---
         if (window.visualViewport && window.innerWidth < 998) {
             const handleResize = () => {
                 if (!chatInterface.classList.contains('d-none') && popup.classList.contains('active')) {
@@ -423,7 +436,6 @@
 
         window.openChatDetail = function(id) {
             chatInterface.classList.add('in-conversation');
-            console.log("Client opening chat:", id);
         }
 
         window.backToChatList = function() {
@@ -435,7 +447,6 @@
             const chatInterface = document.getElementById('chat-interface');
             if(menuInterface) menuInterface.classList.add('d-none');
             if(chatInterface) chatInterface.classList.remove('d-none');
-
             if (window.visualViewport) window.visualViewport.dispatchEvent(new Event('resize'));
         }
 

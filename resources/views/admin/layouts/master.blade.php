@@ -33,8 +33,6 @@
             --modal-bg: rgba(255, 255, 255, 0.9);
             --modal-text: #000;
             --modal-border: rgba(60, 60, 67, 0.29);
-            --modal-btn-cancel: #007aff;
-            --modal-btn-confirm: #ff3b30;
         }
 
         body.dark-mode {
@@ -55,15 +53,13 @@
             --modal-bg: rgba(30, 30, 30, 0.9);
             --modal-text: #fff;
             --modal-border: rgba(84, 84, 88, 0.65);
-            --modal-btn-cancel: #0a84ff;
-            --modal-btn-confirm: #ff453a;
         }
 
-        /* UPDATED: Cấu trúc cuộn cố định (Fixed Body, Scroll Wrapper) */
+        /* Layout cơ bản */
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; background-color: var(--bg-body); color: var(--text-color); }
         body.no-select { user-select: none; -webkit-user-select: none; }
 
-        /* UPDATED: Main Wrapper là khung cuộn chính */
+        /* Main Wrapper */
         #main-wrapper { width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; position: relative; z-index: 1; padding-bottom: 100px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
         #main-wrapper::-webkit-scrollbar { width: 8px; }
         #main-wrapper::-webkit-scrollbar-track { background: transparent; }
@@ -76,7 +72,7 @@
         .glass-effect { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .cursor-pointer { cursor: pointer !important; }
 
-        /* Dark Mode overrides common */
+        /* Dark Mode Overrides */
         body.dark-mode .text-dark { color: #f1f5f9 !important; }
         body.dark-mode .text-primary { color: #38bdf8 !important; }
         body.dark-mode .text-secondary { color: #cbd5e1 !important; }
@@ -93,7 +89,6 @@
             background: rgba(0,0,0,0.4);
             transition: 0.3s;
             z-index: 1;
-            /* Ngăn chặn sự kiện chuột xuyên qua nhưng không đóng */
             pointer-events: auto;
         }
 
@@ -111,19 +106,34 @@
         #global-confirm-modal.active .modal-box { transform: scale(1); }
 
         .modal-content-box { padding: 20px 16px 20px; }
-        .modal-title { font-weight: 700; font-size: 17px; margin-bottom: 6px; color: var(--modal-text); }
-        .modal-desc { font-size: 13px; line-height: 1.4; color: var(--modal-text); opacity: 0.8; word-wrap: break-word; }
+        /* CẬP NHẬT: Sử dụng rem để co giãn theo cài đặt cỡ chữ */
+        .modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; color: var(--modal-text); }
+        .modal-desc { font-size: 0.85rem; line-height: 1.4; color: var(--modal-text); opacity: 0.8; word-wrap: break-word; }
 
+        /* --- DYNAMIC ACTIONS AREA --- */
         .modal-actions { display: flex; border-top: 0.5px solid var(--modal-border); }
 
         .btn-modal {
             flex: 1; border: none; background: transparent; padding: 12px;
-            font-size: 17px; cursor: pointer; transition: 0.2s;
+            /* CẬP NHẬT: Sử dụng rem để co giãn theo cài đặt cỡ chữ */
+            font-size: 1.05rem; cursor: pointer; transition: 0.2s;
+            border-right: 0.5px solid var(--modal-border);
+            color: #007aff; /* Default iOS Blue */
+            font-weight: 400;
         }
+        .btn-modal:last-child { border-right: none; }
         .btn-modal:active { background: rgba(127,127,127,0.15); }
 
-        .btn-cancel { color: var(--modal-btn-cancel); border-right: 0.5px solid var(--modal-border); font-weight: 400; }
-        .btn-confirm { color: var(--modal-btn-confirm); font-weight: 600; }
+        /* --- COLOR VARIANTS --- */
+        .modal-text-primary { color: #007aff !important; font-weight: 400; }
+        .modal-text-danger { color: #ff3b30 !important; font-weight: 600; }
+        .modal-text-success { color: #34c759 !important; font-weight: 600; }
+        .modal-text-bold { font-weight: 600 !important; }
+
+        /* Dark Mode Adaptation */
+        body.dark-mode .modal-text-primary { color: #0a84ff !important; }
+        body.dark-mode .modal-text-danger { color: #ff453a !important; }
+        body.dark-mode .modal-text-success { color: #30d158 !important; }
     </style>
 </head>
 <body>
@@ -152,91 +162,122 @@
             <div id="global-modal-title" class="modal-title"></div>
             <div id="global-modal-desc" class="modal-desc"></div>
         </div>
-        <div class="modal-actions">
-            <button class="btn-modal btn-cancel" id="btn-global-cancel"></button>
-            <button class="btn-modal btn-confirm" id="btn-global-confirm"></button>
-        </div>
+        <div id="global-modal-actions" class="modal-actions"></div>
     </div>
 </div>
 
 <script>
-    // --- 1. KHỞI TẠO THEME ---
+    // --- 1. THEME SETUP ---
     (function() {
         const savedTheme = localStorage.getItem('admin_theme_preference');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
+        if (savedTheme === 'dark') document.body.classList.add('dark-mode');
     })();
 
-    // --- 2. LOGIC SCROLL ẨN/HIỆN BUBBLE (FIXED) ---
+    // --- 2. SCROLL LOGIC ---
     document.addEventListener('DOMContentLoaded', () => {
         const mainWrapper = document.getElementById('main-wrapper');
         const bubbleWrapper = document.getElementById('bubble-wrapper');
-
         if(mainWrapper && bubbleWrapper) {
             let lastScrollTop = 0;
             const scrollThreshold = 50;
-
             mainWrapper.addEventListener('scroll', () => {
                 if (window.isSystemOpen || document.body.classList.contains('no-select')) return;
-
                 const currentScroll = mainWrapper.scrollTop;
-
                 if (currentScroll <= scrollThreshold) {
                     bubbleWrapper.classList.remove('scroll-hidden');
                 } else {
-                    if (currentScroll > lastScrollTop) {
-                        bubbleWrapper.classList.add('scroll-hidden'); // Cuộn xuống -> Ẩn
-                    } else {
-                        bubbleWrapper.classList.remove('scroll-hidden'); // Cuộn lên -> Hiện
-                    }
+                    if (currentScroll > lastScrollTop) bubbleWrapper.classList.add('scroll-hidden');
+                    else bubbleWrapper.classList.remove('scroll-hidden');
                 }
                 lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
             });
         }
     });
 
-    // --- 3. HỆ THỐNG POPUP TOÀN CỤC ---
-    function showGlobalModal(type, titleHtml, descHtml, cancelText, confirmText, onConfirm) {
+    // --- 3. HỆ THỐNG MODAL THÔNG MINH (CORE) ---
+
+    const closeGlobalModal = () => {
+        document.getElementById('global-confirm-modal').classList.remove('active');
+    };
+
+    function showCustomModal(title, desc, buttons = []) {
         const modal = document.getElementById('global-confirm-modal');
         const elTitle = document.getElementById('global-modal-title');
         const elDesc = document.getElementById('global-modal-desc');
-        const btnCancel = document.getElementById('btn-global-cancel');
-        const btnConfirm = document.getElementById('btn-global-confirm');
+        const elActions = document.getElementById('global-modal-actions');
 
-        btnCancel.style.display = 'block';
-        btnConfirm.style.width = 'auto';
+        elTitle.innerHTML = title || 'Thông báo';
+        elDesc.innerHTML = desc || '';
+        elActions.innerHTML = '';
 
-        elTitle.innerHTML = titleHtml || 'Thông báo';
-        elDesc.innerHTML = descHtml || '';
-        btnCancel.innerText = cancelText || 'Hủy';
-        btnConfirm.innerText = confirmText || 'Đồng ý';
+        buttons.forEach(btn => {
+            const button = document.createElement('button');
+            button.className = 'btn-modal ' + (btn.class || 'modal-text-primary');
+            button.innerHTML = btn.text || 'Nút';
 
-        if (type === 'alert') {
-            btnCancel.style.display = 'none';
-        }
+            button.onclick = () => {
+                if (typeof btn.onClick === 'function') {
+                    btn.onClick();
+                }
+                if (!btn.preventClose) {
+                    closeGlobalModal();
+                }
+            };
+            elActions.appendChild(button);
+        });
 
         modal.classList.add('active');
-
-        const closeModal = () => { modal.classList.remove('active'); };
-
-        // Chỉ đóng khi nhấn nút, KHÔNG đóng khi nhấn background
-        btnCancel.onclick = closeModal;
-
-        btnConfirm.onclick = () => {
-            if (typeof onConfirm === 'function') {
-                onConfirm();
-            }
-            closeModal();
-        };
     }
 
-    window.showConfirm = function(title, desc, txtCancel, txtConfirm, callback) {
-        showGlobalModal('confirm', title, desc, txtCancel, txtConfirm, callback);
+    // --- 4. SHORTCUT HELPERS ---
+
+    window.showAlert = function(title, desc, btnText = 'Đóng', btnColor = 'primary', callback = null) {
+        const btnClass = `modal-text-${btnColor}`;
+        showCustomModal(title, desc, [
+            {
+                text: btnText,
+                class: btnClass + (btnColor !== 'primary' ? ' modal-text-bold' : ''),
+                onClick: callback
+            }
+        ]);
     };
 
-    window.showAlert = function(title, desc, txtBtn = 'Đóng', callback = null) {
-        showGlobalModal('alert', title, desc, null, txtBtn, callback);
+    window.showConfirm = function(title, desc, arg3, arg4, arg5) {
+        let cancelText = 'Hủy';
+        let confirmText = 'Đồng ý';
+        let onConfirm = null;
+        let onCancel = null;
+        let confirmColor = 'danger';
+        let cancelColor = 'primary';
+
+        if (typeof arg3 === 'function') {
+            onConfirm = arg3;
+            const options = arg4 || {};
+            if(options.cancelText) cancelText = options.cancelText;
+            if(options.confirmText) confirmText = options.confirmText;
+            if(options.confirmColor) confirmColor = options.confirmColor;
+            if(options.cancelColor) cancelColor = options.cancelColor;
+            if(options.onCancel && typeof options.onCancel === 'function') {
+                onCancel = options.onCancel;
+            }
+        } else {
+            cancelText = arg3 || 'Hủy';
+            confirmText = arg4 || 'Đồng ý';
+            onConfirm = arg5;
+        }
+
+        showCustomModal(title, desc, [
+            {
+                text: cancelText,
+                class: `modal-text-${cancelColor}`,
+                onClick: onCancel
+            },
+            {
+                text: confirmText,
+                class: `modal-text-${confirmColor}`,
+                onClick: onConfirm
+            }
+        ]);
     };
 </script>
 
@@ -248,11 +289,16 @@
     });
     var channel = pusher.subscribe('notifications');
     channel.bind('system.message', function(data) {
+        let btnColor = 'primary';
+        if (data.type === 'error') btnColor = 'danger';
+        else if (data.type === 'success') btnColor = 'success';
+
         if (typeof window.showAlert === 'function') {
             window.showAlert(
                 '<i class="fa-solid fa-bell text-warning"></i> THÔNG BÁO MỚI',
                 data.message,
-                'Đã xem'
+                'Đã xem',
+                btnColor
             );
         } else {
             alert('Thông báo: ' + data.message);
