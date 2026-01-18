@@ -81,6 +81,7 @@
             background: rgba(0,0,0,0.4);
             transition: 0.3s;
             z-index: 1; /* Nằm dưới Box */
+            pointer-events: auto; /* Chặn click xuyên qua nhưng không gán sự kiện đóng */
         }
 
         .modal-box {
@@ -221,11 +222,8 @@
         // Xử lý sự kiện (Gán đè để tránh lặp)
         btnCancel.onclick = closeModal;
 
-        modal.onclick = (e) => {
-            if(e.target === modal || e.target.classList.contains('modal-backdrop')) {
-                closeModal();
-            }
-        };
+        // --- CẬP NHẬT: Không đóng khi nhấn ra ngoài (Backdrop) ---
+        // modal.onclick = (e) => { ... } -> Đã xóa logic kiểm tra backdrop
 
         btnConfirm.onclick = () => {
             if (typeof onConfirm === 'function') {
@@ -250,6 +248,27 @@
     window.showAlert = function(title, desc, txtBtn = 'Đóng', callback = null) {
         showGlobalModal('alert', title, desc, null, txtBtn, callback);
     };
+</script>
+
+{{-- --- REAL-TIME NOTIFICATION SYSTEM (PUSHER) --- --}}
+{{-- Thêm giống Admin để nhận thông báo --}}
+<script src="{{ asset('js/pusher.min.js') }}"></script>
+<script>
+    var pusher = new Pusher('bbd581278169e135dc72', {
+        cluster: 'ap1'
+    });
+    var channel = pusher.subscribe('notifications');
+    channel.bind('system.message', function(data) {
+        if (typeof window.showAlert === 'function') {
+            window.showAlert(
+                '<i class="fa-solid fa-bell text-warning"></i> THÔNG BÁO MỚI',
+                data.message,
+                'Đã xem'
+            );
+        } else {
+            alert('Thông báo: ' + data.message);
+        }
+    });
 </script>
 
 @livewireScripts

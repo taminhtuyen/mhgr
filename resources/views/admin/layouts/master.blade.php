@@ -93,6 +93,8 @@
             background: rgba(0,0,0,0.4);
             transition: 0.3s;
             z-index: 1;
+            /* Ngăn chặn sự kiện chuột xuyên qua nhưng không đóng */
+            pointer-events: auto;
         }
 
         .modal-box {
@@ -218,13 +220,8 @@
 
         const closeModal = () => { modal.classList.remove('active'); };
 
+        // Chỉ đóng khi nhấn nút, KHÔNG đóng khi nhấn background
         btnCancel.onclick = closeModal;
-
-        modal.onclick = (e) => {
-            if(e.target === modal || e.target.classList.contains('modal-backdrop')) {
-                closeModal();
-            }
-        };
 
         btnConfirm.onclick = () => {
             if (typeof onConfirm === 'function') {
@@ -246,17 +243,11 @@
 {{-- --- REAL-TIME NOTIFICATION SYSTEM (PUSHER) --- --}}
 <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script>
-    // 1. Khởi tạo kết nối Pusher (Key của bạn)
     var pusher = new Pusher('bbd581278169e135dc72', {
         cluster: 'ap1'
     });
-
-    // 2. Đăng ký kênh 'notifications' (Khớp với file PHP SystemNotification)
     var channel = pusher.subscribe('notifications');
-
-    // 3. Lắng nghe sự kiện 'system.message'
     channel.bind('system.message', function(data) {
-        // Khi có tin nhắn, dùng showAlert để hiện Popup
         if (typeof window.showAlert === 'function') {
             window.showAlert(
                 '<i class="fa-solid fa-bell text-warning"></i> THÔNG BÁO MỚI',
