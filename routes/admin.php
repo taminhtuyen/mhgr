@@ -92,9 +92,7 @@ Route::prefix('sales')->name('sales.')->group(function () {
 
 // 2. NHÓM SẢN PHẨM (Catalog)
 Route::prefix('catalog')->name('catalog.')->group(function () {
-    Route::get('products', function () {
-        return view('admin.products.index');
-    })->name('products.index');
+    Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('attributes', AttributeController::class);
     Route::resource('suppliers', SupplierController::class);
