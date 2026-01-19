@@ -1,5 +1,5 @@
 <div id="bubble-wrapper" style="position: fixed; bottom: 30px; right: 30px; z-index: 10000;">
-    {{-- 2 BONG BÓNG CON (MENU & CHAT) --}}
+    {{-- 3 BONG BÓNG CON --}}
     <div class="sub-bubbles-container">
         {{-- 1. Bong bóng Menu --}}
         <div class="sub-bubble" id="btn-open-menu" title="Menu chức năng">
@@ -9,6 +9,10 @@
         <div class="sub-bubble" id="btn-open-chat" title="Tin nhắn">
             <i class="fa-solid fa-comments"></i>
             <span class="badge-counter">1</span>
+        </div>
+        {{-- 3. Bong bóng Cài đặt (MỚI) --}}
+        <div class="sub-bubble" id="btn-open-settings" title="Cài đặt">
+            <i class="fa-solid fa-gear"></i>
         </div>
     </div>
 
@@ -107,19 +111,14 @@
 
     /* ACTIVE STATE (ĐƯỢC CHỌN - TĨNH, KHÔNG NHẤP NHÁY) */
     .sub-bubble.active {
-        /* 1. Nền Gradient */
         background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
-        /* 2. Màu chữ trắng */
         color: #fff !important;
-        /* 3. Viền phát sáng nhẹ */
         border: 1px solid rgba(255,255,255,0.4) !important;
-        /* 4. Scale to hơn chút */
         transform: scale(1.15) !important;
-        /* 5. BOX-SHADOW TĨNH (STATIC GLOW) */
         box-shadow:
-            0 0 0 4px rgba(14, 165, 233, 0.2),  /* Vầng sáng mờ bao quanh (Ring) */
-            0 10px 25px -5px rgba(14, 165, 233, 0.7), /* Bóng đổ sâu bên dưới */
-            0 0 20px rgba(14, 165, 233, 0.5) !important; /* Ánh sáng toả ra xung quanh */
+            0 0 0 4px rgba(14, 165, 233, 0.2),
+            0 10px 25px -5px rgba(14, 165, 233, 0.7),
+            0 0 20px rgba(14, 165, 233, 0.5) !important;
     }
 
     #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
@@ -150,15 +149,15 @@
         const popup = document.getElementById('nav-popup');
         const backdrop = document.getElementById('nav-backdrop');
         const icon = document.getElementById('bubble-icon');
-        const mainWrapper = document.getElementById('main-wrapper');
 
         // Buttons
         const btnMenu = document.getElementById('btn-open-menu');
         const btnChat = document.getElementById('btn-open-chat');
+        const btnSettings = document.getElementById('btn-open-settings'); // MỚI
 
         // Global state
         window.isSystemOpen = false;
-        window.currentPopupMode = 'menu'; // Default
+        window.currentPopupMode = 'menu';
 
         // --- 1. LOGIC DRAG & DROP ---
         let isDragging = false, startX, startY, initialLeft, initialTop;
@@ -208,7 +207,7 @@
             }
         };
 
-        // --- 2. HỆ THỐNG ĐIỀU KHIỂN (OPEN/CLOSE/POSITION) ---
+        // --- 2. HỆ THỐNG ĐIỀU KHIỂN ---
         window.openAll = function(mode) {
             window.isSystemOpen = true; window.currentPopupMode = mode;
             expandBubblesVisual();
@@ -218,13 +217,13 @@
             // Render Content
             if(mode === 'menu' && typeof window.renderMenuContent === 'function') window.renderMenuContent();
             if(mode === 'chat' && typeof window.renderChatContent === 'function') window.renderChatContent();
+            if(mode === 'settings' && typeof window.renderSettingsContent === 'function') window.renderSettingsContent(); // MỚI
 
             wrapper.classList.add('expanded');
             icon.classList.replace('fa-bars', 'fa-xmark');
             backdrop.classList.add('active');
             popup.classList.add('active');
 
-            // Hiệu ứng: Chuyển màu đỏ & Sáng bong bóng con
             mainBubble.classList.add('red-mode');
             highlightActiveBubble(mode);
 
@@ -236,17 +235,20 @@
             wrapper.classList.remove('expanded'); popup.classList.remove('active');
             icon.classList.replace('fa-xmark', 'fa-bars'); backdrop.classList.remove('active');
 
-            // Tắt hiệu ứng
             mainBubble.classList.remove('red-mode');
-            if(btnMenu) btnMenu.classList.remove('active');
-            if(btnChat) btnChat.classList.remove('active');
+            btnMenu.classList.remove('active');
+            btnChat.classList.remove('active');
+            btnSettings.classList.remove('active'); // MỚI
         };
 
         function highlightActiveBubble(mode) {
-            if(btnMenu) btnMenu.classList.remove('active');
-            if(btnChat) btnChat.classList.remove('active');
-            if (mode === 'menu' && btnMenu) btnMenu.classList.add('active');
-            if (mode === 'chat' && btnChat) btnChat.classList.add('active');
+            btnMenu.classList.remove('active');
+            btnChat.classList.remove('active');
+            btnSettings.classList.remove('active'); // MỚI
+
+            if (mode === 'menu') btnMenu.classList.add('active');
+            if (mode === 'chat') btnChat.classList.add('active');
+            if (mode === 'settings') btnSettings.classList.add('active');
         }
 
         window.expandBubblesVisual = function() {
@@ -273,7 +275,7 @@
                 if (rect.top > screenH / 2) { popup.style.bottom = (screenH - rect.top + gap) + 'px'; popup.style.top = 'auto'; popup.style.maxHeight = (rect.top - gap - edgePadding) + 'px'; popup.style.transformOrigin = 'bottom center'; }
                 else { popup.style.top = (rect.bottom + gap) + 'px'; popup.style.bottom = 'auto'; popup.style.maxHeight = (screenH - rect.bottom - gap - edgePadding) + 'px'; popup.style.transformOrigin = 'top center'; }
             } else { // PC
-                popup.style.width = type === 'menu' ? 'fit-content' : 'max-content';
+                popup.style.width = (type === 'menu' || type === 'settings') ? 'fit-content' : 'max-content';
                 popup.style.maxWidth = '95vw';
                 if (rect.left > screenW / 2) { popup.style.right = (screenW - rect.left + gap) + 'px'; popup.style.left = 'auto'; popup.style.transformOrigin = 'right center'; }
                 else { popup.style.left = (rect.right + gap) + 'px'; popup.style.right = 'auto'; popup.style.transformOrigin = 'left center'; }
@@ -285,12 +287,9 @@
         };
 
         // --- 3. BẮT SỰ KIỆN SUB-BUBBLES ---
-        // Sửa: Thêm sự kiện cho nút Menu và Chat
         if(btnMenu) btnMenu.addEventListener('click', (e) => { e.stopPropagation(); openAll('menu'); });
         if(btnChat) btnChat.addEventListener('click', (e) => { e.stopPropagation(); openAll('chat'); });
-
-        // QUAN TRỌNG: Đã xóa sự kiện backdrop click để đóng popup
-        // backdrop.addEventListener('click', closeAll); -> DELETED
+        if(btnSettings) btnSettings.addEventListener('click', (e) => { e.stopPropagation(); openAll('settings'); }); // MỚI
 
         let resizeTimer;
         window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (window.isSystemOpen) { expandBubblesVisual(); window.positionPopup(window.currentPopupMode); } }, 100); });

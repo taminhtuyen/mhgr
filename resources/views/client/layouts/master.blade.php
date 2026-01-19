@@ -135,6 +135,8 @@
 <div id="nav-popup">
     @include('client.partials.menu-popup')
     @include('client.partials.chat-popup')
+    {{-- MỚI: Thêm file cài đặt vào đây --}}
+    @include('client.partials.settings-popup')
 </div>
 
 {{-- MAIN CONTENT --}}

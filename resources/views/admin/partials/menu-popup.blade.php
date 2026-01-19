@@ -11,37 +11,6 @@
             --popup-border-highlight: rgba(255, 255, 255, 0.2); /* Chế độ tối: Viền sáng */
         }
 
-        /* ÁP DỤNG VIỀN CHO CÁC DROPDOWN MENU */
-        .glass-effect.dropdown-menu {
-            border: 1.5px solid var(--popup-border-highlight) !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
-        }
-
-        /* 2. CSS CHO THANH TRƯỢT FONT SIZE (ĐỒNG BỘ Y HỆT CLIENT) */
-        #admin-fontsize-range { cursor: pointer; height: 6px; }
-        #admin-fontsize-range::-webkit-slider-runnable-track {
-            background: var(--input-darker);
-            height: 6px;
-            border-radius: 10px;
-            border: 1px solid var(--popup-border);
-        }
-        #admin-fontsize-range::-webkit-slider-thumb {
-            margin-top: -6px;
-            background: var(--primary);
-            box-shadow: 0 0 10px rgba(var(--primary), 0.4);
-            border: 2px solid #fff;
-            height: 18px;
-            width: 18px;
-            transition: transform 0.1s ease;
-        }
-        #admin-fontsize-range:active::-webkit-slider-thumb { transform: scale(1.2); }
-
-        /* Dropdown Item Style */
-        .dropdown-item { color: var(--text-color) !important; transition: all 0.2s; font-weight: 500; }
-        .dropdown-item:hover { background-color: var(--link-hover-bg) !important; color: var(--link-hover-text) !important; }
-        .dropdown-item i { width: 20px; text-align: center; color: var(--text-muted); }
-        .dropdown-item:hover i { color: var(--link-hover-text); }
-
         /* 3. LAYOUT CHUNG & SCROLL */
         #menu-interface { width: 100%; overflow-y: auto; max-height: 80vh; scrollbar-width: thin; overscroll-behavior: contain; }
         #menu-interface::-webkit-scrollbar { width: 6px; } #menu-interface::-webkit-scrollbar-track { background: transparent; } #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
@@ -80,27 +49,12 @@
         .view-switcher { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--popup-border); background: var(--popup-bg); color: var(--text-muted); transition: all 0.2s; }
         .view-switcher:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.05); }
 
-        /* --- 5. THEME SWITCH ANIMATION (FIXED) --- */
-        .theme { display: flex; align-items: center; font-size: 10px; line-height: 1; }
-        .theme__toggle-wrap { position: relative; width: 6em; height: 3em; }
-        .theme__icon { transition: 0.3s; z-index: 1; position: absolute; display: block; top: 0.75em; left: 0.75em; width: 1.5em; height: 1.5em; pointer-events: none; }
-        .theme__icon-part { border-radius: 50%; box-shadow: 0.4em -0.4em 0 0.5em hsl(0,0%,100%) inset; top: calc(50% - 0.5em); left: calc(50% - 0.5em); width: 1em; height: 1em; position: absolute; transition: box-shadow 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out; transform: scale(0.5); }
-        .theme__icon-part ~ .theme__icon-part { background-color: hsl(0,0%,100%); border-radius: 0.05em; top: 50%; left: calc(50% - 0.05em); transform: rotate(0deg) translateY(0.5em); transform-origin: 50% 0; width: 0.1em; height: 0.2em; }
-        .theme__icon-part:nth-child(3) { transform: rotate(45deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(4) { transform: rotate(90deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(5) { transform: rotate(135deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(6) { transform: rotate(180deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(7) { transform: rotate(225deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(8) { transform: rotate(270deg) translateY(0.5em); }
-        .theme__icon-part:nth-child(9) { transform: rotate(315deg) translateY(0.5em); }
-        .theme__toggle { background-color: hsl(48,90%,85%); border-radius: 1.5em; box-shadow: 0 0 0 0.125em rgba(255,255,255,0.5); padding: 0.25em; width: 100%; height: 100%; -webkit-appearance: none; appearance: none; transition: background-color 0.3s ease-in-out; cursor: pointer; position: relative; display: block; margin: 0; }
-        .theme__toggle:before { background-color: hsl(48,90%,55%); border-radius: 50%; content: ""; width: 2.5em; height: 2.5em; transition: 0.3s; display: block; }
-        .theme__toggle:focus { box-shadow: 0 0 0 0.125em var(--primary); outline: transparent; }
-        .theme__toggle:checked { background-color: hsl(198,90%,15%); }
-        .theme__toggle:checked:before { transform: translateX(3em); background-color: hsl(198,90%,55%); }
-        .theme__toggle:checked ~ .theme__icon { transform: translateX(3em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(1) { box-shadow: 0.2em -0.2em 0 0.2em hsl(0,0%,100%) inset; transform: scale(1); top: 0.2em; left: -0.2em; }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part ~ .theme__icon-part { opacity: 0; }
+        /* Dropdown Item Style */
+        .dropdown-item { color: var(--text-color) !important; transition: all 0.2s; font-weight: 500; }
+        .dropdown-item:hover { background-color: var(--link-hover-bg) !important; color: var(--link-hover-text) !important; }
+        .dropdown-item i { width: 20px; text-align: center; color: var(--text-muted); }
+        .dropdown-item:hover i { color: var(--link-hover-text); }
+        .glass-effect.dropdown-menu { border: 1.5px solid var(--popup-border-highlight) !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important; }
     </style>
 
     {{-- HEADER CỦA MENU --}}
@@ -109,60 +63,7 @@
             <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>MENU
         </div>
 
-        <div class="d-flex align-items-center gap-3">
-            {{-- 1. ĐIỀU CHỈNH KÍCH CỠ CHỮ (ĐỒNG BỘ CLIENT) --}}
-            <div class="dropdown">
-                <div class="view-switcher cursor-pointer" id="admin-btn-fontsize-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" title="Kích thước chữ">
-                    <i class="fa-solid fa-font"></i>
-                </div>
-                <div class="dropdown-menu dropdown-menu-end p-3 shadow-lg border-0 glass-effect" style="min-width: 280px; background-color: var(--popup-bg); margin-top: 12px;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <label class="form-label small fw-bold mb-0" style="color: var(--text-color);">Cỡ chữ hệ thống</label>
-                        <span id="admin-fontsize-ratio-display" class="badge rounded-pill bg-primary px-2" style="font-size: 0.75rem; font-weight: 600;">1.0x</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <i class="fa-solid fa-font small text-muted"></i>
-                        <input type="range" class="form-range flex-grow-1" id="admin-fontsize-range" min="12" max="22" step="1" value="16">
-                        <i class="fa-solid fa-font fs-5 text-primary"></i>
-                    </div>
-                </div>
-            </div>
-
-            {{-- 2. ĐIỀU KHIỂN HIỂN THỊ & SẮP XẾP --}}
-            <div class="dropdown">
-                <div class="view-switcher cursor-pointer" id="admin-btn-view-options" data-bs-toggle="dropdown" title="Tuỳ chọn hiển thị">
-                    <i class="fa-solid fa-table-cells" id="admin-icon-view-mode"></i>
-                </div>
-                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 glass-effect" style="background-color: var(--popup-bg); margin-top: 12px; min-width: 230px;">
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#" id="admin-action-switch-view">
-                            <i class="fa-solid fa-list-ul" id="admin-icon-action-view"></i>
-                            <span id="admin-text-action-view">Hiển thị kiểu danh sách</span>
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider" style="border-color: var(--popup-border);"></li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="#" id="admin-action-reset-menu">
-                            <i class="fa-solid fa-arrow-rotate-left"></i>
-                            <span>Sắp xếp menu mặc định</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            {{-- 3. NÚT CHUYỂN ĐỔI CHẾ ĐỘ NGÀY ĐÊM (ANIMATION) --}}
-            <div class="theme-switch-wrapper">
-                <label for="admin-theme-toggle-input" class="theme">
-                    <span class="theme__toggle-wrap">
-                        <input id="admin-theme-toggle-input" class="theme__toggle" type="checkbox" role="switch" name="theme" value="dark">
-                        <span class="theme__icon">
-                            <span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span>
-                            <span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span>
-                        </span>
-                    </span>
-                </label>
-            </div>
-        </div>
+        {{-- ĐÃ LOẠI BỎ DROPDOWN RESET Ở ĐÂY --}}
     </div>
 
     {{-- CONTAINER CHÍNH --}}
@@ -270,98 +171,24 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. THEME LOGIC (SYNCED WITH ANIMATION) ---
-        const themeToggle = document.querySelector('#admin-theme-toggle-input');
-        const body = document.body;
-
-        if(localStorage.getItem('admin_theme_preference') === 'dark') {
-            body.classList.add('dark-mode');
-            if(themeToggle) themeToggle.checked = true;
-        }
-
-        if(themeToggle) {
-            themeToggle.addEventListener('change', (e) => {
-                body.classList.toggle('dark-mode', e.target.checked);
-                localStorage.setItem('admin_theme_preference', e.target.checked ? 'dark' : 'light');
-            });
-        }
-
-        // --- 2. GLOBAL FONT SIZE LOGIC (ĐỒNG BỘ CLIENT) ---
-        const fsRange = document.getElementById('admin-fontsize-range');
-        const fsDisplay = document.getElementById('admin-fontsize-ratio-display');
-        const htmlEl = document.documentElement;
-
-        function updateFontSize(val) {
-            htmlEl.style.fontSize = val + 'px';
-            const ratio = (val / 16).toFixed(1);
-            if(fsDisplay) fsDisplay.innerText = ratio + 'x';
-            localStorage.setItem('admin_global_fontsize', val);
-        }
-
-        const savedFs = localStorage.getItem('admin_global_fontsize') || '16';
-        if(fsRange) {
-            fsRange.value = savedFs;
-            updateFontSize(savedFs);
-            fsRange.addEventListener('input', (e) => updateFontSize(e.target.value));
-        }
-
-        // --- 3. VIEW MODE DROPDOWN LOGIC (ADMIN) ---
-        const btnActionSwitch = document.getElementById('admin-action-switch-view');
-        const iconMode = document.getElementById('admin-icon-view-mode');
-        const iconAction = document.getElementById('admin-icon-action-view');
-        const textAction = document.getElementById('admin-text-action-view');
+        // --- 1. VIEW MODE DROPDOWN LOGIC (ADMIN) ---
         const menuWrapper = document.getElementById('admin-menu-container');
 
+        // Logic check trạng thái đã lưu
         const savedView = localStorage.getItem('admin_menu_view') || 'list';
         applyMenuView(savedView);
-
-        if(btnActionSwitch) {
-            btnActionSwitch.addEventListener('click', (e) => {
-                e.preventDefault();
-                const current = menuWrapper.classList.contains('view-mode-grid') ? 'grid' : 'list';
-                const newState = current === 'grid' ? 'list' : 'grid';
-                applyMenuView(newState);
-                setTimeout(() => { if(window.isSystemOpen) window.positionPopup('menu'); }, 50);
-            });
-        }
 
         function applyMenuView(mode) {
             if(mode === 'grid') {
                 menuWrapper.classList.remove('view-mode-list');
                 menuWrapper.classList.add('view-mode-grid');
-                iconMode.className = 'fa-solid fa-table-cells';
-                iconAction.className = 'fa-solid fa-list-ul';
-                textAction.innerText = 'Hiển thị kiểu danh sách';
             } else {
                 menuWrapper.classList.remove('view-mode-grid');
                 menuWrapper.classList.add('view-mode-list');
-                iconMode.className = 'fa-solid fa-list-ul';
-                iconAction.className = 'fa-solid fa-table-cells';
-                textAction.innerText = 'Hiển thị kiểu lưới';
             }
-            localStorage.setItem('admin_menu_view', mode);
         }
 
-        // --- 4. RESET ORDER LOGIC (ADMIN) ---
-        const btnReset = document.getElementById('admin-action-reset-menu');
-        if(btnReset) {
-            btnReset.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.showConfirm(
-                    'Xác nhận đặt lại?',
-                    'Vị trí sắp xếp các icon sẽ quay về mặc định ban đầu.',
-                    function() {
-                        Object.keys(localStorage).forEach(key => {
-                            if (key.startsWith('admin_menu_order_')) localStorage.removeItem(key);
-                        });
-                        location.reload();
-                    },
-                    { confirmText: 'Đặt lại ngay', confirmColor: 'danger' }
-                );
-            });
-        }
-
-        // --- 5. SORTABLE JS LOGIC ---
+        // --- 2. SORTABLE JS LOGIC ---
         const groups = document.querySelectorAll('.menu-items-container');
         groups.forEach(group => {
             const groupId = group.getAttribute('data-group-id');
@@ -384,12 +211,15 @@
             });
         });
 
-        // --- 6. EXPORT RENDER FUNCTION ---
+        // --- 3. EXPORT RENDER FUNCTION ---
         window.renderMenuContent = function() {
             const menuInterface = document.getElementById('menu-interface');
             const chatInterface = document.getElementById('chat-interface');
+            const settingsInterface = document.getElementById('settings-interface');
+
             if(menuInterface) menuInterface.classList.remove('d-none');
             if(chatInterface) chatInterface.classList.add('d-none');
+            if(settingsInterface) settingsInterface.classList.add('d-none');
         }
     });
 </script>

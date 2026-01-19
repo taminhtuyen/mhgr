@@ -1,5 +1,5 @@
 <div id="bubble-wrapper" style="position: fixed; bottom: 40px; right: 40px; z-index: 10000;">
-    {{-- 2 BONG BÓNG CON --}}
+    {{-- 3 BONG BÓNG CON --}}
     <div class="sub-bubbles-container">
         {{-- 1. Bong bóng Menu --}}
         <div class="sub-bubble" id="btn-open-menu" title="Menu chức năng">
@@ -9,6 +9,10 @@
         <div class="sub-bubble" id="btn-open-chat" title="Tin nhắn">
             <i class="fa-solid fa-comments"></i>
             <span class="badge-counter">3</span>
+        </div>
+        {{-- 3. Bong bóng Cài đặt (MỚI) --}}
+        <div class="sub-bubble" id="btn-open-settings" title="Cài đặt">
+            <i class="fa-solid fa-gear"></i>
         </div>
     </div>
 
@@ -23,7 +27,6 @@
 <style>
     /* --- DEFINITIONS --- */
     :root {
-        /* Màu chủ đạo dạng RGB để làm độ trong suốt cho bóng */
         --primary-rgb: 14, 165, 233;
     }
 
@@ -47,7 +50,7 @@
         width: 60px; height: 60px;
         background: linear-gradient(135deg, #0ea5e9, #0284c7);
         color: #fff; border-radius: 50%;
-        box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.5); /* Bóng đổ mềm mại */
+        box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.5);
         display: flex; align-items: center; justify-content: center;
         font-size: 24px; cursor: pointer; position: relative; z-index: 2;
         transition: all 0.3s ease;
@@ -57,7 +60,7 @@
 
     /* TRẠNG THÁI RED MODE (KHI MỞ) */
     #nav-bubble.red-mode {
-        background: linear-gradient(135deg, #ef4444, #dc2626) !important; /* Đỏ Gradient */
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
         box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.5);
         transform: scale(1);
     }
@@ -83,20 +86,19 @@
     body.dark-mode .main-bubble-badge { border-color: #0f172a; }
 
     /* SUB BUBBLES CONTAINER */
-    .sub-bubbles-container { position: absolute; left: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 20px; pointer-events: none; }
+    .sub-bubbles-container { position: absolute; left: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 15px; pointer-events: none; }
 
-    /* SUB BUBBLES STYLE - NORMAL STATE */
+    /* SUB BUBBLES STYLE */
     .sub-bubble {
         width: 50px; height: 50px;
         background-color: var(--popup-bg);
-        border: 1px solid var(--popup-border); /* Viền mỏng tinh tế */
+        border: 1px solid var(--popup-border);
         color: var(--text-color);
         backdrop-filter: blur(10px); border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-size: 20px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Bóng nhẹ khi chưa active */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         cursor: pointer; opacity: 0; transform: scale(0);
-        /* QUAN TRỌNG: Transition cho box-shadow để tạo hiệu ứng "toả ra 1 lần" mượt mà */
         transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         position: relative;
     }
@@ -106,32 +108,19 @@
         transform: translateY(-2px);
     }
 
-    /* ACTIVE STATE (ĐƯỢC CHỌN - TĨNH, KHÔNG NHẤP NHÁY) */
+    /* ACTIVE STATE */
     .sub-bubble.active {
-        /* 1. Nền Gradient đậm đà */
         background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
-
-        /* 2. Màu chữ trắng */
         color: #fff !important;
-
-        /* 3. Viền phát sáng nhẹ */
         border: 1px solid rgba(255,255,255,0.4) !important;
-
-        /* 4. Scale to hơn chút */
         transform: scale(1.15) !important;
-
-        /* 5. BOX-SHADOW TĨNH (STATIC GLOW) */
-        /* Đây là ánh sáng "đóng băng", không dùng animation nữa */
         box-shadow:
-            0 0 0 4px rgba(14, 165, 233, 0.2),  /* Vầng sáng mờ bao quanh (Ring) */
-            0 10px 25px -5px rgba(14, 165, 233, 0.7), /* Bóng đổ sâu bên dưới */
-            0 0 20px rgba(14, 165, 233, 0.5) !important; /* Ánh sáng toả ra xung quanh */
+            0 0 0 4px rgba(14, 165, 233, 0.2),
+            0 10px 25px -5px rgba(14, 165, 233, 0.7),
+            0 0 20px rgba(14, 165, 233, 0.5) !important;
     }
 
-    /* Loại bỏ hoàn toàn animation nhấp nháy cũ */
-    .sub-bubble.active::after {
-        display: none;
-    }
+    .sub-bubble.active::after { display: none; }
 
     #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
 
@@ -161,11 +150,11 @@
         const popup = document.getElementById('nav-popup');
         const backdrop = document.getElementById('nav-backdrop');
         const icon = document.getElementById('bubble-icon');
-        const mainWrapper = document.getElementById('main-wrapper');
 
         // Buttons
         const btnMenu = document.getElementById('btn-open-menu');
         const btnChat = document.getElementById('btn-open-chat');
+        const btnSettings = document.getElementById('btn-open-settings'); // MỚI
 
         // Global state
         window.isSystemOpen = false;
@@ -227,8 +216,10 @@
             expandBubblesVisual();
             wrapper.classList.remove('scroll-hidden');
 
+            // Gọi các hàm render tương ứng
             if(mode === 'menu' && typeof window.renderMenuContent === 'function') window.renderMenuContent();
             if(mode === 'chat' && typeof window.renderChatContent === 'function') window.renderChatContent();
+            if(mode === 'settings' && typeof window.renderSettingsContent === 'function') window.renderSettingsContent();
 
             wrapper.classList.add('expanded');
             icon.classList.replace('fa-bars', 'fa-xmark');
@@ -251,6 +242,7 @@
             mainBubble.classList.remove('red-mode');
             btnMenu.classList.remove('active');
             btnChat.classList.remove('active');
+            btnSettings.classList.remove('active');
 
             if(typeof window.backToChatList === 'function') setTimeout(window.backToChatList, 300);
         };
@@ -258,8 +250,11 @@
         function highlightActiveBubble(mode) {
             btnMenu.classList.remove('active');
             btnChat.classList.remove('active');
+            btnSettings.classList.remove('active');
+
             if (mode === 'menu') btnMenu.classList.add('active');
             if (mode === 'chat') btnChat.classList.add('active');
+            if (mode === 'settings') btnSettings.classList.add('active');
         }
 
         window.expandBubblesVisual = function() {
@@ -279,13 +274,16 @@
         window.positionPopup = function(type) {
             const rect = wrapper.getBoundingClientRect(); const screenW = window.innerWidth; const screenH = window.innerHeight; const gap = 15; const edgePadding = 20;
             popup.style.removeProperty('inset'); popup.style.left = ''; popup.style.right = ''; popup.style.top = ''; popup.style.bottom = '';
+
             if (screenW < 998) {
+                // Mobile Logic
                 let vwUnit = 92; if (screenW >= 450) vwUnit = 88;
                 popup.style.width = `${vwUnit}vw`; popup.style.maxWidth = `${vwUnit}vw`; popup.style.left = '50%'; popup.style.transform = 'translateX(-50%)';
                 if (rect.top > screenH / 2) { popup.style.bottom = (screenH - rect.top + gap) + 'px'; popup.style.top = 'auto'; popup.style.maxHeight = (rect.top - gap - edgePadding) + 'px'; popup.style.transformOrigin = 'bottom center'; }
                 else { popup.style.top = (rect.bottom + gap) + 'px'; popup.style.bottom = 'auto'; popup.style.maxHeight = (screenH - rect.bottom - gap - edgePadding) + 'px'; popup.style.transformOrigin = 'top center'; }
             } else {
-                popup.style.width = type === 'menu' ? 'fit-content' : 'max-content';
+                // Desktop Logic
+                popup.style.width = (type === 'menu' || type === 'settings') ? 'fit-content' : 'max-content';
                 popup.style.maxWidth = '95vw';
                 if (rect.left > screenW / 2) { popup.style.right = (screenW - rect.left + gap) + 'px'; popup.style.left = 'auto'; popup.style.transformOrigin = 'right center'; }
                 else { popup.style.left = (rect.right + gap) + 'px'; popup.style.right = 'auto'; popup.style.transformOrigin = 'left center'; }
@@ -298,6 +296,7 @@
         // --- 3. BẮT SỰ KIỆN SUB-BUBBLES ---
         if(btnMenu) btnMenu.addEventListener('click', (e) => { e.stopPropagation(); openAll('menu'); });
         if(btnChat) btnChat.addEventListener('click', (e) => { e.stopPropagation(); openAll('chat'); });
+        if(btnSettings) btnSettings.addEventListener('click', (e) => { e.stopPropagation(); openAll('settings'); });
 
         let resizeTimer;
         window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (window.isSystemOpen) { expandBubblesVisual(); window.positionPopup(window.currentPopupMode); } }, 100); });

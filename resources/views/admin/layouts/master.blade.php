@@ -106,7 +106,6 @@
         #global-confirm-modal.active .modal-box { transform: scale(1); }
 
         .modal-content-box { padding: 20px 16px 20px; }
-        /* CẬP NHẬT: Sử dụng rem để co giãn theo cài đặt cỡ chữ */
         .modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; color: var(--modal-text); }
         .modal-desc { font-size: 0.85rem; line-height: 1.4; color: var(--modal-text); opacity: 0.8; word-wrap: break-word; }
 
@@ -115,7 +114,6 @@
 
         .btn-modal {
             flex: 1; border: none; background: transparent; padding: 12px;
-            /* CẬP NHẬT: Sử dụng rem để co giãn theo cài đặt cỡ chữ */
             font-size: 1.05rem; cursor: pointer; transition: 0.2s;
             border-right: 0.5px solid var(--modal-border);
             color: #007aff; /* Default iOS Blue */
@@ -152,6 +150,8 @@
 <div id="nav-popup">
     @include('admin.partials.menu-popup')
     @include('admin.partials.chat-popup')
+    {{-- MỚI: Thêm file cài đặt vào đây --}}
+    @include('admin.partials.settings-popup')
 </div>
 
 {{-- GLOBAL MODAL DYNAMIC --}}

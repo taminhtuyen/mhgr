@@ -24,7 +24,6 @@
         body.dark-mode .msg-meta { color: #94a3b8; }
 
         .nav-tabs-custom .nav-link { color: var(--text-muted); border: none; border-bottom: 2px solid transparent; font-size: 0.85rem; font-weight: 600; padding: 10px 0; margin-right: 20px; background: transparent; }
-        .nav-tabs-custom .nav-link:hover { color: var(--primary); }
         .nav-tabs-custom .nav-link.active { color: var(--primary); background: transparent; border-bottom: 2px solid var(--primary); }
 
         /* --- 3. SIDEBAR ACTIONS (FIX STACKING CONTEXT) --- */
@@ -159,7 +158,6 @@
                         <button class="btn btn-sm btn-icon text-primary no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body"><i class="fa-solid fa-bars"></i></button>
                         <ul class="dropdown-menu shadow-sm border-0 glass-effect">
                             <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-check-double me-2 text-primary"></i>Đánh dấu tất cả đã đọc</a></li>
-                            <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-gear me-2 text-muted"></i>Cài đặt chat</a></li>
                         </ul>
                     </div>
                     <input type="text" class="form-control rounded-pill chat-search-input" placeholder="Tìm kiếm..." style="background-color: var(--input-darker); color: var(--text-color); border-color: var(--popup-border); font-size: 0.9rem;">
@@ -346,8 +344,14 @@
         const typingIndicator = document.getElementById('typing-indicator');
         const btnSend = document.getElementById('btn-send-message');
 
-        // --- 1. CONFIG ---
-        let chatSettings = { enterToSend: false };
+        // --- 1. CONFIG: LOAD TỪ STORAGE ---
+        // Biến này sẽ được cập nhật bởi settings-popup
+        window.updateChatSettings = function() {
+            window.chatSettings = {
+                enterToSend: localStorage.getItem('client_chat_enter_to_send') === 'true'
+            };
+        };
+        window.updateChatSettings(); // Load initial
 
         // --- 2. SEND MESSAGE LOGIC ---
         function sendMessage() {
@@ -368,7 +372,10 @@
             });
 
             inputField.addEventListener('keydown', function(e) {
-                if (chatSettings.enterToSend && e.key === 'Enter' && !e.shiftKey) {
+                // Kiểm tra setting mỗi lần gõ hoặc dùng biến global
+                const enterToSend = localStorage.getItem('client_chat_enter_to_send') === 'true';
+
+                if (enterToSend && e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
@@ -445,7 +452,10 @@
         window.renderChatContent = function() {
             const menuInterface = document.getElementById('menu-interface');
             const chatInterface = document.getElementById('chat-interface');
+            const settingsInterface = document.getElementById('settings-interface');
+
             if(menuInterface) menuInterface.classList.add('d-none');
+            if(settingsInterface) settingsInterface.classList.add('d-none');
             if(chatInterface) chatInterface.classList.remove('d-none');
             if (window.visualViewport) window.visualViewport.dispatchEvent(new Event('resize'));
         }
@@ -456,11 +466,5 @@
             if(window.resetChatPopupStyle) window.resetChatPopupStyle();
         }
 
-        const backdrop = document.getElementById('nav-backdrop');
-        if(backdrop) {
-            backdrop.addEventListener('click', () => {
-                if(window.resetChatPopupStyle) window.resetChatPopupStyle();
-            });
-        }
     });
 </script>
