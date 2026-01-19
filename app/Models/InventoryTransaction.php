@@ -7,25 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class CartItem extends Model
+class InventoryTransaction extends Model
 {
     use HasFactory;
 
-    protected $table = 'cart_items';
+    protected $table = 'inventory_transactions';
 
     protected $fillable = [
-        'cart_id',
+        'warehouse_id',
         'product_id',
         'product_variation_id',
-        'quantity',
-        'price_at_add',
-        'options',
+        'type',
+        'quantity_change',
+        'quantity_after',
+        'reference_id',
+        'note',
+        'user_id',
     ];
 
-    public function cart(): BelongsTo
-    {
-        return $this->belongsTo(Cart::class, 'cart_id');
-    }
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');

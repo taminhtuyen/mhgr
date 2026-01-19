@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 
 class Order extends Model
 {
@@ -15,9 +17,12 @@ class Order extends Model
 
     protected $fillable = [
         'order_code',
-        'customer_id',
-        'shipping_manager_id', // Shipper
-        'preparing_manager_id', // Người nhặt hàng
+        'buyer_id',
+        'buyer_type',
+        'seller_id',
+        'seller_type',
+        'shipping_manager_id',
+        'preparing_manager_id',
         'shipping_name',
         'shipping_phone',
         'shipping_address',
@@ -32,47 +37,36 @@ class Order extends Model
         'vat_percentage',
         'final_amount',
         'shipping_method_id',
+        'profit_user',
+        'profit_admin',
+        'vat_user',
+        'vat_admin',
         'payment_method',
-        'payment_status', // unpaid, paid...
-        'status',         // pending, shipping, completed...
+        'payment_status',
+        'level_customer',
+        'customer_group',
+        'status',
         'is_packing',
+        'delivery_trip_id',
         'note',
         'invoice_requested',
-        'seller_id',
         'order_type',
     ];
 
-    protected function casts(): array
+    public function user(): BelongsTo
     {
-        return [
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-            'is_packing' => 'boolean',
-            'invoice_requested' => 'boolean',
-        ];
+        return $this->belongsTo(User::class, 'user_id');
     }
-
-    /**
-     * Quan hệ: Đơn hàng gồm những món gì (Chi tiết đơn).
-     */
-    public function items(): HasMany
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class, 'order_id');
     }
-
-    /**
-     * Quan hệ: Lịch sử xử lý đơn hàng (Ai duyệt, ai giao...).
-     */
-    public function history(): HasMany
+    public function delivery(): HasOne
     {
-        return $this->hasMany(OrderHistory::class, 'order_id');
+        return $this->hasOne(Delivery::class, 'order_id');
     }
-
-    /**
-     * Quan hệ: Khách hàng mua đơn này.
-     */
-    public function customer(): BelongsTo
+    public function orderReturns(): HasMany
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        return $this->hasMany(OrderReturn::class, 'order_id');
     }
 }

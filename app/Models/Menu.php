@@ -6,17 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Permission extends Model
+class Menu extends Model
 {
     use HasFactory;
 
-    protected $table = 'permissions';
+    protected $table = 'menus';
 
     protected $fillable = [
         'name',
-        'code',
-        'description',
-        'role_group_id',
+        'position',
+        'is_active',
     ];
 
 }

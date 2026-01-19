@@ -5,34 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
-class Cart extends Model
+class SystemLog extends Model
 {
     use HasFactory;
 
-    protected $table = 'carts';
+    protected $table = 'system_logs';
 
     protected $fillable = [
         'user_id',
-        'session_id',
-        'status',
-        'coupon_code',
-        'total_price',
-        'currency',
+        'action',
+        'severity',
+        'message',
+        'payload',
         'ip_address',
         'user_agent',
-        'metadata',
-        'total_quantity',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-    public function cartItems(): HasMany
-    {
-        return $this->hasMany(CartItem::class, 'cart_id');
     }
 }

@@ -7,24 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class CartItem extends Model
+class Wishlist extends Model
 {
     use HasFactory;
 
-    protected $table = 'cart_items';
+    protected $table = 'wishlists';
 
     protected $fillable = [
-        'cart_id',
+        'user_id',
+        'customer_id',
         'product_id',
-        'product_variation_id',
-        'quantity',
-        'price_at_add',
-        'options',
     ];
 
-    public function cart(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Cart::class, 'cart_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
     public function product(): BelongsTo
     {

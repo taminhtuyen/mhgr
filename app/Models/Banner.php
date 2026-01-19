@@ -6,17 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Permission extends Model
+class Banner extends Model
 {
     use HasFactory;
 
-    protected $table = 'permissions';
+    protected $table = 'banners';
 
     protected $fillable = [
-        'name',
-        'code',
-        'description',
-        'role_group_id',
+        'thumbnail_url',
+        'position',
+        'is_deleted',
     ];
 
 }

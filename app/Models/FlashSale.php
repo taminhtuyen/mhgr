@@ -7,20 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
-class Role extends Model
+class FlashSale extends Model
 {
     use HasFactory;
 
-    protected $table = 'roles';
+    protected $table = 'flash_sales';
 
     protected $fillable = [
         'name',
-        'code',
-        'description',
+        'start_time',
+        'end_time',
+        'is_active',
     ];
 
-    public function permissions(): BelongsToMany
+    public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class);
+        return $this->belongsToMany(Product::class);
     }
 }

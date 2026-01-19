@@ -6,17 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Permission extends Model
+class Setting extends Model
 {
     use HasFactory;
 
-    protected $table = 'permissions';
+    protected $table = 'settings';
 
     protected $fillable = [
-        'name',
-        'code',
-        'description',
-        'role_group_id',
+        'setting_code',
+        'setting_value',
+        'is_deleted',
     ];
 
 }

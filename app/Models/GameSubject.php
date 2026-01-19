@@ -6,17 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Permission extends Model
+class GameSubject extends Model
 {
     use HasFactory;
 
-    protected $table = 'permissions';
+    protected $table = 'game_subjects';
 
     protected $fillable = [
         'name',
-        'code',
-        'description',
-        'role_group_id',
+        'slug',
+        'icon_url',
+        'is_active',
+        'position',
     ];
 
 }

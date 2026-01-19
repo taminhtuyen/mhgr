@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Product extends Model
 {
@@ -21,7 +21,7 @@ class Product extends Model
         'name',
         'description',
         'link_video',
-        'status', // A: Active, I: Inactive...
+        'status',
         'is_pin',
         'point_purchase',
         'slug',
@@ -37,37 +37,20 @@ class Product extends Model
         'owner_id',
     ];
 
-    /**
-     * Quan hệ: Thuộc về một danh mục.
-     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-
-    /**
-     * Quan hệ: Có nhiều biến thể (Màu sắc, kích thước...).
-     */
-    public function variations(): HasMany
+    public function productVariations(): HasMany
     {
         return $this->hasMany(ProductVariation::class, 'product_id');
     }
-
-    /**
-     * Quan hệ Đa hình: Sản phẩm có nhiều hình ảnh.
-     * Bảng trung gian: imageables
-     */
-    public function images(): MorphToMany
+    public function images(): HasMany
     {
-        return $this->morphToMany(Image::class, 'imageable', 'imageables', 'imageable_id', 'image_id')
-            ->withPivot('position', 'meta');
+        return $this->hasMany(Image::class, 'product_id');
     }
-
-    /**
-     * Quan hệ: Tồn kho thực tế trong các kho hàng.
-     */
-    public function inventoryStocks(): HasMany
+    public function reviews(): HasMany
     {
-        return $this->hasMany(InventoryStock::class, 'product_id');
+        return $this->hasMany(Review::class, 'product_id');
     }
 }
