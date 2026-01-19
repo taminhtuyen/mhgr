@@ -8,22 +8,27 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class CustomerRequest extends Model
+class Chat extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'requests';
+    protected $table = 'chats';
 
     protected $fillable = [
         'user_id',
-        'type',
-        'content',
-        'status',
-        'response',
+        'admin_id',
+        'message',
+        'is_read',
+        'sender_type',
+        'attachment',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }

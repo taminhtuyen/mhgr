@@ -8,18 +8,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class CustomerRequest extends Model
+class Affiliate extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'requests';
+    protected $table = 'affiliates';
 
     protected $fillable = [
         'user_id',
-        'type',
-        'content',
+        'code',
+        'commission_rate',
+        'total_referred',
+        'total_earnings',
         'status',
-        'response',
     ];
 
     public function user(): BelongsTo

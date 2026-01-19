@@ -8,22 +8,28 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class CustomerRequest extends Model
+class Consignment extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'requests';
+    protected $table = 'consignments';
 
     protected $fillable = [
         'user_id',
-        'type',
-        'content',
+        'product_id',
+        'quantity',
+        'agreed_price',
         'status',
-        'response',
+        'note',
+        'expired_at',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }
