@@ -5,7 +5,7 @@
         <div class="sub-bubble" id="btn-open-menu" title="Menu chức năng">
             <i class="fa-solid fa-table-cells"></i>
         </div>
-        {{-- 2. Bong bóng Chat --}}
+        {{-- 2. Bong bóng ChatConversation --}}
         <div class="sub-bubble" id="btn-open-chat" title="Tin nhắn">
             <i class="fa-solid fa-comments"></i>
             <span class="badge-counter">3</span>
@@ -153,7 +153,7 @@
 
         // Buttons
         const btnMenu = document.getElementById('btn-open-menu');
-        const btnChat = document.getElementById('btn-open-chat');
+        const btnChatConversation = document.getElementById('btn-open-chat');
         const btnSettings = document.getElementById('btn-open-settings'); // MỚI
 
         // Global state
@@ -218,7 +218,7 @@
 
             // Gọi các hàm render tương ứng
             if(mode === 'menu' && typeof window.renderMenuContent === 'function') window.renderMenuContent();
-            if(mode === 'chat' && typeof window.renderChatContent === 'function') window.renderChatContent();
+            if(mode === 'chat' && typeof window.renderChatConversationContent === 'function') window.renderChatConversationContent();
             if(mode === 'settings' && typeof window.renderSettingsContent === 'function') window.renderSettingsContent();
 
             wrapper.classList.add('expanded');
@@ -241,19 +241,19 @@
 
             mainBubble.classList.remove('red-mode');
             btnMenu.classList.remove('active');
-            btnChat.classList.remove('active');
+            btnChatConversation.classList.remove('active');
             btnSettings.classList.remove('active');
 
-            if(typeof window.backToChatList === 'function') setTimeout(window.backToChatList, 300);
+            if(typeof window.backToChatConversationList === 'function') setTimeout(window.backToChatConversationList, 300);
         };
 
         function highlightActiveBubble(mode) {
             btnMenu.classList.remove('active');
-            btnChat.classList.remove('active');
+            btnChatConversation.classList.remove('active');
             btnSettings.classList.remove('active');
 
             if (mode === 'menu') btnMenu.classList.add('active');
-            if (mode === 'chat') btnChat.classList.add('active');
+            if (mode === 'chat') btnChatConversation.classList.add('active');
             if (mode === 'settings') btnSettings.classList.add('active');
         }
 
@@ -295,7 +295,7 @@
 
         // --- 3. BẮT SỰ KIỆN SUB-BUBBLES ---
         if(btnMenu) btnMenu.addEventListener('click', (e) => { e.stopPropagation(); openAll('menu'); });
-        if(btnChat) btnChat.addEventListener('click', (e) => { e.stopPropagation(); openAll('chat'); });
+        if(btnChatConversation) btnChatConversation.addEventListener('click', (e) => { e.stopPropagation(); openAll('chat'); });
         if(btnSettings) btnSettings.addEventListener('click', (e) => { e.stopPropagation(); openAll('settings'); });
 
         let resizeTimer;

@@ -400,7 +400,7 @@
                 const isEnabled = e.target.checked;
                 localStorage.setItem('admin_chat_enter_to_send', isEnabled);
                 updateEnterText(isEnabled);
-                if(window.updateChatSettings) window.updateChatSettings();
+                if(window.updateChatConversationSettings) window.updateChatConversationSettings();
             });
         }
 

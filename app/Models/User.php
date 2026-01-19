@@ -41,6 +41,6 @@ class User extends Model
     }
     public function wallet(): HasOne
     {
-        return $this->hasOne(Wallet::class, 'user_id');
+        return $this->hasOne(RewardWallet::class, 'user_id');
     }
 }

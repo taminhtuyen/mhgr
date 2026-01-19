@@ -63,7 +63,7 @@ class Order extends Model
     }
     public function delivery(): HasOne
     {
-        return $this->hasOne(Delivery::class, 'order_id');
+        return $this->hasOne(ShippingShipment::class, 'order_id');
     }
     public function orderReturns(): HasMany
     {

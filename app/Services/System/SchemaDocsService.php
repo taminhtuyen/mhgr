@@ -10,67 +10,82 @@ class SchemaDocsService
 {
     /**
      * Định nghĩa Bảng Chính và Bảng Phụ cho từng Module
+     * Key của mảng này phải trùng với tên Resource trên URL (Route)
      */
     public static function getModuleMap()
     {
         return [
-            // --- SALES ---
+            // --- SALES (BÁN HÀNG) ---
             'orders' => [
                 'main' => 'orders',
-                'related' => ['order_items', 'order_history', 'order_transactions', 'order_returns', 'deliveries', 'invoices', 'payments_transactions']
+                'related' => ['order_items', 'order_history', 'order_transactions', 'order_returns', 'shipping_shipments', 'tax_invoices', 'payment_transactions']
             ],
             'carts' => ['main' => 'carts', 'related' => ['cart_items']],
-            'invoices' => ['main' => 'invoices', 'related' => ['orders', 'tax_rates']],
-            'deliveries' => ['main' => 'deliveries', 'related' => ['orders', 'shipping_shipments']],
+            // [CẬP NHẬT] invoices -> tax-invoices
+            'tax-invoices' => ['main' => 'tax_invoices', 'related' => ['orders', 'tax_rates']],
+            // [CẬP NHẬT] deliveries -> shipping-shipments
+            'shipping-shipments' => ['main' => 'shipping_shipments', 'related' => ['orders']],
             'returns' => ['main' => 'order_returns', 'related' => ['orders', 'order_items']],
 
-            // --- CATALOG ---
+            // --- CATALOG (SẢN PHẨM) ---
             'products' => [
                 'main' => 'products',
-                'related' => ['product_variations', 'product_attributes', 'product_tags', 'images', 'reviews', 'inventory_stocks']
+                'related' => ['product_variations', 'product_attributes', 'product_tags', 'images', 'product_reviews', 'inventory_stocks']
             ],
             'categories' => ['main' => 'categories', 'related' => []],
-            'attributes' => ['main' => 'attributes', 'related' => ['attribute_values', 'product_attributes']],
-            'suppliers' => ['main' => 'suppliers', 'related' => ['purchase_orders']],
-            'reviews' => ['main' => 'reviews', 'related' => ['products', 'users']],
+            'attributes' => ['main' => 'product_attributes', 'related' => ['attribute_values']],
+            'suppliers' => ['main' => 'suppliers', 'related' => ['import_orders']],
+            // [CẬP NHẬT] reviews -> product-reviews
+            'product-reviews' => ['main' => 'product_reviews', 'related' => ['products', 'users']],
 
-            // --- INVENTORY ---
-            'inventory-stocks' => ['main' => 'inventory_stocks', 'related' => ['warehouses', 'products']],
-            'inventory-transactions' => ['main' => 'inventory_transactions', 'related' => ['orders', 'purchase_orders']],
+            // --- INVENTORY (KHO HÀNG) ---
+            // [CẬP NHẬT] inventory-stocks -> stocks (theo route mới)
+            'stocks' => ['main' => 'inventory_stocks', 'related' => ['warehouses', 'products']],
+            // [CẬP NHẬT] inventory-transactions -> transactions
+            'transactions' => ['main' => 'inventory_transactions', 'related' => ['orders', 'import_orders']],
             'warehouses' => ['main' => 'warehouses', 'related' => ['inventory_stocks']],
-            'purchase-orders' => ['main' => 'purchase_orders', 'related' => ['purchase_order_items', 'suppliers']],
+            // [CẬP NHẬT] purchase-orders -> import-orders
+            'import-orders' => ['main' => 'import_orders', 'related' => ['import_order_items', 'suppliers']],
 
             // --- MARKETING ---
             'promotions' => ['main' => 'promotions', 'related' => ['promotion_usage']],
-            'coupons' => ['main' => 'coupons', 'related' => []],
+            // [CẬP NHẬT] coupons -> promotion-coupons
+            'promotion-coupons' => ['main' => 'promotion_coupons', 'related' => []],
             'flash-sales' => ['main' => 'flash_sales', 'related' => ['flash_sale_products']],
-            'affiliates' => ['main' => 'affiliates', 'related' => ['users']],
+            // [CẬP NHẬT] affiliates -> affiliate-links
+            'affiliate-links' => ['main' => 'affiliate_links', 'related' => ['users']],
 
-            // --- FINANCE ---
-            'wallets' => ['main' => 'wallets', 'related' => ['wallet_transactions']],
-            'commissions' => ['main' => 'commissions', 'related' => ['affiliates', 'orders']],
-            'profit-distributions' => ['main' => 'profit_distributions', 'related' => []],
+            // --- FINANCE (TÀI CHÍNH) ---
+            // [CẬP NHẬT] wallets -> reward-wallets
+            'reward-wallets' => ['main' => 'users_reward_wallets', 'related' => ['users_reward_history']],
+            'commissions' => ['main' => 'affiliate_commissions', 'related' => ['affiliate_links', 'orders']],
+            // [CẬP NHẬT] profit-distributions -> profit-distribution-groups
+            'profit-distribution-groups' => ['main' => 'profit_distribution_groups', 'related' => []],
 
-            // --- CONTENT ---
-            'posts' => ['main' => 'posts', 'related' => ['categories', 'tags']],
+            // --- CONTENT (NỘI DUNG) ---
+            'posts' => ['main' => 'posts', 'related' => ['categories']],
             'banners' => ['main' => 'banners', 'related' => []],
-            'pages' => ['main' => 'pages', 'related' => []],
             'menus' => ['main' => 'menus', 'related' => ['menu_items']],
             'images' => ['main' => 'images', 'related' => []],
             'game-subjects' => ['main' => 'game_subjects', 'related' => []],
 
             // --- CRM & CONSIGNMENT ---
-            'customers' => ['main' => 'customers', 'related' => ['users']], // Map customer view to users table logic usually
-            'chats' => ['main' => 'chats', 'related' => []],
-            'requests' => ['main' => 'requests', 'related' => []],
-            'consignments' => ['main' => 'consignments', 'related' => ['consignment_customers']],
-            'consignment-customers' => ['main' => 'consignment_customers', 'related' => ['consignments']],
+            'customers' => ['main' => 'users', 'related' => ['user_addresses']], // CRM Customers
+            // [CẬP NHẬT] chats -> chat-conversations
+            'chat-conversations' => ['main' => 'chat_conversations', 'related' => ['chat_messages', 'chat_participants']],
+            'requests' => ['main' => 'support_requests', 'related' => []],
+            'consignments' => ['main' => 'consignment_orders', 'related' => ['consignment_customers']],
+
+            // Lưu ý: Nếu URL admin/consignment/customers trùng với admin/crm/customers, key này có thể bị conflict.
+            // Tạm thời map vào consignment_customers
+            'consignment-customers' => ['main' => 'consignment_customers', 'related' => ['consignment_orders']],
 
             // --- SYSTEM ---
-            'users' => ['main' => 'users', 'related' => ['user_addresses', 'user_roles', 'wallets']],
+            'users' => ['main' => 'users', 'related' => ['user_addresses', 'user_roles', 'users_reward_wallets']],
             'roles' => ['main' => 'roles', 'related' => ['permissions', 'permissions_role']],
             'settings' => ['main' => 'settings', 'related' => []],
-            'system-logs' => ['main' => 'system_logs', 'related' => []],
+            // [CẬP NHẬT] system-logs -> logs
+            'logs' => ['main' => 'system_logs', 'related' => []],
             'locations' => ['main' => 'provinces', 'related' => ['wards']],
         ];
     }
@@ -110,13 +125,15 @@ class SchemaDocsService
         if ($field === 'status') return 'Trạng thái hoạt động';
         if ($field === 'name' || $field === 'title') return 'Tên định danh';
         if ($field === 'slug') return 'Đường dẫn URL thân thiện (SEO)';
-        if ($field === 'image' || $field === 'avatar') return 'Đường dẫn hình ảnh';
+        if ($field === 'image' || $field === 'avatar' || $field === 'proof_image') return 'Đường dẫn hình ảnh';
         if ($field === 'description') return 'Mô tả ngắn';
         if ($field === 'content') return 'Nội dung chi tiết';
-        if ($field === 'price') return 'Giá bán';
+        if ($field === 'price' || $field === 'total_cost' || str_contains($field, 'amount') || str_contains($field, 'fee')) return 'Số tiền / Giá trị';
         if ($field === 'sku') return 'Mã kho (Stock Keeping Unit)';
+        if ($field === 'tracking_code') return 'Mã vận đơn';
         if (str_contains($type, 'json')) return 'Dữ liệu cấu hình/mảng';
         if (str_contains($type, 'tinyint')) return 'Cờ bật/tắt (0/1)';
+        if (str_contains($type, 'date') || str_contains($type, 'time')) return 'Ngày giờ';
 
         return 'Dữ liệu thông thường';
     }

@@ -62,8 +62,6 @@
         <div class="h5 mb-0 fw-bold d-flex align-items-center" style="color: var(--text-color);">
             <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>MENU
         </div>
-
-        {{-- ĐÃ LOẠI BỎ DROPDOWN RESET Ở ĐÂY --}}
     </div>
 
     {{-- CONTAINER CHÍNH --}}
@@ -80,9 +78,9 @@
             <div class="group-title text-success">BÁN HÀNG</div>
             <div class="menu-items-container" data-group-id="sales">
                 <a href="{{ route('admin.sales.orders.index') }}" class="menu-link" data-id="orders"><i class="fa-solid fa-cart-shopping"></i> <span>Đơn Hàng</span></a>
-                <a href="{{ route('admin.sales.deliveries.index') }}" class="menu-link" data-id="deliveries"><i class="fa-solid fa-truck"></i> <span>Vận Chuyển</span></a>
+                <a href="{{ route('admin.sales.shipping-shipments.index') }}" class="menu-link" data-id="deliveries"><i class="fa-solid fa-truck"></i> <span>Vận Chuyển</span></a>
                 <a href="{{ route('admin.sales.returns.index') }}" class="menu-link" data-id="returns"><i class="fa-solid fa-rotate-left"></i> <span>Trả Hàng</span></a>
-                <a href="{{ route('admin.sales.invoices.index') }}" class="menu-link" data-id="invoices"><i class="fa-solid fa-file-invoice"></i> <span>Hóa Đơn</span></a>
+                <a href="{{ route('admin.sales.tax-invoices.index') }}" class="menu-link" data-id="invoices"><i class="fa-solid fa-file-invoice"></i> <span>Hóa Đơn</span></a>
                 <a href="{{ route('admin.sales.carts.index') }}" class="menu-link" data-id="carts"><i class="fa-solid fa-cart-arrow-down"></i> <span>Giỏ Treo</span></a>
             </div>
         </div>
@@ -105,7 +103,7 @@
                 <a href="{{ route('admin.catalog.categories.index') }}" class="menu-link" data-id="categories"><i class="fa-solid fa-layer-group"></i> <span>Danh Mục</span></a>
                 <a href="{{ route('admin.catalog.attributes.index') }}" class="menu-link" data-id="attributes"><i class="fa-solid fa-tags"></i> <span>Thuộc Tính</span></a>
                 <a href="{{ route('admin.catalog.suppliers.index') }}" class="menu-link" data-id="suppliers"><i class="fa-solid fa-handshake"></i> <span>Nhà Cung Cấp</span></a>
-                <a href="{{ route('admin.catalog.reviews.index') }}" class="menu-link" data-id="reviews"><i class="fa-solid fa-star"></i> <span>Đánh Giá</span></a>
+                <a href="{{ route('admin.catalog.product-reviews.index') }}" class="menu-link" data-id="reviews"><i class="fa-solid fa-star"></i> <span>Đánh Giá</span></a>
             </div>
         </div>
         {{-- === NHÓM 5: KHO HÀNG === --}}
@@ -114,7 +112,7 @@
             <div class="menu-items-container" data-group-id="inventory">
                 <a href="{{ route('admin.inventory.stocks.index') }}" class="menu-link" data-id="stocks"><i class="fa-solid fa-cubes"></i> <span>Tồn Kho</span></a>
                 <a href="{{ route('admin.inventory.warehouses.index') }}" class="menu-link" data-id="warehouses"><i class="fa-solid fa-warehouse"></i> <span>Danh Sách Kho</span></a>
-                <a href="{{ route('admin.inventory.purchase-orders.index') }}" class="menu-link" data-id="po"><i class="fa-solid fa-file-import"></i> <span>Nhập (PO)</span></a>
+                <a href="{{ route('admin.inventory.import-orders.index') }}" class="menu-link" data-id="po"><i class="fa-solid fa-file-import"></i> <span>Nhập (PO)</span></a>
                 <a href="{{ route('admin.inventory.transactions.index') }}" class="menu-link" data-id="transactions"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch Sử Kho</span></a>
             </div>
         </div>
@@ -122,8 +120,9 @@
         <div class="menu-group-box">
             <div class="group-title text-primary">TÀI CHÍNH</div>
             <div class="menu-items-container" data-group-id="finance">
-                <a href="{{ route('admin.finance.profits.index') }}" class="menu-link" data-id="profits"><i class="fa-solid fa-percent"></i> <span>Lợi Nhuận</span></a>
-                <a href="{{ route('admin.finance.wallets.index') }}" class="menu-link" data-id="wallets"><i class="fa-solid fa-wallet"></i> <span>Ví Tiền</span></a>
+                {{-- [ĐÃ SỬA] Route profits -> profit-distribution-groups --}}
+                <a href="{{ route('admin.finance.profit-distribution-groups.index') }}" class="menu-link" data-id="profits"><i class="fa-solid fa-percent"></i> <span>Lợi Nhuận</span></a>
+                <a href="{{ route('admin.finance.reward-wallets.index') }}" class="menu-link" data-id="wallets"><i class="fa-solid fa-wallet"></i> <span>Ví Tiền</span></a>
                 <a href="{{ route('admin.finance.commissions.index') }}" class="menu-link" data-id="commissions"><i class="fa-solid fa-money-bill-transfer"></i> <span>Hoa Hồng</span></a>
             </div>
         </div>
@@ -131,7 +130,8 @@
         <div class="menu-group-box">
             <div class="group-title text-secondary">KÝ GỬI</div>
             <div class="menu-items-container" data-group-id="consignment">
-                <a href="{{ route('admin.consignment.orders.index') }}" class="menu-link" data-id="consignment_orders"><i class="fa-solid fa-clipboard-list"></i> <span>Đơn Ký Gửi</span></a>
+                {{-- [ĐÃ SỬA] Route orders -> consignments --}}
+                <a href="{{ route('admin.consignment.consignments.index') }}" class="menu-link" data-id="consignment_orders"><i class="fa-solid fa-clipboard-list"></i> <span>Đơn Ký Gửi</span></a>
                 <a href="{{ route('admin.consignment.customers.index') }}" class="menu-link" data-id="consignment_customers"><i class="fa-solid fa-users-rectangle"></i> <span>Khách Ký Gửi</span></a>
             </div>
         </div>
@@ -140,9 +140,9 @@
             <div class="group-title text-info">MARKETING</div>
             <div class="menu-items-container" data-group-id="marketing">
                 <a href="{{ route('admin.marketing.promotions.index') }}" class="menu-link" data-id="promotions"><i class="fa-solid fa-bullhorn"></i> <span>Chiến Dịch</span></a>
-                <a href="{{ route('admin.marketing.coupons.index') }}" class="menu-link" data-id="coupons"><i class="fa-solid fa-ticket"></i> <span>Voucher</span></a>
+                <a href="{{ route('admin.marketing.promotion-coupons.index') }}" class="menu-link" data-id="coupons"><i class="fa-solid fa-ticket"></i> <span>Voucher</span></a>
                 <a href="{{ route('admin.marketing.flash-sales.index') }}" class="menu-link" data-id="flash"><i class="fa-solid fa-bolt"></i> <span>Flash Sale</span></a>
-                <a href="{{ route('admin.marketing.affiliates.index') }}" class="menu-link" data-id="affiliates"><i class="fa-solid fa-network-wired"></i> <span>Affiliate</span></a>
+                <a href="{{ route('admin.marketing.affiliate-links.index') }}" class="menu-link" data-id="affiliates"><i class="fa-solid fa-network-wired"></i> <span>AffiliateLink</span></a>
             </div>
         </div>
         {{-- === NHÓM 9: NỘI DUNG === --}}
@@ -152,7 +152,7 @@
                 <a href="{{ route('admin.content.posts.index') }}" class="menu-link" data-id="posts"><i class="fa-solid fa-newspaper"></i> <span>Tin Tức</span></a>
                 <a href="{{ route('admin.content.banners.index') }}" class="menu-link" data-id="banners"><i class="fa-solid fa-image"></i> <span>Banner</span></a>
                 <a href="{{ route('admin.content.menus.index') }}" class="menu-link" data-id="menus"><i class="fa-solid fa-bars"></i> <span>Menu Web</span></a>
-                <a href="{{ route('admin.content.pages.index') }}" class="menu-link" data-id="pages"><i class="fa-solid fa-file-lines"></i> <span>Trang Tĩnh</span></a>
+                {{-- [ĐÃ XÓA] Route pages (đã bị xóa khỏi hệ thống) --}}
                 <a href="{{ route('admin.content.images.index') }}" class="menu-link" data-id="images"><i class="fa-solid fa-images"></i> <span>Thư Viện</span></a>
                 <a href="{{ route('admin.content.game-subjects.index') }}" class="menu-link" data-id="games"><i class="fa-solid fa-gamepad"></i> <span>Game/Học</span></a>
             </div>
@@ -162,7 +162,7 @@
             <div class="group-title text-warning">KHÁCH HÀNG (CRM)</div>
             <div class="menu-items-container" data-group-id="crm">
                 <a href="{{ route('admin.crm.customers.index') }}" class="menu-link" data-id="customers"><i class="fa-solid fa-user-group"></i> <span>Khách Hàng</span></a>
-                <a href="{{ route('admin.crm.chats.index') }}" class="menu-link" data-id="chats"><i class="fa-solid fa-comments"></i> <span>Hội Thoại</span></a>
+                <a href="{{ route('admin.crm.chat-conversations.index') }}" class="menu-link" data-id="chats"><i class="fa-solid fa-comments"></i> <span>Hội Thoại</span></a>
                 <a href="{{ route('admin.crm.requests.index') }}" class="menu-link" data-id="requests"><i class="fa-solid fa-envelope-open-text"></i> <span>Yêu Cầu</span></a>
             </div>
         </div>

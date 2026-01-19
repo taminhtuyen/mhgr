@@ -174,7 +174,7 @@
                     {{-- TAB 1: SELLER --}}
                     <div class="tab-pane fade show active" id="seller-pane" role="tabpanel">
                         @for($k = 1; $k <= 3; $k++)
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative {{ $k == 1 ? 'active' : '' }}" onclick="openChatDetail('seller_{{ $k }}')">
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative {{ $k == 1 ? 'active' : '' }}" onclick="openChatConversationDetail('seller_{{ $k }}')">
                             <div class="flex-shrink-0 position-relative"><img src="https://ui-avatars.com/api/?name=Seller+{{ $k }}&background=0ea5e9&color=fff" class="rounded-circle me-2" width="45" height="45"></div>
                             <div class="flex-grow-1 overflow-hidden pe-4">
                                 <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người bán {{ $k }}</h6><small class="text-muted" style="font-size: 0.7rem;">Hôm qua</small></div>
@@ -199,7 +199,7 @@
                     {{-- TAB 2: BUYER --}}
                     <div class="tab-pane fade" id="buyer-pane" role="tabpanel">
                         @for($i = 1; $i <= 5; $i++)
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChatDetail('buyer_{{ $i }}')">
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChatConversationDetail('buyer_{{ $i }}')">
                             <div class="flex-shrink-0 position-relative"><img src="https://ui-avatars.com/api/?name=Buyer+{{ $i }}&background=random" class="rounded-circle me-2" width="45" height="45"></div>
                             <div class="flex-grow-1 overflow-hidden pe-4">
                                 <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người mua {{ $i }}</h6><small class="text-muted" style="font-size: 0.7rem;">10:30</small></div>
@@ -223,7 +223,7 @@
 
                     {{-- TAB 3: SYSTEM --}}
                     <div class="tab-pane fade" id="system-pane" role="tabpanel">
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" style="border-bottom: 1px solid var(--popup-border); background-color: rgba(var(--primary), 0.03);" onclick="openChatDetail('system_main')">
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" style="border-bottom: 1px solid var(--popup-border); background-color: rgba(var(--primary), 0.03);" onclick="openChatConversationDetail('system_main')">
                             <div class="flex-shrink-0 position-relative"><div class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white" style="width: 45px; height: 45px; background: linear-gradient(45deg, #ff416c, #ff4b2b);"><i class="fa-solid fa-robot"></i></div></div>
                             <div class="flex-grow-1 overflow-hidden pe-4"><div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate fw-bold" style="color: var(--text-color); font-size: 0.9rem;">HỆ THỐNG</h6><small class="text-muted" style="font-size: 0.7rem;">Vừa xong</small></div><p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Chào mừng bạn...</p></div>
 
@@ -248,7 +248,7 @@
             {{-- HEADER (FIXED OVERFLOW & TRUNCATE) --}}
             <div class="chat-header p-3 border-bottom d-flex align-items-center flex-shrink-0"
                  style="background: var(--popup-bg); backdrop-filter: blur(5px); border-color: var(--popup-border) !important; z-index: 5;">
-                <button class="btn btn-back-mobile me-3 mobile-nav-btn shadow-sm" onclick="backToChatList()"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="btn btn-back-mobile me-3 mobile-nav-btn shadow-sm" onclick="backToChatConversationList()"><i class="fa-solid fa-chevron-left"></i></button>
 
                 <img src="https://ui-avatars.com/api/?name=Seller+1&background=random" class="rounded-circle me-2" width="40" height="40">
 
@@ -346,12 +346,12 @@
 
         // --- 1. CONFIG: LOAD TỪ STORAGE ---
         // Biến này sẽ được cập nhật bởi settings-popup
-        window.updateChatSettings = function() {
+        window.updateChatConversationSettings = function() {
             window.chatSettings = {
                 enterToSend: localStorage.getItem('client_chat_enter_to_send') === 'true'
             };
         };
-        window.updateChatSettings(); // Load initial
+        window.updateChatConversationSettings(); // Load initial
 
         // --- 2. SEND MESSAGE LOGIC ---
         function sendMessage() {
@@ -421,35 +421,35 @@
                         popup.style.bottom = '0px';
                         chatInterface.style.height = '100%';
                     } else {
-                        window.resetChatPopupStyle();
+                        window.resetChatConversationPopupStyle();
                     }
                 }
             };
             window.visualViewport.addEventListener('resize', handleResize);
             window.visualViewport.addEventListener('scroll', handleResize);
 
-            window.resetChatPopupStyle = function() {
+            window.resetChatConversationPopupStyle = function() {
                 popup.style.height = '';
                 popup.style.bottom = '';
                 chatInterface.style.height = '';
             }
         } else {
-            window.resetChatPopupStyle = function() {};
+            window.resetChatConversationPopupStyle = function() {};
         }
 
         // --- 6. API ---
         window.showTyping = function() { if(typingIndicator) typingIndicator.classList.remove('d-none'); }
         window.hideTyping = function() { if(typingIndicator) typingIndicator.classList.add('d-none'); }
 
-        window.openChatDetail = function(id) {
+        window.openChatConversationDetail = function(id) {
             chatInterface.classList.add('in-conversation');
         }
 
-        window.backToChatList = function() {
+        window.backToChatConversationList = function() {
             chatInterface.classList.remove('in-conversation');
         }
 
-        window.renderChatContent = function() {
+        window.renderChatConversationContent = function() {
             const menuInterface = document.getElementById('menu-interface');
             const chatInterface = document.getElementById('chat-interface');
             const settingsInterface = document.getElementById('settings-interface');
@@ -463,7 +463,7 @@
         const oldCloseAll = window.closeAll;
         window.closeAll = function() {
             if(oldCloseAll) oldCloseAll();
-            if(window.resetChatPopupStyle) window.resetChatPopupStyle();
+            if(window.resetChatConversationPopupStyle) window.resetChatConversationPopupStyle();
         }
 
     });
