@@ -1,77 +1,87 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Events\SystemNotification; // Import sự kiện thông báo
+use App\Events\SystemNotification;
 
-// --- IMPORT CONTROLLERS ---
-use App\Http\Controllers\Admin\DashboardController;
-// Sales
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\DeliveryController;
-use App\Http\Controllers\Admin\ReturnController;
-use App\Http\Controllers\Admin\InvoiceController;
-use App\Http\Controllers\Admin\CartController;
-// Catalog
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\AttributeController;
-use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\Admin\ReviewController;
-// Inventory
-use App\Http\Controllers\Admin\InventoryStockController;
-use App\Http\Controllers\Admin\WarehouseController;
-use App\Http\Controllers\Admin\PurchaseOrderController;
-use App\Http\Controllers\Admin\InventoryTransactionController;
-// Finance
-use App\Http\Controllers\Admin\ProfitDistributionController;
-use App\Http\Controllers\Admin\WalletController;
-use App\Http\Controllers\Admin\CommissionController;
-// Consignment
-use App\Http\Controllers\Admin\ConsignmentController;
-use App\Http\Controllers\Admin\ConsignmentCustomerController;
-// Marketing
-use App\Http\Controllers\Admin\PromotionController;
-use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\FlashSaleController;
-use App\Http\Controllers\Admin\AffiliateController;
-// Content
-use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\Admin\BannerController;
-use App\Http\Controllers\Admin\GameSubjectController;
-use App\Http\Controllers\Admin\MenuController;
-use App\Http\Controllers\Admin\PageController;
-use App\Http\Controllers\Admin\ImageController;
-// CRM
-use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\ChatController;
-use App\Http\Controllers\Admin\RequestController;
-// System
-use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\LocationController;
-use App\Http\Controllers\Admin\SystemLogController;
+// --- IMPORT CONTROLLERS (CẤU TRÚC MỚI) ---
+
+// 0. Dashboard
+use App\Http\Controllers\Admin\Dashboard\DashboardController;
+
+// 1. Sales (Bán Hàng)
+use App\Http\Controllers\Admin\Sales\OrderController;
+use App\Http\Controllers\Admin\Sales\DeliveryController;
+use App\Http\Controllers\Admin\Sales\ReturnController;
+use App\Http\Controllers\Admin\Sales\InvoiceController;
+use App\Http\Controllers\Admin\Sales\CartController;
+
+// 2. Catalog (Sản Phẩm)
+use App\Http\Controllers\Admin\Catalog\ProductController;
+use App\Http\Controllers\Admin\Catalog\CategoryController;
+use App\Http\Controllers\Admin\Catalog\AttributeController;
+use App\Http\Controllers\Admin\Catalog\SupplierController;
+use App\Http\Controllers\Admin\Catalog\ReviewController;
+
+// 3. Inventory (Kho Hàng)
+use App\Http\Controllers\Admin\Inventory\InventoryStockController;
+use App\Http\Controllers\Admin\Inventory\WarehouseController;
+use App\Http\Controllers\Admin\Inventory\PurchaseOrderController;
+use App\Http\Controllers\Admin\Inventory\InventoryTransactionController;
+
+// 4. Finance (Tài Chính)
+use App\Http\Controllers\Admin\Finance\ProfitDistributionController;
+use App\Http\Controllers\Admin\Finance\WalletController;
+use App\Http\Controllers\Admin\Finance\CommissionController;
+
+// 5. Consignment (Ký Gửi)
+use App\Http\Controllers\Admin\Consignment\ConsignmentController;
+use App\Http\Controllers\Admin\Consignment\ConsignmentCustomerController;
+
+// 6. Marketing (Marketing)
+use App\Http\Controllers\Admin\Marketing\PromotionController;
+use App\Http\Controllers\Admin\Marketing\CouponController;
+use App\Http\Controllers\Admin\Marketing\FlashSaleController;
+use App\Http\Controllers\Admin\Marketing\AffiliateController;
+
+// 7. Content (Nội Dung)
+use App\Http\Controllers\Admin\Content\PostController;
+use App\Http\Controllers\Admin\Content\BannerController;
+use App\Http\Controllers\Admin\Content\GameSubjectController;
+use App\Http\Controllers\Admin\Content\MenuController;
+use App\Http\Controllers\Admin\Content\PageController;
+use App\Http\Controllers\Admin\Content\ImageController;
+
+// 8. CRM (Khách Hàng & Chat)
+use App\Http\Controllers\Admin\CRM\CustomerController;
+use App\Http\Controllers\Admin\CRM\ChatController;
+use App\Http\Controllers\Admin\CRM\RequestController;
+
+// 9. System (Hệ Thống)
+use App\Http\Controllers\Admin\System\SettingController;
+use App\Http\Controllers\Admin\System\UserController;
+use App\Http\Controllers\Admin\System\RoleController;
+use App\Http\Controllers\Admin\System\LocationController;
+use App\Http\Controllers\Admin\System\SystemLogController;
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN ROUTES (STANDARD DESIGN)
+| ADMIN ROUTES (REFACTORED STRUCTURE)
 |--------------------------------------------------------------------------
 | Quy tắc đặt tên: admin.[nhóm].[chức_năng].[hành_động]
-| Ví dụ: admin.sales.orders.index
+| Logic: Giữ nguyên luồng xử lý cũ, chỉ thay đổi Namespace Controller.
 */
 
-// --- ROUTE TEST THÔNG BÁO REAL-TIME (Chạy thử: /admin/test-notification) ---
+// --- ROUTE TEST THÔNG BÁO REAL-TIME ---
 Route::get('/test-notification', function () {
     $message = "Hệ thống: Có đơn hàng mới #MB" . rand(1000, 9999) . " vừa được tạo lúc " . date('H:i:s');
     event(new SystemNotification($message));
     return "<h1>Đã gửi thông báo: $message</h1><p>Hãy kiểm tra Tab Admin Dashboard.</p>";
 });
 
-// Dashboard (Không thuộc nhóm nào)
+// Dashboard
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 // 1. NHÓM BÁN HÀNG (Sales)
-// URL: /admin/sales/... | Name: admin.sales....
 Route::prefix('sales')->name('sales.')->group(function () {
     Route::resource('orders', OrderController::class);
     Route::resource('deliveries', DeliveryController::class);
@@ -81,7 +91,6 @@ Route::prefix('sales')->name('sales.')->group(function () {
 });
 
 // 2. NHÓM SẢN PHẨM (Catalog)
-// URL: /admin/catalog/... | Name: admin.catalog....
 Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::get('products', function () {
         return view('admin.products.index');
@@ -93,7 +102,6 @@ Route::prefix('catalog')->name('catalog.')->group(function () {
 });
 
 // 3. NHÓM KHO HÀNG (Inventory)
-// URL: /admin/inventory/... | Name: admin.inventory....
 Route::prefix('inventory')->name('inventory.')->group(function () {
     Route::resource('stocks', InventoryStockController::class);
     Route::resource('warehouses', WarehouseController::class);
@@ -102,7 +110,6 @@ Route::prefix('inventory')->name('inventory.')->group(function () {
 });
 
 // 4. NHÓM TÀI CHÍNH (Finance)
-// URL: /admin/finance/... | Name: admin.finance....
 Route::prefix('finance')->name('finance.')->group(function () {
     Route::resource('profits', ProfitDistributionController::class);
     Route::resource('wallets', WalletController::class);
@@ -110,14 +117,12 @@ Route::prefix('finance')->name('finance.')->group(function () {
 });
 
 // 5. NHÓM KÝ GỬI (Consignment)
-// URL: /admin/consignment/... | Name: admin.consignment....
 Route::prefix('consignment')->name('consignment.')->group(function () {
     Route::resource('orders', ConsignmentController::class);
     Route::resource('customers', ConsignmentCustomerController::class);
 });
 
 // 6. NHÓM MARKETING (Marketing)
-// URL: /admin/marketing/... | Name: admin.marketing....
 Route::prefix('marketing')->name('marketing.')->group(function () {
     Route::resource('promotions', PromotionController::class);
     Route::resource('coupons', CouponController::class);
@@ -126,7 +131,6 @@ Route::prefix('marketing')->name('marketing.')->group(function () {
 });
 
 // 7. NHÓM NỘI DUNG (Content)
-// URL: /admin/content/... | Name: admin.content....
 Route::prefix('content')->name('content.')->group(function () {
     Route::resource('posts', PostController::class);
     Route::resource('banners', BannerController::class);
@@ -137,7 +141,6 @@ Route::prefix('content')->name('content.')->group(function () {
 });
 
 // 8. NHÓM CRM (CRM)
-// URL: /admin/crm/... | Name: admin.crm....
 Route::prefix('crm')->name('crm.')->group(function () {
     Route::resource('customers', CustomerController::class);
     Route::resource('chats', ChatController::class);
@@ -145,7 +148,6 @@ Route::prefix('crm')->name('crm.')->group(function () {
 });
 
 // 9. NHÓM HỆ THỐNG (System)
-// URL: /admin/system/... | Name: admin.system....
 Route::prefix('system')->name('system.')->group(function () {
     Route::resource('settings', SettingController::class);
     Route::resource('users', UserController::class);
