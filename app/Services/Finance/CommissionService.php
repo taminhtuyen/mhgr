@@ -2,15 +2,12 @@
 
 namespace App\Services\Finance;
 
+use App\Models\AffiliateCommission;
+
 class CommissionService
 {
-    /**
-     * Create a new service instance.
-     */
-    public function __construct()
+    public function model()
     {
-        //
+        return AffiliateCommission::class;
     }
-
-    // Viết business logic tại đây
 }

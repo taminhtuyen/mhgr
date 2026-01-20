@@ -2,15 +2,12 @@
 
 namespace App\Services\Finance;
 
+use App\Models\UserRewardWallet;
+
 class RewardWalletService
 {
-    /**
-     * Create a new service instance.
-     */
-    public function __construct()
+    public function model()
     {
-        //
+        return UserRewardWallet::class;
     }
-
-    // Viết business logic tại đây
 }

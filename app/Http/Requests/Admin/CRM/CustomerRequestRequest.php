@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\CRM;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CustomerRequest extends FormRequest
+class CustomerRequestRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
