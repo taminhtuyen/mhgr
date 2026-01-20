@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    @include('admin.partials.schema-view')
+    <livewire:admin.-content.-game-subject-table />
 
 @endsection

@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    @include('admin.partials.schema-view')
+    <livewire:admin.-sales.-order-return-table />
 
 @endsection

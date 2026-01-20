@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    @include('admin.partials.schema-view')
+    <livewire:admin.-finance.-profit-distribution-group-table />
 
 @endsection
