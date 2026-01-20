@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Catalog;
+use App\Services\Catalog\CategoryService;
+use App\Http\Requests\Admin\Catalog\CategoryRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

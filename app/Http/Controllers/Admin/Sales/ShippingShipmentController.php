@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Admin\Sales;
+use App\Services\Sales\ShippingShipmentService;
+use App\Http\Requests\Admin\Sales\ShippingShipmentRequest;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;

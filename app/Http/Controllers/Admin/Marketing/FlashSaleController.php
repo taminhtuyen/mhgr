@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Marketing;
+use App\Services\Marketing\FlashSaleService;
+use App\Http\Requests\Admin\Marketing\FlashSaleRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

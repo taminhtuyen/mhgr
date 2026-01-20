@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Admin\Content;
+use App\Services\Content\ImageService;
+use App\Http\Requests\Admin\Content\ImageRequest;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;

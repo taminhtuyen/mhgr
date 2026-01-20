@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Finance;
+use App\Services\Finance\ProfitDistributionGroupService;
+use App\Http\Requests\Admin\Finance\ProfitDistributionGroupRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

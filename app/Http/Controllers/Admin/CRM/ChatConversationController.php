@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\CRM;
+use App\Services\CRM\ChatConversationService;
+use App\Http\Requests\Admin\CRM\ChatConversationRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

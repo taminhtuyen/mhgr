@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Marketing;
+use App\Services\Marketing\PromotionService;
+use App\Http\Requests\Admin\Marketing\PromotionRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

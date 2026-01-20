@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Catalog;
+use App\Services\Catalog\SupplierService;
+use App\Http\Requests\Admin\Catalog\SupplierRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

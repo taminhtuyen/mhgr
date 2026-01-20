@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Content;
+use App\Services\Content\BannerService;
+use App\Http\Requests\Admin\Content\BannerRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

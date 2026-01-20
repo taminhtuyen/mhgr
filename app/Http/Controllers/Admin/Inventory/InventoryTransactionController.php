@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Inventory;
+use App\Services\Inventory\InventoryTransactionService;
+use App\Http\Requests\Admin\Inventory\InventoryTransactionRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Finance;
+use App\Services\Finance\RewardWalletService;
+use App\Http\Requests\Admin\Finance\RewardWalletRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

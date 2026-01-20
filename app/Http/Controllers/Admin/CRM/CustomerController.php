@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Admin\CRM;
+use App\Services\CRM\CustomerService;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

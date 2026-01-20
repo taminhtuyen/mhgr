@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Marketing;
+use App\Services\Marketing\PromotionCouponService;
+use App\Http\Requests\Admin\Marketing\PromotionCouponRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

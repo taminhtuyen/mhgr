@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Admin\Sales;
+use App\Services\Sales\OrderService;
+use App\Http\Requests\Admin\Sales\OrderRequest;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;

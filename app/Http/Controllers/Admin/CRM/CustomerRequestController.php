@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin\CRM;
+use App\Http\Requests\Admin\CRM\CustomerRequestRequest;
 
 use App\Http\Controllers\Controller;
 use App\Services\CRM\CustomerRequestService;

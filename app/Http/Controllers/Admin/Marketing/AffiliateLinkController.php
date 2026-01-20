@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Marketing;
+use App\Services\Marketing\AffiliateLinkService;
+use App\Http\Requests\Admin\Marketing\AffiliateLinkRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

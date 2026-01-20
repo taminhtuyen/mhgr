@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Consignment;
+use App\Services\Consignment\ConsignmentService;
+use App\Http\Requests\Admin\Consignment\ConsignmentRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

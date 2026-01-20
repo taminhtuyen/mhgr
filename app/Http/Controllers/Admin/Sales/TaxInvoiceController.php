@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Admin\Sales;
+use App\Services\Sales\TaxInvoiceService;
+use App\Http\Requests\Admin\Sales\TaxInvoiceRequest;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;

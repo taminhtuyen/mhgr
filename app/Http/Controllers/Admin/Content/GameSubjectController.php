@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\Content;
+use App\Services\Content\GameSubjectService;
+use App\Http\Requests\Admin\Content\GameSubjectRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 

@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin\System;
+use App\Services\System\LocationService;
+use App\Http\Requests\Admin\System\LocationRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HasTableSchema;
 
