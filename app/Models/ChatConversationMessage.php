@@ -30,7 +30,7 @@ class ChatConversationMessage extends Model
 
     public function conversation(): BelongsTo
     {
-        return $this->belongsTo(ChatConversationConversation::class, 'conversation_id');
+        return $this->belongsTo(ChatConversation::class, 'conversation_id');
     }
 
     public function sender(): BelongsTo

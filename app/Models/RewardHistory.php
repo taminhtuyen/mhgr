@@ -31,6 +31,6 @@ class RewardHistory extends Model
 
     public function wallet(): BelongsTo
     {
-        return $this->belongsTo(RewardRewardWallet::class, 'wallet_id');
+        return $this->belongsTo(UserRewardWallet::class, 'wallet_id');
     }
 }
