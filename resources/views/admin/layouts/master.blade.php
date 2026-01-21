@@ -12,6 +12,8 @@
 
     @livewireStyles
 
+    @stack('styles')
+
     <style>
         /* --- GLOBAL VARIABLES --- */
         :root {

@@ -151,8 +151,7 @@ Route::get('/test-html-error', function () {
         'type'    => 'error',
         // HTML Content: Giữ nguyên
         'content' => 'Phát hiện truy cập trái phép từ IP lạ.<br>
-                      <img src="https://via.placeholder.com/250x100/ff0000/ffffff?text=ALERT" style="width:100%; margin-top:10px; border-radius:8px;">
-                      <br><small class="text-muted">Vui lòng kiểm tra log ngay lập tức.</small>',
+                      <small class="text-muted">Vui lòng kiểm tra log ngay lập tức.</small>',
         'buttons' => [
             [
                 'text'   => 'Đóng',
