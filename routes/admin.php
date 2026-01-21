@@ -143,22 +143,66 @@ Route::prefix('system')->name('system.')->group(function () {
 });
 
 // --- TOOLS & UTILITIES (TESTING) ---
-// Route này dùng để test thông báo Realtime mà không cần thao tác DB
-Route::get('/test-notification', function () {
-    $data = [
-        'id' => rand(1, 9999),
-        'title' => 'Kiểm tra hệ thống thông báo',
-        'content' => 'Đây là tin nhắn thử nghiệm gửi từ Admin Route lúc ' . now()->format('H:i:s d/m/Y'),
-        'type' => 'info', // có thể là: info, success, warning, error
-        'url' => '#'
-    ];
+// 1. Test thông báo lỗi (Alert Style)
+// iOS Style: Nút "Đóng" màu xanh (bình thường), Nút hành động chính màu đỏ hoặc xanh đậm
+Route::get('/test-html-error', function () {
+    event(new SystemNotification([
+        'title'   => 'Cảnh báo Bảo mật', // iOS thường dùng tiêu đề ngắn
+        'type'    => 'error',
+        // HTML Content: Giữ nguyên
+        'content' => 'Phát hiện truy cập trái phép từ IP lạ.<br>
+                      <img src="https://via.placeholder.com/250x100/ff0000/ffffff?text=ALERT" style="width:100%; margin-top:10px; border-radius:8px;">
+                      <br><small class="text-muted">Vui lòng kiểm tra log ngay lập tức.</small>',
+        'buttons' => [
+            [
+                'text'   => 'Đóng',
+                'color'  => 'primary', // CHUẨN iOS: Nút đóng luôn là màu xanh (Primary), không dùng màu xám
+                'action' => ['type' => 'dismiss']
+            ],
+            [
+                'text'   => 'Xem Log',
+                'color'  => 'danger', // Màu đỏ báo hiệu sự cố
+                'isBold' => true,     // In đậm để thu hút sự chú ý
+                'action' => ['type' => 'url', 'value' => '/admin/system/logs']
+            ]
+        ]
+    ]));
+    return "Đã gửi thông báo lỗi chuẩn iOS!";
+});
 
-    // Phát sự kiện
-    event(new SystemNotification($data));
+// 2. Test thông báo xác nhận (Confirmation Style)
+// iOS Style: Nút "Hủy" bên trái (Màu xanh), Nút "Xóa" bên phải (Màu đỏ)
+Route::get('/test-confirm-action', function () {
+    event(new SystemNotification([
+        'title'   => 'Xác nhận xóa?',
+        'content' => 'Bạn có chắc chắn muốn xóa danh mục <b>"Điện tử"</b> không?<br>Hành động này không thể hoàn tác.',
+        'type'    => 'warning', // Dùng warning để hiện icon tam giác vàng (hoặc error nếu muốn icon đỏ)
+        'buttons' => [
+            [
+                'text'   => 'Hủy bỏ',
+                'color'  => 'primary', // SỬA QUAN TRỌNG: iOS dùng màu xanh cho nút Hủy, không dùng màu xám (secondary)
+                'action' => ['type' => 'dismiss']
+            ],
+            [
+                'text'   => 'Xóa ngay',
+                'color'  => 'danger', // Màu đỏ cho hành động phá hủy
+                'isBold' => true,     // In đậm nút hành động chính
+                // Gọi Livewire function: deleteCategory(id: 5)
+                'action' => ['type' => 'livewire', 'value' => 'deleteCategory', 'params' => ['id' => 5]]
+            ]
+        ]
+    ]));
+    return "Đã gửi thông báo xác nhận chuẩn iOS!";
+});
 
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Đã gửi sự kiện SystemNotification thành công!',
-        'payload' => $data
-    ]);
+// 3. Test thông báo thành công (Simple Alert)
+// iOS Style: Chỉ có 1 nút "Đóng" hoặc "OK" màu xanh in đậm
+Route::get('/test-simple-success', function () {
+    event(new SystemNotification([
+        'title'   => 'Thành công',
+        'content' => 'Cập nhật cài đặt hệ thống hoàn tất.',
+        'type'    => 'success',
+        // Không truyền buttons -> SystemNotification.php sẽ tự tạo nút "Đóng" màu Xanh + In đậm (đúng chuẩn iOS)
+    ]));
+    return "Đã gửi thông báo thành công chuẩn iOS!";
 });

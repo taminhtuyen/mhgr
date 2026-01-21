@@ -95,16 +95,29 @@
         #global-confirm-modal.active .modal-box { transform: scale(1); }
 
         .modal-content-box { padding: 20px 16px 20px; }
-        /* CẬP NHẬT: Sử dụng rem cho tiêu đề và mô tả để hỗ trợ co giãn cỡ chữ hệ thống */
-        .modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; color: var(--modal-text); }
+
+        /* CẬP NHẬT: Title hỗ trợ Flex để căn chỉnh Icon đẹp hơn */
+        .modal-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            color: var(--modal-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
         .modal-desc { font-size: 0.85rem; line-height: 1.4; color: var(--modal-text); opacity: 0.8; word-wrap: break-word; }
+
+        /* Hỗ trợ ảnh trong nội dung */
+        .modal-desc img { max-width: 100%; border-radius: 6px; margin-top: 8px; }
 
         /* --- DYNAMIC ACTIONS AREA --- */
         .modal-actions { display: flex; border-top: 0.5px solid var(--modal-border); }
 
         .btn-modal {
             flex: 1; border: none; background: transparent; padding: 12px;
-            /* CẬP NHẬT: Sử dụng rem cho cỡ chữ của nút bấm để hỗ trợ co giãn */
             font-size: 1.05rem; cursor: pointer; transition: 0.2s;
             border-right: 0.5px solid var(--modal-border);
             color: #007aff; /* Default iOS Blue */
@@ -117,12 +130,15 @@
         .modal-text-primary { color: #007aff !important; font-weight: 400; }
         .modal-text-danger { color: #ff3b30 !important; font-weight: 600; }
         .modal-text-success { color: #34c759 !important; font-weight: 600; }
+        /* Thêm màu Secondary nếu cần */
+        .modal-text-secondary { color: #6c757d !important; font-weight: 400; }
         .modal-text-bold { font-weight: 600 !important; }
 
         /* Dark Mode Adaptation */
         body.dark-mode .modal-text-primary { color: #0a84ff !important; }
         body.dark-mode .modal-text-danger { color: #ff453a !important; }
         body.dark-mode .modal-text-success { color: #30d158 !important; }
+        body.dark-mode .modal-text-secondary { color: #98989d !important; }
     </style>
 </head>
 <body>
@@ -135,7 +151,6 @@
 <div id="nav-popup">
     @include('client.partials.menu-popup')
     @include('client.partials.chat-popup')
-    {{-- MỚI: Thêm file cài đặt vào đây --}}
     @include('client.partials.settings-popup')
 </div>
 
@@ -157,6 +172,7 @@
     </div>
 </div>
 
+{{-- --- SCRIPT XỬ LÝ (UPDATED) --- --}}
 <script>
     // --- 1. THEME SETUP ---
     (function() {
@@ -185,35 +201,76 @@
         }
     });
 
-    // --- 3. HỆ THỐNG POPUP THÔNG MINH (CORE) ---
+    // --- 3. HỆ THỐNG POPUP THÔNG MINH (CORE LOGIC ĐỒNG BỘ VỚI ADMIN) ---
 
     const closeGlobalModal = () => {
         document.getElementById('global-confirm-modal').classList.remove('active');
     };
 
     /**
-     * Hàm hiển thị Modal tuỳ biến cao cấp
+     * Hàm hiển thị Modal đa năng (Advanced)
+     * Thay thế showCustomModal cũ bằng logic xử lý thông minh hơn
+     * @param {string} titleHtml - Tiêu đề (có thể chứa HTML Icon)
+     * @param {string} contentHtml - Nội dung HTML
+     * @param {Array} buttons - Mảng cấu hình nút
      */
-    function showCustomModal(title, desc, buttons = []) {
+    function showDynamicModal(titleHtml, contentHtml, buttons = []) {
         const modal = document.getElementById('global-confirm-modal');
         const elTitle = document.getElementById('global-modal-title');
         const elDesc = document.getElementById('global-modal-desc');
         const elActions = document.getElementById('global-modal-actions');
 
-        elTitle.innerHTML = title || 'Thông báo';
-        elDesc.innerHTML = desc || '';
+        // Mặc định tiêu đề nếu null
+        if (!titleHtml) {
+            titleHtml = '<i class="fa-solid fa-bell text-warning"></i> Thông báo';
+        }
+
+        elTitle.innerHTML = titleHtml;
+        elDesc.innerHTML = contentHtml || '';
         elActions.innerHTML = '';
 
-        buttons.forEach(btn => {
-            const button = document.createElement('button');
-            button.className = 'btn-modal ' + (btn.class || 'modal-text-primary');
-            button.innerHTML = btn.text || 'Nút';
+        // Fallback Buttons
+        if (!buttons || buttons.length === 0) {
+            buttons = [{ text: 'Đóng', color: 'primary', action: { type: 'dismiss' } }];
+        }
 
+        buttons.forEach(btnConfig => {
+            const button = document.createElement('button');
+
+            // Map màu sắc iOS chuẩn
+            let colorClass = 'modal-text-primary';
+            if (btnConfig.color === 'danger') colorClass = 'modal-text-danger';
+            if (btnConfig.color === 'success') colorClass = 'modal-text-success';
+            if (btnConfig.color === 'secondary') colorClass = 'modal-text-secondary';
+
+            // Logic CSS Class
+            button.className = `btn-modal ${colorClass}`;
+            if (btnConfig.isBold) button.style.fontWeight = "600";
+
+            button.innerHTML = btnConfig.text || 'Nút';
+
+            // Xử lý Sự kiện Click
             button.onclick = () => {
-                if (typeof btn.onClick === 'function') {
-                    btn.onClick();
+                const action = btnConfig.action || {};
+
+                // 1. Chuyển trang (URL Redirect)
+                if (action.type === 'url' && action.value) {
+                    window.location.href = action.value;
                 }
-                if (!btn.preventClose) {
+                // 2. Gọi Livewire (Dispatch Event)
+                else if (action.type === 'livewire' && action.value) {
+                    if (typeof Livewire !== 'undefined') {
+                        Livewire.dispatch(action.value, action.params || {});
+                    }
+                    closeGlobalModal();
+                }
+                // 3. Callback Javascript Nội bộ (Dùng cho code cũ)
+                else if (action.type === 'callback' && typeof action.value === 'function') {
+                    action.value();
+                    if (!action.preventClose) closeGlobalModal();
+                }
+                // 4. Mặc định: Đóng modal
+                else {
                     closeGlobalModal();
                 }
             };
@@ -223,82 +280,76 @@
         modal.classList.add('active');
     }
 
-    // --- 4. SHORTCUT HELPERS ---
+    // --- 4. SHORTCUT HELPERS (Tương thích code cũ) ---
+    // Giữ lại để code Client cũ không bị lỗi, nhưng mapping sang hàm showDynamicModal mới
 
     window.showAlert = function(title, desc, btnText = 'Đóng', btnColor = 'primary', callback = null) {
-        const btnClass = `modal-text-${btnColor}`;
-        showCustomModal(title, desc, [
-            {
-                text: btnText,
-                class: btnClass + (btnColor !== 'primary' ? ' modal-text-bold' : ''),
-                onClick: callback
-            }
-        ]);
+        // Tự động thêm icon vào title cũ để đồng bộ giao diện mới
+        const icon = '<i class="fa-solid fa-bell text-warning"></i>';
+        showDynamicModal(`${icon} ${title}`, desc, [{
+            text: btnText,
+            color: btnColor,
+            isBold: btnColor !== 'primary', // Logic cũ: Nếu không phải primary thì in đậm
+            action: { type: 'callback', value: callback }
+        }]);
     };
 
-    window.showConfirm = function(title, desc, arg3, arg4, arg5) {
-        let cancelText = 'Hủy';
-        let confirmText = 'Đồng ý';
-        let onConfirm = null;
-        let onCancel = null;
-        let confirmColor = 'danger';
-        let cancelColor = 'primary';
+    window.showConfirm = function(title, desc, cancelText, confirmText, onConfirm) {
+        let _onConfirm = onConfirm;
+        let _cancelText = cancelText || 'Hủy';
+        let _confirmText = confirmText || 'Đồng ý';
 
-        if (typeof arg3 === 'function') {
-            onConfirm = arg3;
-            const options = arg4 || {};
-
-            if(options.cancelText) cancelText = options.cancelText;
-            if(options.confirmText) confirmText = options.confirmText;
-            if(options.confirmColor) confirmColor = options.confirmColor;
-            if(options.cancelColor) cancelColor = options.cancelColor;
-
-            if(options.onCancel && typeof options.onCancel === 'function') {
-                onCancel = options.onCancel;
-            }
-        } else {
-            cancelText = arg3 || 'Hủy';
-            confirmText = arg4 || 'Đồng ý';
-            onConfirm = arg5;
+        // Xử lý overload tham số linh hoạt của hàm cũ
+        if (typeof cancelText === 'function') {
+            _onConfirm = cancelText;
+            _cancelText = 'Hủy';
+            _confirmText = 'Đồng ý';
         }
 
-        showCustomModal(title, desc, [
-            {
-                text: cancelText,
-                class: `modal-text-${cancelColor}`,
-                onClick: onCancel
-            },
-            {
-                text: confirmText,
-                class: `modal-text-${confirmColor}`,
-                onClick: onConfirm
-            }
+        const icon = '<i class="fa-solid fa-circle-question text-danger"></i>';
+
+        showDynamicModal(`${icon} ${title}`, desc, [
+            { text: _cancelText, color: 'primary', action: { type: 'dismiss' } }, // Nút Hủy màu xanh (iOS)
+            { text: _confirmText, color: 'danger', isBold: true, action: { type: 'callback', value: _onConfirm } } // Nút Đồng ý màu đỏ in đậm
         ]);
     };
 </script>
 
-{{-- --- REAL-TIME NOTIFICATION SYSTEM (PUSHER) --- --}}
-<script src="{{ asset('js/pusher.min.js') }}"></script>
+{{-- --- 5. REAL-TIME NOTIFICATION SYSTEM (PUSHER) - NEW ENGINE --- --}}
+{{-- Sử dụng CDN mới nhất để đảm bảo tính năng ổn định như Admin --}}
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script>
     var pusher = new Pusher('bbd581278169e135dc72', {
         cluster: 'ap1'
     });
     var channel = pusher.subscribe('notifications');
-    channel.bind('system.message', function(data) {
-        let btnColor = 'primary';
-        if (data.type === 'error') btnColor = 'danger';
-        else if (data.type === 'success') btnColor = 'success';
 
-        if (typeof window.showAlert === 'function') {
-            window.showAlert(
-                '<i class="fa-solid fa-bell text-warning"></i> THÔNG BÁO MỚI',
-                data.message,
-                'Đã xem',
-                btnColor
-            );
-        } else {
-            alert('Thông báo: ' + data.message);
+    channel.bind('system.message', function(data) {
+        // Lấy dữ liệu notification chuẩn hóa từ Backend (SystemNotification.php)
+        const noti = data.notification;
+
+        if (!noti) return;
+
+        // 1. Xử lý Icon hiển thị cạnh tiêu đề
+        let iconHtml = '<i class="fa-solid fa-bell text-warning"></i>';
+
+        if (noti.type === 'success') {
+            iconHtml = '<i class="fa-solid fa-circle-check text-success"></i>';
+        } else if (noti.type === 'error') {
+            iconHtml = '<i class="fa-solid fa-circle-exclamation text-danger"></i>';
+        } else if (noti.type === 'warning') {
+            iconHtml = '<i class="fa-solid fa-triangle-exclamation text-warning"></i>';
         }
+
+        // 2. Ghép Icon vào Title
+        const fullTitle = `${iconHtml} ${noti.title}`;
+
+        // 3. Gọi hàm hiển thị
+        showDynamicModal(
+            fullTitle,
+            noti.content,
+            noti.buttons
+        );
     });
 </script>
 

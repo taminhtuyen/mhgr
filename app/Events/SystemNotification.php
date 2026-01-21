@@ -12,23 +12,63 @@ class SystemNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $message;
+    /**
+     * Dữ liệu gửi đi (Frontend sẽ nhận được biến data.notification)
+     */
+    public $notification;
 
-    // Nhận nội dung thông báo từ nơi gọi
-    public function __construct($message)
+    public function __construct($input)
     {
-        $this->message = $message;
+        // 1. Cấu hình mặc định
+        $default = [
+            'title'   => 'Thông báo', // iOS thường để tiêu đề ngắn gọn
+            'content' => '',
+            'type'    => 'info',
+            'buttons' => []
+        ];
+
+        // 2. Chuẩn hóa dữ liệu đầu vào
+        if (is_string($input)) {
+            // TRƯỜNG HỢP 1: Chỉ truyền chuỗi văn bản
+            // -> Tạo giao diện Alert iOS chuẩn: 1 nút "Đóng" màu Xanh, In đậm
+            $default['content'] = $input;
+            $default['buttons'][] = [
+                'text'   => 'Đóng',
+                'color'  => 'primary', // iOS dùng màu xanh (primary) cho nút OK
+                'isBold' => true,      // iOS luôn in đậm nút hành động chính
+                'action' => ['type' => 'dismiss']
+            ];
+        } elseif (is_array($input) || is_object($input)) {
+            // TRƯỜNG HỢP 2: Truyền mảng cấu hình
+            $data = (array) $input;
+
+            // Gộp dữ liệu cơ bản
+            $default = array_merge($default, array_diff_key($data, ['buttons' => []]));
+
+            // Xử lý Buttons
+            if (!empty($data['buttons']) && is_array($data['buttons'])) {
+                // Nếu người dùng tự cấu hình nút -> Giữ nguyên
+                $default['buttons'] = $data['buttons'];
+            } elseif (empty($default['buttons'])) {
+                // Nếu người dùng KHÔNG cấu hình nút -> Tạo nút mặc định kiểu iOS
+                // Dù là lỗi hay thành công, nút "Đóng" đơn lẻ trên iOS vẫn thường là màu xanh chủ đạo
+                $default['buttons'][] = [
+                    'text'   => 'Đóng',
+                    'color'  => 'primary',
+                    'isBold' => true, // In đậm để người dùng dễ nhận biết nút bấm
+                    'action' => ['type' => 'dismiss']
+                ];
+            }
+        }
+
+        $this->notification = $default;
     }
 
-    // Tên kênh phát sóng (Channel): 'notifications'
-    // Sau này VPS cũng sẽ dùng kênh này, không cần sửa.
     public function broadcastOn()
     {
         return new Channel('notifications');
     }
 
-    // Tên sự kiện (Event Name): 'system.message'
-    // Tên này dùng để JS bắt sự kiện.
     public function broadcastAs()
     {
         return 'system.message';
