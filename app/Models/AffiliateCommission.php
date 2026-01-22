@@ -10,7 +10,7 @@ class AffiliateCommission extends Model
 {
     use HasFactory;
 
-    protected $table = 'commissions';
+    protected $table = 'affiliate_commissions';
 
     protected $guarded = ['id']; // Cho phép điền mọi cột trừ ID (tiện lợi hơn $fillable khi chưa biết cột)
 

@@ -480,6 +480,12 @@ return new class extends Migration
             $partitionSqlLogs
         ");
 
+        if (false) {
+            Schema::create('system_logs', function (Blueprint $table) {
+                $table->bigIncrements('id');
+            });
+        }
+
         // SQL Orders (Partitioned)
         // CẬP NHẬT: Thêm buyer_id, buyer_type, seller_id, seller_type
         $partitionSqlOrders = "PARTITION BY RANGE (year(`created_at`)) (

@@ -11,6 +11,6 @@ class RoleTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-system.-role-table');
+        return view('livewire.admin.system.role-table');
     }
 }

@@ -11,6 +11,6 @@ class MenuTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-content.-menu-table');
+        return view('livewire.admin.content.menu-table');
     }
 }

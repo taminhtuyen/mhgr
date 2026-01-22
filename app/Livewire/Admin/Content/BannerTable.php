@@ -11,6 +11,6 @@ class BannerTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-content.-banner-table');
+        return view('livewire.admin.content.banner-table');
     }
 }

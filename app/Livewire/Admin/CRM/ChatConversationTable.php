@@ -11,6 +11,6 @@ class ChatConversationTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-c-r-m.-chat-conversation-table');
+        return view('livewire.admin.c-r-m.chat-conversation-table');
     }
 }

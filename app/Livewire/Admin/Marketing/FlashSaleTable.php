@@ -11,6 +11,6 @@ class FlashSaleTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-marketing.-flash-sale-table');
+        return view('livewire.admin.marketing.flash-sale-table');
     }
 }

@@ -12,7 +12,7 @@ class Consignment extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'consignments';
+    protected $table = 'consignment_orders';
 
     protected $fillable = [
         'user_id',

@@ -11,6 +11,6 @@ class ImageTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-content.-image-table');
+        return view('livewire.admin.content.image-table');
     }
 }

@@ -11,6 +11,6 @@ class CartTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-sales.-cart-table');
+        return view('livewire.admin.sales.cart-table');
     }
 }

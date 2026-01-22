@@ -10,7 +10,7 @@ class PromotionUsage extends Model
 {
     use HasFactory;
 
-    protected $table = 'promotion_usage';
+    protected $table = 'promotion_customer_usage';
 
     protected $guarded = ['id']; // Cho phép điền mọi cột trừ ID (tiện lợi hơn $fillable khi chưa biết cột)
 

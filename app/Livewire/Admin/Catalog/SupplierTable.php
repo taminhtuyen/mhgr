@@ -11,6 +11,6 @@ class SupplierTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-catalog.-supplier-table');
+        return view('livewire.admin.catalog.supplier-table');
     }
 }

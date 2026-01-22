@@ -11,6 +11,6 @@ class AttributeTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-catalog.-attribute-table');
+        return view('livewire.admin.catalog.attribute-table');
     }
 }

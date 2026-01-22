@@ -10,7 +10,7 @@ class AttributeValue extends Model
 {
     use HasFactory;
 
-    protected $table = 'attribute_values';
+    protected $table = 'product_attributes_values';
 
     protected $guarded = ['id']; // Cho phép điền mọi cột trừ ID (tiện lợi hơn $fillable khi chưa biết cột)
 

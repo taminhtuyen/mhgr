@@ -11,6 +11,6 @@ class ProductTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-catalog.-product-table');
+        return view('livewire.admin.catalog.product-table');
     }
 }

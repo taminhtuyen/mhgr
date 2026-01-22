@@ -11,6 +11,6 @@ class CustomerRequestTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-c-r-m.-customer-request-table');
+        return view('livewire.admin.c-r-m.customer-request-table');
     }
 }

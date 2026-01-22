@@ -11,6 +11,6 @@ class SettingTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-system.-setting-table');
+        return view('livewire.admin.system.setting-table');
     }
 }

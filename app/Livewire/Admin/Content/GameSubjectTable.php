@@ -11,6 +11,6 @@ class GameSubjectTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-content.-game-subject-table');
+        return view('livewire.admin.content.game-subject-table');
     }
 }

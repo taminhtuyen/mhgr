@@ -11,6 +11,6 @@ class StockTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-inventory.-stock-table');
+        return view('livewire.admin.inventory.stock-table');
     }
 }

@@ -11,6 +11,6 @@ class ShippingShipmentTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-sales.-shipping-shipment-table');
+        return view('livewire.admin.sales.shipping-shipment-table');
     }
 }

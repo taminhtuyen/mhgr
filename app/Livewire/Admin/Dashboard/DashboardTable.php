@@ -11,6 +11,6 @@ class DashboardTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-dashboard.-dashboard-table');
+        return view('livewire.admin.dashboard.dashboard-table');
     }
 }

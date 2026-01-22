@@ -11,6 +11,6 @@ class TransactionTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-inventory.-transaction-table');
+        return view('livewire.admin.inventory.transaction-table');
     }
 }

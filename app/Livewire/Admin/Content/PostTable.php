@@ -11,6 +11,6 @@ class PostTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-content.-post-table');
+        return view('livewire.admin.content.post-table');
     }
 }

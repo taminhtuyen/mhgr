@@ -11,6 +11,6 @@ class AffiliateLinkTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-marketing.-affiliate-link-table');
+        return view('livewire.admin.marketing.affiliate-link-table');
     }
 }

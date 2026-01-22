@@ -11,6 +11,6 @@ class UserTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-system.-user-table');
+        return view('livewire.admin.system.user-table');
     }
 }

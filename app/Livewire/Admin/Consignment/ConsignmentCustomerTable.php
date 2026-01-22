@@ -11,6 +11,6 @@ class ConsignmentCustomerTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-consignment.-consignment-customer-table');
+        return view('livewire.admin.consignment.consignment-customer-table');
     }
 }

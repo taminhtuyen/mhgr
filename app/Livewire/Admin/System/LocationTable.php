@@ -11,6 +11,6 @@ class LocationTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-system.-location-table');
+        return view('livewire.admin.system.location-table');
     }
 }

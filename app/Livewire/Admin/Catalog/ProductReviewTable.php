@@ -11,6 +11,6 @@ class ProductReviewTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-catalog.-product-review-table');
+        return view('livewire.admin.catalog.product-review-table');
     }
 }

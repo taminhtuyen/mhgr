@@ -11,6 +11,6 @@ class CommissionTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-finance.-commission-table');
+        return view('livewire.admin.finance.commission-table');
     }
 }

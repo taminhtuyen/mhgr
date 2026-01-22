@@ -11,6 +11,6 @@ class TaxInvoiceTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-sales.-tax-invoice-table');
+        return view('livewire.admin.sales.tax-invoice-table');
     }
 }

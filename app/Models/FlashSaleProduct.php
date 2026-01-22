@@ -11,7 +11,7 @@ class FlashSaleProduct extends Model
 {
     use HasFactory;
 
-    protected $table = 'flash_sale_products';
+    protected $table = 'flash_sale_items';
 
     // Sử dụng guarded để an toàn cho các bảng giao dịch nhiều cột
     protected $guarded = ['id'];

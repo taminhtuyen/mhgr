@@ -11,6 +11,6 @@ class ImportOrderTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-inventory.-import-order-table');
+        return view('livewire.admin.inventory.import-order-table');
     }
 }

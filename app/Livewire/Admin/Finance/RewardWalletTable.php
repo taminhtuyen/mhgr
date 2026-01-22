@@ -11,6 +11,6 @@ class RewardWalletTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-finance.-reward-wallet-table');
+        return view('livewire.admin.finance.reward-wallet-table');
     }
 }

@@ -11,6 +11,6 @@ class PromotionCouponTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-marketing.-promotion-coupon-table');
+        return view('livewire.admin.marketing.promotion-coupon-table');
     }
 }

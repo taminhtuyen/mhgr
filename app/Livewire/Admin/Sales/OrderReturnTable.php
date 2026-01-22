@@ -11,6 +11,6 @@ class OrderReturnTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-sales.-order-return-table');
+        return view('livewire.admin.sales.order-return-table');
     }
 }

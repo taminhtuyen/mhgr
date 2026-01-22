@@ -11,6 +11,6 @@ class WarehouseTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-inventory.-warehouse-table');
+        return view('livewire.admin.inventory.warehouse-table');
     }
 }

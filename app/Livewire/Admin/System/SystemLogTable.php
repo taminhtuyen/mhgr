@@ -11,6 +11,6 @@ class SystemLogTable extends Component
 
     public function render()
     {
-        return view('livewire.admin.-system.-system-log-table');
+        return view('livewire.admin.system.system-log-table');
     }
 }
