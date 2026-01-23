@@ -2,61 +2,70 @@
     <style>
         /* --- CSS CHO SETTINGS POPUP --- */
         #settings-interface {
-            /* Tăng chiều rộng cho PC */
             width: 420px;
             max-width: 100%;
-            padding: 25px;
+            /* [CẬP NHẬT] Bỏ padding ở container cha để sticky header dính sát mép */
+            padding: 0;
             display: flex;
             flex-direction: column;
             gap: 20px;
 
-            /* --- CẬP NHẬT: THÊM SCROLL --- */
-            max-height: 80vh; /* Giới hạn chiều cao tối đa */
-            overflow-y: auto; /* Cho phép cuộn dọc */
-            overscroll-behavior: contain; /* Ngăn cuộn lan ra body */
-            scrollbar-width: thin; /* Firefox */
+            max-height: 80vh;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
         }
 
-        /* --- CẬP NHẬT: STYLE THANH CUỘN (CHROME/WEBKIT) --- */
-        #settings-interface::-webkit-scrollbar {
-            width: 6px;
-        }
-        #settings-interface::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #settings-interface::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb);
-            border-radius: 10px;
-        }
+        /* --- SCROLLBAR --- */
+        #settings-interface::-webkit-scrollbar { width: 6px; }
+        #settings-interface::-webkit-scrollbar-track { background: transparent; }
+        #settings-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
 
-        /* Responsive cho Mobile */
         @media (max-width: 998px) {
             #settings-interface {
                 width: 92vw;
-                padding: 20px;
-                max-height: 75vh; /* Mobile cần thấp hơn chút để tránh bàn phím/nav */
+                /* padding mobile cũng cần reset về 0 để sticky hoạt động đúng */
+                padding: 0;
+                max-height: 75vh;
             }
         }
 
+        /* --- [CẬP NHẬT] STICKY HEADER CHO SETTINGS --- */
         .settings-header {
             font-size: 1.2rem;
             font-weight: 800;
             color: var(--text-color);
             border-bottom: 2px solid var(--popup-border);
-            padding-bottom: 12px;
-            margin-bottom: 5px;
+
+            /* Sticky Logic */
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: var(--popup-bg); /* Nền đè nội dung */
+            backdrop-filter: blur(10px); /* Hiệu ứng mờ */
+
+            /* Thay thế padding của container cha bằng padding nội bộ */
+            padding: 20px 25px 15px 25px;
+            margin-bottom: 5px; /* Giữ khoảng cách với nội dung */
+
             display: flex;
             align-items: center;
             gap: 12px;
-            /* Đảm bảo header không bị co khi cuộn nếu dùng flex cha, nhưng ở đây scroll body */
             flex-shrink: 0;
         }
 
+        /* [CẬP NHẬT] Điều chỉnh Margin cho các khối nội dung vì container cha đã bỏ padding */
         .settings-group {
             background: rgba(127, 127, 127, 0.05);
             border-radius: 16px;
             padding: 18px;
             border: 1px solid var(--popup-border);
+            /* Thêm margin ngang để nội dung không dính sát mép (thay cho padding cha cũ) */
+            margin: 0 25px;
+        }
+        /* Settings group cuối cùng cần margin bottom */
+        .settings-group:last-child {
+            margin-bottom: 25px;
         }
 
         .settings-group-title {
@@ -198,7 +207,12 @@
     </style>
 
     <div class="settings-header">
-        <i class="fa-solid fa-gears text-primary"></i> CÀI ĐẶT
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-gears text-primary"></i> CÀI ĐẶT
+        </div>
+        <button class="btn btn-sm btn-icon text-muted ms-auto bg-transparent border-0" onclick="closeAll()" title="Đóng">
+            <i class="fa-solid fa-xmark" style="font-size: 1.2rem;"></i>
+        </button>
     </div>
 
     {{-- NHÓM 1: GIAO DIỆN --}}

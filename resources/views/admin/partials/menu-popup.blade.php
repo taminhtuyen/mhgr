@@ -13,8 +13,24 @@
 
         /* 3. LAYOUT CHUNG & SCROLL */
         #menu-interface { width: 100%; overflow-y: auto; max-height: 80vh; scrollbar-width: thin; overscroll-behavior: contain; }
-        #menu-interface::-webkit-scrollbar { width: 6px; } #menu-interface::-webkit-scrollbar-track { background: transparent; } #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
-        .popup-header { padding: 18px 25px 0 25px; border-bottom: 1px solid var(--popup-border); }
+        #menu-interface::-webkit-scrollbar { width: 6px; }
+        #menu-interface::-webkit-scrollbar-track { background: transparent; }
+        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
+
+        /* --- [CẬP NHẬT] STICKY HEADER CHO MENU --- */
+        .popup-header {
+            padding: 18px 25px 15px 25px;
+            border-bottom: 1px solid var(--popup-border);
+
+            /* Sticky Logic */
+            position: sticky;
+            top: 0;
+            z-index: 50; /* Đảm bảo nằm trên nội dung khi cuộn */
+            background-color: var(--popup-bg); /* Nền để che nội dung trôi qua */
+            backdrop-filter: blur(10px); /* Hiệu ứng mờ hiện đại */
+            margin-top: -1px; /* Fix lỗi hở pixel trên một số màn hình */
+        }
+
         .menu-main-wrapper { padding: 25px; gap: 20px; }
         .menu-group-box { display: flex; flex-direction: column; margin-bottom: 5px; }
 
@@ -55,13 +71,30 @@
         .dropdown-item i { width: 20px; text-align: center; color: var(--text-muted); }
         .dropdown-item:hover i { color: var(--link-hover-text); }
         .glass-effect.dropdown-menu { border: 1.5px solid var(--popup-border-highlight) !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important; }
+
+        /* Close Button Style */
+        .btn-close-popup {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+        }
+        .btn-close-popup:hover {
+            background-color: rgba(127,127,127,0.1);
+            color: var(--text-color);
+        }
     </style>
 
-    {{-- HEADER CỦA MENU --}}
-    <div class="popup-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+    {{-- HEADER CỦA MENU (STICKY) --}}
+    <div class="popup-header d-flex justify-content-between align-items-center">
         <div class="h5 mb-0 fw-bold d-flex align-items-center" style="color: var(--text-color);">
             <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>MENU
         </div>
+        <button class="btn btn-sm btn-icon text-muted btn-close-popup bg-transparent border-0" onclick="closeAll()" title="Đóng">
+            <i class="fa-solid fa-xmark" style="font-size: 1.2rem;"></i>
+        </button>
     </div>
 
     {{-- CONTAINER CHÍNH --}}
@@ -120,7 +153,6 @@
         <div class="menu-group-box">
             <div class="group-title text-primary">TÀI CHÍNH</div>
             <div class="menu-items-container" data-group-id="finance">
-                {{-- [ĐÃ SỬA] Route profits -> profit-distribution-groups --}}
                 <a href="{{ route('admin.finance.profit-distribution-groups.index') }}" class="menu-link" data-id="profits"><i class="fa-solid fa-percent"></i> <span>Lợi Nhuận</span></a>
                 <a href="{{ route('admin.finance.reward-wallets.index') }}" class="menu-link" data-id="wallets"><i class="fa-solid fa-wallet"></i> <span>Ví Tiền</span></a>
                 <a href="{{ route('admin.finance.commissions.index') }}" class="menu-link" data-id="commissions"><i class="fa-solid fa-money-bill-transfer"></i> <span>Hoa Hồng</span></a>
@@ -130,7 +162,6 @@
         <div class="menu-group-box">
             <div class="group-title text-secondary">KÝ GỬI</div>
             <div class="menu-items-container" data-group-id="consignment">
-                {{-- [ĐÃ SỬA] Route orders -> consignments --}}
                 <a href="{{ route('admin.consignment.consignments.index') }}" class="menu-link" data-id="consignment_orders"><i class="fa-solid fa-clipboard-list"></i> <span>Đơn Ký Gửi</span></a>
                 <a href="{{ route('admin.consignment.customers.index') }}" class="menu-link" data-id="consignment_customers"><i class="fa-solid fa-users-rectangle"></i> <span>Khách Ký Gửi</span></a>
             </div>
@@ -152,7 +183,6 @@
                 <a href="{{ route('admin.content.posts.index') }}" class="menu-link" data-id="posts"><i class="fa-solid fa-newspaper"></i> <span>Tin Tức</span></a>
                 <a href="{{ route('admin.content.banners.index') }}" class="menu-link" data-id="banners"><i class="fa-solid fa-image"></i> <span>Banner</span></a>
                 <a href="{{ route('admin.content.menus.index') }}" class="menu-link" data-id="menus"><i class="fa-solid fa-bars"></i> <span>Menu Web</span></a>
-                {{-- [ĐÃ XÓA] Route pages (đã bị xóa khỏi hệ thống) --}}
                 <a href="{{ route('admin.content.images.index') }}" class="menu-link" data-id="images"><i class="fa-solid fa-images"></i> <span>Thư Viện</span></a>
                 <a href="{{ route('admin.content.game-subjects.index') }}" class="menu-link" data-id="games"><i class="fa-solid fa-gamepad"></i> <span>Game/Học</span></a>
             </div>

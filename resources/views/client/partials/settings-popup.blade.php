@@ -4,7 +4,7 @@
         #settings-interface {
             width: 420px;
             max-width: 100%;
-            padding: 25px;
+            padding: 0; /* Bỏ padding cha để sticky dính sát */
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -25,29 +25,53 @@
         @media (max-width: 998px) {
             #settings-interface {
                 width: 92vw;
-                padding: 20px;
+                padding: 0;
                 max-height: 75vh;
             }
         }
 
+        /* [CẬP NHẬT] STICKY HEADER CHO SETTINGS - ĐÃ GIẢM OPACITY */
         .settings-header {
             font-size: 1.2rem;
             font-weight: 800;
             color: var(--text-color);
             border-bottom: 2px solid var(--popup-border);
-            padding-bottom: 12px;
+
+            /* Sticky Logic */
+            position: sticky;
+            top: 0;
+            z-index: 50;
+
+            /* [QUAN TRỌNG] Chỉnh màu nền trong suốt hơn (0.8) */
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            /* Padding nội bộ */
+            padding: 20px 25px 15px 25px;
             margin-bottom: 5px;
+
             display: flex;
             align-items: center;
             gap: 12px;
             flex-shrink: 0;
         }
 
+        /* Dark Mode Header riêng */
+        body.dark-mode .settings-header {
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+
+        /* Margin cho nội dung con */
         .settings-group {
             background: rgba(127, 127, 127, 0.05);
             border-radius: 16px;
             padding: 18px;
             border: 1px solid var(--popup-border);
+            margin: 0 25px; /* Margin ngang */
+        }
+        .settings-group:last-child {
+            margin-bottom: 25px;
         }
 
         .settings-group-title {
@@ -130,8 +154,15 @@
         .theme__toggle:checked ~ .theme__icon .theme__icon-part ~ .theme__icon-part { opacity: 0; }
     </style>
 
+    {{-- HEADER (STICKY) --}}
     <div class="settings-header">
-        <i class="fa-solid fa-gears text-primary"></i> CÀI ĐẶT
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-gears text-primary"></i> CÀI ĐẶT
+        </div>
+        {{-- Nút đóng --}}
+        <button class="btn btn-sm btn-icon text-muted ms-auto bg-transparent border-0" onclick="closeAll()" title="Đóng">
+            <i class="fa-solid fa-xmark" style="font-size: 1.2rem;"></i>
+        </button>
     </div>
 
     {{-- NHÓM 1: GIAO DIỆN --}}

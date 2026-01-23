@@ -18,28 +18,28 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
 
-        /* --- 2. COLORS & UTILS --- */
+        /* --- 2. UTILS --- */
         .chat-search-input::placeholder { color: var(--text-muted); opacity: 0.8; }
         .msg-meta { font-size: 0.65rem; margin-top: 4px; color: var(--text-muted); font-weight: 500; }
         body.dark-mode .msg-meta { color: #94a3b8; }
 
         .nav-tabs-custom .nav-link { color: var(--text-muted); border: none; border-bottom: 2px solid transparent; font-size: 0.85rem; font-weight: 600; padding: 10px 0; margin-right: 20px; background: transparent; }
+        .nav-tabs-custom .nav-link:hover { color: var(--primary); }
         .nav-tabs-custom .nav-link.active { color: var(--primary); background: transparent; border-bottom: 2px solid var(--primary); }
 
-        /* --- 3. SIDEBAR ACTIONS (FIX STACKING CONTEXT) --- */
+        /* --- 3. SIDEBAR ACTIONS (CẬP NHẬT CSS) --- */
         .chat-actions-btn {
             position: absolute; top: 50%; right: 10px;
             transform: translateY(-50%); z-index: 10;
         }
 
-        /* Đẩy z-index lên cao nhất khi mở menu để không bị đè bởi các nút khác */
         .chat-actions-btn.show {
             z-index: 1000 !important;
         }
 
         .chat-actions-btn .btn-icon {
             color: #94a3b8;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.9); /* Light Mode: Nền trắng mờ */
             border: 1px solid rgba(0,0,0,0.05);
             transition: all 0.2s;
             width: 28px; height: 28px;
@@ -49,8 +49,16 @@
         }
         .chat-actions-btn .btn-icon:hover { color: var(--primary); background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-        body.dark-mode .chat-actions-btn .btn-icon { color: #cbd5e1; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.1); }
-        body.dark-mode .chat-actions-btn .btn-icon:hover { background: var(--primary); color: #fff; }
+        /* [DARK MODE FIX] Nút trong suốt, chỉ hiện nền khi hover */
+        body.dark-mode .chat-actions-btn .btn-icon {
+            color: var(--text-muted);
+            background: transparent;
+            border-color: transparent;
+        }
+        body.dark-mode .chat-actions-btn .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
 
         .chat-sidebar .dropdown-menu {
             border: 1px solid var(--popup-border); box-shadow: var(--popup-shadow);
@@ -105,14 +113,13 @@
         #chat-input-field {
             resize: none;
             overflow-y: hidden;
-            min-height: 2.6rem; /* Co giãn theo rem */
+            min-height: 2.6rem; /* Scalable height */
             max-height: 120px;
             line-height: 1.5;
             padding-top: 8px; padding-bottom: 8px;
         }
         #chat-input-field.scroll-active { overflow-y: auto; }
 
-        /* Style cho các nút nhập liệu co giãn theo font-size */
         .chat-input-btn {
             height: 2.6rem;
             display: flex;
@@ -121,7 +128,7 @@
             transition: all 0.2s;
         }
         .chat-input-btn i {
-            font-size: 1.1rem; /* Icon cũng phóng to theo rem */
+            font-size: 1.1rem;
         }
 
         /* --- 7. MOBILE RESPONSIVE --- */
@@ -129,6 +136,44 @@
         .desktop-nav-element { display: block; }
         .btn-back-mobile { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50% !important; padding: 0; background-color: var(--bg-body); border: 1px solid var(--popup-border); color: var(--text-muted); transition: all 0.2s; }
 
+        /* HEADER & LAYOUT UPDATES */
+        /* Header Sidebar Overlay (Absolute + Blur) */
+        .chat-sidebar { position: relative; } /* Ensure absolute children position correctly */
+        .chat-overlay-header {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 50;
+            padding: 15px 15px 0 15px; height: 115px;
+            border-bottom: 1px solid var(--popup-border);
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; flex-direction: column; justify-content: flex-start;
+        }
+        body.dark-mode .chat-overlay-header { background-color: rgba(15, 23, 42, 0.8); }
+
+        /* Content Padding for Sidebar */
+        .chat-scrollable-content {
+            height: 100%; overflow-y: auto;
+            padding-top: 115px; /* Offset for header */
+            overscroll-behavior: contain;
+        }
+
+        /* Chat Window Header Overlay */
+        .chat-window { position: relative; }
+        .chat-window .chat-overlay-header {
+            height: 70px; padding: 0 15px; justify-content: center;
+        }
+        .chat-window .chat-scrollable-content {
+            padding-top: 70px; /* Offset for header */
+        }
+
+        /* Mobile Buttons Logic */
+        .btn-close-sidebar-mobile {
+            width: 32px; height: 32px; align-items: center; justify-content: center;
+            border-radius: 50%; border: 1px solid transparent; color: var(--text-muted);
+            background: transparent; transition: 0.2s;
+        }
+        .btn-close-sidebar-mobile:hover { background-color: rgba(127,127,127,0.1); color: var(--text-color); }
+
+        /* MEDIA QUERY */
         @media (max-width: 997.98px) {
             #chat-interface {
                 width: 100% !important; max-width: none !important;
@@ -139,9 +184,13 @@
             }
             .chat-sidebar { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; background: var(--popup-bg); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); border-right: none; }
             .chat-window { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; background: var(--popup-bg); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
+
             #chat-interface.in-conversation .chat-sidebar { transform: translateX(-20%); opacity: 0; pointer-events: none; }
             #chat-interface.in-conversation .chat-window { transform: translateX(0); }
-            .mobile-nav-btn { display: block !important; } .desktop-nav-element { display: none !important; }
+
+            .mobile-nav-btn { display: block !important; }
+            .desktop-nav-element { display: none !important; }
+
             .chat-input-area {
                 padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
             }
@@ -152,7 +201,9 @@
 
         {{-- CỘT TRÁI: DANH SÁCH --}}
         <div class="chat-sidebar d-flex flex-column border-end h-100" id="chat-list-col" style="border-color: var(--popup-border) !important;">
-            <div class="p-3 border-bottom flex-shrink-0" style="border-color: var(--popup-border) !important;">
+
+            {{-- HEADER SIDEBAR (Absolute Overlay) --}}
+            <div class="chat-overlay-header">
                 <div class="d-flex align-items-center mb-3">
                     <div class="dropdown me-2">
                         <button class="btn btn-sm btn-icon text-primary no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body"><i class="fa-solid fa-bars"></i></button>
@@ -160,29 +211,36 @@
                             <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-check-double me-2 text-primary"></i>Đánh dấu tất cả đã đọc</a></li>
                         </ul>
                     </div>
-                    <input type="text" class="form-control rounded-pill chat-search-input" placeholder="Tìm kiếm..." style="background-color: var(--input-darker); color: var(--text-color); border-color: var(--popup-border); font-size: 0.9rem;">
+                    <input type="text" class="form-control rounded-pill chat-search-input flex-grow-1" placeholder="Tìm kiếm..." style="background-color: var(--input-darker); color: var(--text-color); border-color: var(--popup-border); font-size: 0.9rem;">
+
+                    {{-- Nút đóng Sidebar trên Mobile --}}
+                    <button class="btn-close-sidebar-mobile d-lg-none ms-2" onclick="closeAll()" title="Đóng">
+                        <i class="fa-solid fa-xmark" style="font-size: 1.2rem;"></i>
+                    </button>
                 </div>
-                <ul class="nav nav-tabs nav-tabs-custom" id="chatTab" role="tablist">
-                    <li class="nav-item" role="presentation"><button class="nav-link active" id="seller-tab" data-bs-toggle="tab" data-bs-target="#seller-pane" type="button" role="tab">Người bán</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" id="buyer-tab" data-bs-toggle="tab" data-bs-target="#buyer-pane" type="button" role="tab">Người mua</button></li>
+
+                <ul class="nav nav-tabs nav-tabs-custom w-100" id="chatTab" role="tablist">
+                    <li class="nav-item" role="presentation"><button class="nav-link active" id="buyer-tab" data-bs-toggle="tab" data-bs-target="#buyer-pane" type="button" role="tab">Người mua</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" id="seller-tab" data-bs-toggle="tab" data-bs-target="#seller-pane" type="button" role="tab">Người bán</button></li>
                     <li class="nav-item" role="presentation"><button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system-pane" type="button" role="tab">Hệ thống</button></li>
                 </ul>
             </div>
 
-            <div class="chat-list flex-grow-1 overflow-auto custom-scrollbar" style="position: relative;">
+            {{-- DANH SÁCH CHAT (Scrollable) --}}
+            <div class="chat-scrollable-content custom-scrollbar">
                 <div class="tab-content" id="chatTabContent">
-                    {{-- TAB 1: SELLER --}}
-                    <div class="tab-pane fade show active" id="seller-pane" role="tabpanel">
-                        @for($k = 1; $k <= 3; $k++)
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative {{ $k == 1 ? 'active' : '' }}" onclick="openChatConversationDetail('seller_{{ $k }}')">
-                            <div class="flex-shrink-0 position-relative"><img src="https://ui-avatars.com/api/?name=Seller+{{ $k }}&background=0ea5e9&color=fff" class="rounded-circle me-2" width="45" height="45"></div>
+                    {{-- TAB 1: BUYER --}}
+                    <div class="tab-pane fade show active" id="buyer-pane" role="tabpanel">
+                        @for($i = 1; $i <= 5; $i++)
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative {{ $i == 1 ? 'active' : '' }}" onclick="openChatConversationDetail('buyer_{{ $i }}')">
+                            <div class="flex-shrink-0 position-relative"><img src="https://ui-avatars.com/api/?name=Buyer+{{ $i }}&background=random" class="rounded-circle me-2" width="45" height="45"><span class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle" style="margin-bottom: 2px; margin-right: 8px;"></span></div>
                             <div class="flex-grow-1 overflow-hidden pe-4">
-                                <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người bán {{ $k }}</h6><small class="text-muted" style="font-size: 0.7rem;">Hôm qua</small></div>
-                                <p class="mb-0 text-truncate small mt-1 fw-bold" style="color: var(--text-color);">Đã xác nhận đơn hàng...</p>
+                                <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Khách Mua {{ $i }}</h6><small class="text-muted" style="font-size: 0.7rem;">10:30</small></div>
+                                <p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Shop ơi tư vấn giúp em...</p>
                             </div>
                             <div class="dropdown chat-actions-btn">
                                 <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
-                                    <i class="fa-solid fa-ellipsis"></i>
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
                                     <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell me-2 text-primary"></i>Bật thông báo</a></li>
@@ -196,18 +254,18 @@
                         @endfor
                     </div>
 
-                    {{-- TAB 2: BUYER --}}
-                    <div class="tab-pane fade" id="buyer-pane" role="tabpanel">
-                        @for($i = 1; $i <= 5; $i++)
-                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChatConversationDetail('buyer_{{ $i }}')">
-                            <div class="flex-shrink-0 position-relative"><img src="https://ui-avatars.com/api/?name=Buyer+{{ $i }}&background=random" class="rounded-circle me-2" width="45" height="45"></div>
+                    {{-- TAB 2: SELLER --}}
+                    <div class="tab-pane fade" id="seller-pane" role="tabpanel">
+                        @for($k = 1; $k <= 3; $k++)
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChatConversationDetail('seller_{{ $k }}')">
+                            <div class="flex-shrink-0 position-relative"><img src="https://ui-avatars.com/api/?name=Seller+{{ $k }}&background=0ea5e9&color=fff" class="rounded-circle me-2" width="45" height="45"></div>
                             <div class="flex-grow-1 overflow-hidden pe-4">
-                                <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người mua {{ $i }}</h6><small class="text-muted" style="font-size: 0.7rem;">10:30</small></div>
-                                <p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Sản phẩm này còn hàng...</p>
+                                <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Người bán {{ $k }}</h6><small class="text-muted" style="font-size: 0.7rem;">Hôm qua</small></div>
+                                <p class="mb-0 text-truncate small mt-1 fw-bold" style="color: var(--text-color);">Đã xác nhận đơn nhập PO-{{$k}}99...</p>
                             </div>
                             <div class="dropdown chat-actions-btn">
                                 <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()">
-                                    <i class="fa-solid fa-ellipsis"></i>
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
                                     <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell me-2 text-primary"></i>Bật thông báo</a></li>
@@ -225,10 +283,10 @@
                     <div class="tab-pane fade" id="system-pane" role="tabpanel">
                         <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" style="border-bottom: 1px solid var(--popup-border); background-color: rgba(var(--primary), 0.03);" onclick="openChatConversationDetail('system_main')">
                             <div class="flex-shrink-0 position-relative"><div class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white" style="width: 45px; height: 45px; background: linear-gradient(45deg, #ff416c, #ff4b2b);"><i class="fa-solid fa-robot"></i></div></div>
-                            <div class="flex-grow-1 overflow-hidden pe-4"><div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate fw-bold" style="color: var(--text-color); font-size: 0.9rem;">HỆ THỐNG</h6><small class="text-muted" style="font-size: 0.7rem;">Vừa xong</small></div><p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Chào mừng bạn...</p></div>
+                            <div class="flex-grow-1 overflow-hidden pe-4"><div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate fw-bold" style="color: var(--text-color); font-size: 0.9rem;">HỆ THỐNG</h6><small class="text-muted" style="font-size: 0.7rem;">Vừa xong</small></div><p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Thông báo bảo trì định kỳ...</p></div>
 
                             <div class="dropdown chat-actions-btn">
-                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></button>
+                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
                                     <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell me-2 text-primary"></i>Bật thông báo</a></li>
                                     <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell-slash me-2 text-muted"></i>Tắt thông báo</a></li>
@@ -237,6 +295,26 @@
                                 </ul>
                             </div>
                         </div>
+
+                        @for($s = 1; $s <= 3; $s++)
+                        <div class="chat-item p-3 d-flex align-items-center cursor-pointer position-relative" onclick="openChatConversationDetail('staff_{{ $s }}')">
+                            <div class="flex-shrink-0 position-relative"><img src="https://ui-avatars.com/api/?name=Staff+{{ $s }}&background=22c55e&color=fff" class="rounded-circle me-2" width="45" height="45"></div>
+                            <div class="flex-grow-1 overflow-hidden pe-4">
+                                <div class="d-flex justify-content-between align-items-center"><h6 class="mb-0 text-truncate" style="color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Nhân viên {{ $s }}</h6><small class="text-muted" style="font-size: 0.7rem;">Online 5p trước</small></div>
+                                <p class="mb-0 text-truncate small mt-1" style="color: var(--text-muted);">Báo cáo doanh thu...</p>
+                            </div>
+
+                            <div class="dropdown chat-actions-btn">
+                                <button class="btn btn-icon no-arrow" type="button" data-bs-toggle="dropdown" data-bs-container="body" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 glass-effect">
+                                    <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell me-2 text-primary"></i>Bật thông báo</a></li>
+                                    <li><a class="dropdown-item small" href="#"><i class="fa-solid fa-bell-slash me-2 text-muted"></i>Tắt thông báo</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item small text-danger" href="#"><i class="fa-solid fa-trash me-2"></i>Xóa hội thoại</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        @endfor
                     </div>
                 </div>
             </div>
@@ -245,17 +323,16 @@
         {{-- CỘT PHẢI: CỬA SỔ CHAT --}}
         <div class="chat-window flex-grow-1 d-flex flex-column h-100" id="chat-content-col">
 
-            {{-- HEADER (FIXED OVERFLOW & TRUNCATE) --}}
-            <div class="chat-header p-3 border-bottom d-flex align-items-center flex-shrink-0"
-                 style="background: var(--popup-bg); backdrop-filter: blur(5px); border-color: var(--popup-border) !important; z-index: 5;">
-                <button class="btn btn-back-mobile me-3 mobile-nav-btn shadow-sm" onclick="backToChatConversationList()"><i class="fa-solid fa-chevron-left"></i></button>
+            {{-- HEADER CHAT WINDOW (Absolute Overlay) --}}
+            <div class="chat-overlay-header d-flex flex-row align-items-center">
+                {{-- Nút Quay lại: Chỉ hiện trên Mobile (.d-lg-none) --}}
+                <button class="btn btn-back-mobile me-3 mobile-nav-btn shadow-sm d-lg-none" onclick="backToChatConversationList()"><i class="fa-solid fa-chevron-left"></i></button>
 
-                <img src="https://ui-avatars.com/api/?name=Seller+1&background=random" class="rounded-circle me-2" width="40" height="40">
+                <img src="https://ui-avatars.com/api/?name=Buyer+1&background=random" class="rounded-circle me-2" width="40" height="40">
 
-                {{-- Ép tiêu đề không tràn dòng khi font-size tăng --}}
                 <div style="line-height: 1.4; min-width: 0; flex: 1;">
-                    <div class="fw-bold text-truncate" style="color: var(--text-color); font-size: 0.95rem;">Người bán 1</div>
-                    <div class="small text-success d-flex align-items-center text-truncate" style="font-size: 0.7rem;">
+                    <div class="fw-bold text-truncate" style="color: var(--text-color); font-size: 0.95rem;">Khách Mua 1</div>
+                    <div class="small text-success d-flex align-items-center text-truncate" style="font-size: 0.7rem; opacity: 0.9;">
                         <i class="fa-solid fa-circle me-1 flex-shrink-0" style="font-size: 0.4rem;"></i>
                         <span class="text-truncate">Đang hoạt động</span>
                     </div>
@@ -277,32 +354,33 @@
                             <li><a class="dropdown-item header-dropdown-item text-danger" href="#"><i class="fa-solid fa-ban"></i> Chặn người này</a></li>
                         </ul>
                     </div>
+                    {{-- Nút đóng popup chung (Hiện trên cả PC và Mobile) --}}
                     <button class="btn btn-sm btn-icon text-muted" onclick="closeAll()" title="Đóng chat">
                         <i class="fa-solid fa-xmark" style="font-size: 1.1rem;"></i>
                     </button>
                 </div>
             </div>
 
-            {{-- MESSAGES --}}
-            <div class="chat-messages flex-grow-1 p-3 overflow-auto custom-scrollbar bg-transparent">
+            {{-- MESSAGES (Scrollable with Padding) --}}
+            <div class="chat-scrollable-content custom-scrollbar bg-transparent p-3">
                 @for($j = 1; $j <= 3; $j++)
                 <div class="message-row d-flex mb-3">
                     <img src="https://ui-avatars.com/api/?name=User&background=random" class="rounded-circle me-2 mt-1" width="30" height="30">
                     <div class="message-wrapper" style="max-width: 75%;">
-                        <div class="message-bubble p-2 px-3 rounded shadow-sm" style="background-color: var(--link-hover-bg); color: var(--text-color); border: 1px solid transparent;">Chào bạn, sản phẩm này còn hàng ạ.</div>
+                        <div class="message-bubble p-2 px-3 rounded shadow-sm" style="background-color: var(--link-hover-bg); color: var(--text-color); border: 1px solid transparent;">Xin chào shop, đơn hàng #{{ $j }}992 bao giờ thì giao ạ?</div>
                         <div class="msg-meta ms-1">10:0{{ $j }} AM</div>
                     </div>
                 </div>
                 <div class="message-row d-flex mb-3 flex-row-reverse">
                     <div class="message-wrapper text-end" style="max-width: 75%;">
-                        <div class="message-bubble p-2 px-3 rounded shadow-sm text-start" style="background-color: var(--link-hover-bg); color: var(--text-color); border: 1.5px solid var(--primary);">Vâng, giao sớm giúp mình nhé!</div>
+                        <div class="message-bubble p-2 px-3 rounded shadow-sm text-start" style="background-color: var(--link-hover-bg); color: var(--text-color); border: 1.5px solid var(--primary);">Chào bạn, bên mình đang đóng gói rồi ạ.</div>
                         <div class="msg-meta me-1">10:0{{ $j + 1 }} AM &bull; <span><i class="fa-solid fa-check"></i> Đã gửi</span></div>
                     </div>
                 </div>
                 @endfor
             </div>
 
-            {{-- INPUT AREA (SCALABLE) --}}
+            {{-- INPUT AREA --}}
             <div class="chat-input-area p-3 border-top flex-shrink-0 position-relative"
                  style="background: var(--popup-bg); border-color: var(--popup-border) !important; z-index: 5;">
 
@@ -310,11 +388,10 @@
                     <div class="typing-dots">
                         <span></span><span></span><span></span>
                     </div>
-                    <small class="text-muted ms-2" style="font-size: 0.75rem;">Người bán đang soạn tin...</small>
+                    <small class="text-muted ms-2" style="font-size: 0.75rem;">Khách đang soạn tin...</small>
                 </div>
 
                 <div class="input-group align-items-end" style="gap: 2px;">
-                    {{-- Nút thêm tệp co giãn theo rem --}}
                     <button class="btn btn-outline-secondary border-end-0 text-primary chat-input-btn"
                             style="background-color: var(--bg-body); border-color: var(--popup-border); width: 2.6rem; border-radius: 8px 0 0 8px !important;">
                         <i class="fa-solid fa-plus"></i>
@@ -325,7 +402,6 @@
                               placeholder="Nhập tin nhắn..."
                               style="background-color: var(--bg-body); color: var(--text-color); border-color: var(--popup-border);"></textarea>
 
-                    {{-- Nút gửi co giãn theo rem --}}
                     <button id="btn-send-message" class="btn btn-primary chat-input-btn"
                             style="width: 3.2rem; border-radius: 0 8px 8px 0 !important;">
                         <i class="fa-solid fa-paper-plane"></i>
@@ -345,15 +421,14 @@
         const btnSend = document.getElementById('btn-send-message');
 
         // --- 1. CONFIG: LOAD TỪ STORAGE ---
-        // Biến này sẽ được cập nhật bởi settings-popup
         window.updateChatConversationSettings = function() {
             window.chatSettings = {
                 enterToSend: localStorage.getItem('client_chat_enter_to_send') === 'true'
             };
         };
-        window.updateChatConversationSettings(); // Load initial
+        window.updateChatConversationSettings();
 
-        // --- 2. SEND MESSAGE LOGIC ---
+        // --- 2. SEND LOGIC ---
         function sendMessage() {
             const msg = inputField.value.trim();
             if (!msg) return;
@@ -362,7 +437,7 @@
             inputField.style.height = 'auto';
         }
 
-        // --- 3. AUTO-GROW TEXTAREA ---
+        // --- 3. INPUT EVENTS ---
         if (inputField) {
             inputField.addEventListener('input', function() {
                 this.style.height = 'auto';
@@ -372,9 +447,7 @@
             });
 
             inputField.addEventListener('keydown', function(e) {
-                // Kiểm tra setting mỗi lần gõ hoặc dùng biến global
                 const enterToSend = localStorage.getItem('client_chat_enter_to_send') === 'true';
-
                 if (enterToSend && e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
@@ -389,9 +462,8 @@
             });
         }
 
-        // --- 4. DROPDOWN FIX (STACKING CONTEXT) ---
+        // --- 4. DROPDOWN FIX ---
         const actionButtons = document.querySelectorAll('.chat-actions-btn [data-bs-toggle="dropdown"]');
-
         actionButtons.forEach(btn => {
             btn.addEventListener('show.bs.dropdown', function () {
                 actionButtons.forEach(otherBtn => {
@@ -400,11 +472,9 @@
                         if (dropdown) dropdown.hide();
                     }
                 });
-
                 const parentDiv = btn.closest('.chat-actions-btn');
                 if(parentDiv) parentDiv.classList.add('show');
             });
-
             btn.addEventListener('hidden.bs.dropdown', function () {
                 const parentDiv = btn.closest('.chat-actions-btn');
                 if(parentDiv) parentDiv.classList.remove('show');
@@ -440,14 +510,8 @@
         // --- 6. API ---
         window.showTyping = function() { if(typingIndicator) typingIndicator.classList.remove('d-none'); }
         window.hideTyping = function() { if(typingIndicator) typingIndicator.classList.add('d-none'); }
-
-        window.openChatConversationDetail = function(id) {
-            chatInterface.classList.add('in-conversation');
-        }
-
-        window.backToChatConversationList = function() {
-            chatInterface.classList.remove('in-conversation');
-        }
+        window.openChatConversationDetail = function(id) { chatInterface.classList.add('in-conversation'); }
+        window.backToChatConversationList = function() { chatInterface.classList.remove('in-conversation'); }
 
         window.renderChatConversationContent = function() {
             const menuInterface = document.getElementById('menu-interface');
@@ -465,6 +529,5 @@
             if(oldCloseAll) oldCloseAll();
             if(window.resetChatConversationPopupStyle) window.resetChatConversationPopupStyle();
         }
-
     });
 </script>

@@ -23,8 +23,33 @@
 
         /* 3. LAYOUT CHUNG & SCROLL */
         #menu-interface { width: 100%; overflow-y: auto; max-height: 80vh; scrollbar-width: thin; overscroll-behavior: contain; }
-        #menu-interface::-webkit-scrollbar { width: 6px; } #menu-interface::-webkit-scrollbar-track { background: transparent; } #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
-        .popup-header { padding: 18px 25px 0 25px; border-bottom: 1px solid var(--popup-border); }
+        #menu-interface::-webkit-scrollbar { width: 6px; }
+        #menu-interface::-webkit-scrollbar-track { background: transparent; }
+        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
+
+        /* [CẬP NHẬT] STICKY HEADER CHO MENU CLIENT - ĐÃ GIẢM OPACITY */
+        .popup-header {
+            padding: 18px 25px 15px 25px;
+            border-bottom: 1px solid var(--popup-border);
+
+            /* Sticky Logic */
+            position: sticky;
+            top: 0;
+            z-index: 50;
+
+            /* [QUAN TRỌNG] Chỉnh màu nền trong suốt hơn (0.8) để thấy nội dung mờ bên dưới */
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px); /* Tăng độ blur lên một chút */
+            -webkit-backdrop-filter: blur(12px);
+
+            margin-top: -1px;
+        }
+
+        /* Màu nền header riêng cho Dark Mode */
+        body.dark-mode .popup-header {
+            background-color: rgba(15, 23, 42, 0.8); /* Màu tối nhưng trong suốt 80% */
+        }
+
         .menu-main-wrapper { padding: 25px; gap: 20px; }
         .menu-group-box { display: flex; flex-direction: column; margin-bottom: 5px; }
 
@@ -35,13 +60,13 @@
         }
         body.dark-mode .group-title { border-bottom-color: rgba(255,255,255,0.05); }
 
-        /* 4. CHIA CỘT THÔNG MINH (HỌC TỪ ADMIN) */
+        /* 4. CHIA CỘT THÔNG MINH */
         .menu-link {
             display: flex; align-items: center; color: var(--text-color); text-decoration: none;
             border-radius: 10px; font-weight: 500; font-size: 0.92rem; transition: all 0.2s;
             white-space: nowrap; overflow: hidden;
         }
-        .menu-link span { text-overflow: ellipsis; overflow: hidden; } /* Cắt chữ nếu quá dài */
+        .menu-link span { text-overflow: ellipsis; overflow: hidden; }
 
         /* Chế độ Danh sách */
         .view-mode-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -51,9 +76,8 @@
         .view-mode-list .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateX(5px); }
         .view-mode-list .menu-link i { width: 24px; color: var(--text-muted); margin-right: 10px; text-align: center; font-size: 1rem; }
 
-        /* Breakpoints Chia Cột */
         @media (max-width: 998px) { .view-mode-list { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 767.98px) { .view-mode-list { grid-template-columns: 1fr; } } /* Mobile về 1 cột */
+        @media (max-width: 767.98px) { .view-mode-list { grid-template-columns: 1fr; } }
 
         /* Chế độ Lưới (Grid) */
         .view-mode-grid { display: block; }
@@ -66,18 +90,34 @@
 
         .view-switcher { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--popup-border); background: var(--popup-bg); color: var(--text-muted); transition: all 0.2s; }
         .view-switcher:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.05); }
+
+        /* Style nút đóng */
+        .btn-close-popup {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+        }
+        .btn-close-popup:hover {
+            background-color: rgba(127,127,127,0.1);
+            color: var(--text-color);
+        }
     </style>
 
-    {{-- HEADER CỦA MENU --}}
-    <div class="popup-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+    {{-- HEADER CỦA MENU (STICKY) --}}
+    <div class="popup-header d-flex justify-content-between align-items-center">
         <div class="h5 mb-0 fw-bold d-flex align-items-center" style="color: var(--text-color);">
             <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>MENU
         </div>
-
-        {{-- ĐÃ LOẠI BỎ CÁC NÚT CÀI ĐẶT --}}
+        {{-- Nút đóng popup --}}
+        <button class="btn btn-sm btn-icon text-muted btn-close-popup bg-transparent border-0" onclick="closeAll()" title="Đóng">
+            <i class="fa-solid fa-xmark" style="font-size: 1.2rem;"></i>
+        </button>
     </div>
 
-    {{-- CONTENT CỦA MENU (CHIA CỘT THÔNG MINH) --}}
+    {{-- CONTENT CỦA MENU --}}
     <div class="menu-main-wrapper view-mode-list" id="menu-container">
         {{-- GROUP 1: KHÁM PHÁ --}}
         <div class="menu-group-box">
@@ -124,7 +164,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- 1. VIEW MODE LOGIC (CLIENT) ---
         const menuWrapper = document.getElementById('menu-container');
-
         const savedView = localStorage.getItem('client_menu_view') || 'list';
         applyMenuView(savedView);
 
@@ -166,7 +205,6 @@
             const menuInterface = document.getElementById('menu-interface');
             const chatInterface = document.getElementById('chat-interface');
             const settingsInterface = document.getElementById('settings-interface');
-
             if(menuInterface) menuInterface.classList.remove('d-none');
             if(chatInterface) chatInterface.classList.add('d-none');
             if(settingsInterface) settingsInterface.classList.add('d-none');
