@@ -1,27 +1,25 @@
 <div id="settings-interface" class="d-none">
     <style>
-        /* --- CSS CHO SETTINGS POPUP (CLIENT) --- */
+        /* =========================================
+           CORE LAYOUT & SCROLLBAR
+           ========================================= */
         #settings-interface {
             width: 420px;
             max-width: 100%;
-            padding: 0; /* Bỏ padding cha để sticky dính sát */
+            padding: 0;
             display: flex;
             flex-direction: column;
             gap: 20px;
-
-            /* --- SCROLL LOGIC --- */
             max-height: 80vh;
             overflow-y: auto;
             overscroll-behavior: contain;
             scrollbar-width: thin;
         }
 
-        /* Scrollbar styling */
         #settings-interface::-webkit-scrollbar { width: 6px; }
         #settings-interface::-webkit-scrollbar-track { background: transparent; }
         #settings-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
 
-        /* Responsive Mobile */
         @media (max-width: 998px) {
             #settings-interface {
                 width: 92vw;
@@ -30,45 +28,43 @@
             }
         }
 
-        /* [CẬP NHẬT] STICKY HEADER CHO SETTINGS - ĐÃ GIẢM OPACITY */
+        /* =========================================
+           STICKY HEADER
+           ========================================= */
         .settings-header {
             font-size: 1.2rem;
             font-weight: 800;
             color: var(--text-color);
             border-bottom: 2px solid var(--popup-border);
-
-            /* Sticky Logic */
             position: sticky;
             top: 0;
             z-index: 50;
-
-            /* [QUAN TRỌNG] Chỉnh màu nền trong suốt hơn (0.8) */
-            background-color: rgba(255, 255, 255, 0.8);
+            /* Nền trong suốt mờ (Glassmorphism) */
+            background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-
-            /* Padding nội bộ */
             padding: 20px 25px 15px 25px;
             margin-bottom: 5px;
-
             display: flex;
             align-items: center;
             gap: 12px;
             flex-shrink: 0;
         }
 
-        /* Dark Mode Header riêng */
+        /* Header Dark Mode */
         body.dark-mode .settings-header {
-            background-color: rgba(15, 23, 42, 0.8);
+            background-color: rgba(15, 23, 42, 0.85);
         }
 
-        /* Margin cho nội dung con */
+        /* =========================================
+           GROUP & ITEM STYLING
+           ========================================= */
         .settings-group {
             background: rgba(127, 127, 127, 0.05);
             border-radius: 16px;
             padding: 18px;
             border: 1px solid var(--popup-border);
-            margin: 0 25px; /* Margin ngang */
+            margin: 0 25px;
         }
         .settings-group:last-child {
             margin-bottom: 25px;
@@ -93,25 +89,133 @@
         .setting-item:last-child { margin-bottom: 0; }
 
         .setting-info { display: flex; flex-direction: column; }
+
         .setting-label {
             font-size: 0.95rem; font-weight: 600; color: var(--text-color);
             display: flex; align-items: center; gap: 8px; line-height: 1.4;
         }
+
         .setting-subtext {
             font-size: 0.75rem; color: var(--text-muted);
             margin-top: 2px; margin-left: 24px; font-weight: 400;
         }
 
-        /* Components */
-        .form-switch .form-check-input {
-            width: 3.2em; height: 1.6em; cursor: pointer; border-color: var(--popup-border);
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+        /* =========================================
+           BUTTON 1: THEME SWITCH (SUN/MOON)
+           Style: Theme 14
+           ========================================= */
+        .switch-theme {
+            /* 17px ~ 1.0625rem */
+            font-size: 1.0625rem;
+            position: relative;
+            display: inline-block;
+            width: 3.5em;
+            height: 2em;
         }
-        .form-switch .form-check-input:checked {
-            background-color: var(--primary); border-color: var(--primary);
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+        .switch-theme input {
+            opacity: 0; width: 0; height: 0;
+        }
+        .slider-theme {
+            background-color: #2185d6;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 0 0 0 rgba(33, 133, 214, 0);
+            transition: all 0.4s ease;
+        }
+        .slider-theme:hover {
+            box-shadow: 0 0 15px rgba(33, 133, 214, 0.5);
+        }
+        .slider-theme::before {
+            position: absolute;
+            content: "";
+            height: 1.4em;
+            width: 1.4em;
+            border-radius: 50%;
+            left: 10%;
+            bottom: 15%;
+            box-shadow: inset 15px -4px 0px 15px #fdf906;
+            background-color: #28096b;
+            transition: all 0.4s ease;
+            transform-origin: center;
+        }
+        .slider-theme:hover::before {
+            transform: rotate(45deg);
+        }
+        .clouds_stars {
+            position: absolute;
+            content: "";
+            border-radius: 50%;
+            height: 10px;
+            width: 10px;
+            left: 70%;
+            bottom: 50%;
+            background-color: #fff;
+            transition: all 0.3s;
+            box-shadow: -12px 0 0 0 white, -6px 0 0 1.6px white, 0.3px 16px 0 white, -6.5px 16px 0 white;
+            filter: blur(0.55px);
+        }
+        /* Checked State */
+        .switch-theme input:checked ~ .clouds_stars {
+            transform: translateX(-20px);
+            height: 2px;
+            width: 2px;
+            border-radius: 50%;
+            left: 80%;
+            top: 15%;
+            background-color: #fff;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            box-shadow: -7px 10px 0 #fff, 8px 15px 0 #fff, -17px 1px 0 #fff, -20px 10px 0 #fff, -7px 23px 0 #fff, -15px 25px 0 #fff;
+            filter: none;
+            animation: twinkle 2s infinite;
+        }
+        .switch-theme input:checked + .slider-theme {
+            background-color: #28096b !important;
+        }
+        .switch-theme input:checked + .slider-theme::before {
+            transform: translateX(100%);
+            box-shadow: inset 8px -4px 0 0 #fff;
+        }
+        .switch-theme input:checked + .slider-theme:hover::before {
+            transform: translateX(100%) rotate(-45deg);
+        }
+        @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* =========================================
+           BUTTON 2: STANDARD TOGGLE (LITE)
+           Style: iOS Style (Switch 31)
+           ========================================= */
+        .toggle-switch-lite {
+            display: inline-block; position: relative; width: 50px; height: 30px;
+        }
+        .toggle-input-lite { display: none; }
+        .toggle-label-lite {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #e9e9eb; border-radius: 34px; cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .toggle-label-lite:before {
+            content: ""; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px;
+            background-color: #fff; border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toggle-input-lite:checked + .toggle-label-lite { background-color: #34C759; }
+        .toggle-input-lite:checked + .toggle-label-lite:before { transform: translateX(20px); }
+
+        /* Auto Dark Mode Style cho Button Lite */
+        body.dark-mode .toggle-label-lite {
+            background-color: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        body.dark-mode .toggle-input-lite:checked + .toggle-label-lite {
+            background-color: #30D158; border-color: transparent;
         }
 
+        /* =========================================
+           OTHER CONTROLS
+           ========================================= */
         .btn-view-toggle {
             width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--popup-border);
             background: var(--bg-body); color: var(--text-muted); display: flex; align-items: center; justify-content: center;
@@ -126,32 +230,19 @@
         }
         .btn-reset-menu:hover { background: #ef4444; color: #fff; }
 
-        /* Slider */
+        /* Slider Font Size */
         #settings-fontsize-range { cursor: pointer; height: 6px; width: 120px; }
-        #settings-fontsize-range::-webkit-slider-runnable-track { background: var(--input-darker); height: 6px; border-radius: 10px; border: 1px solid var(--popup-border); }
-        #settings-fontsize-range::-webkit-slider-thumb { margin-top: -6px; background: var(--primary); box-shadow: 0 0 10px rgba(var(--primary), 0.4); border: 2px solid #fff; height: 18px; width: 18px; transition: transform 0.1s ease; -webkit-appearance: none; border-radius: 50%; }
+        #settings-fontsize-range::-webkit-slider-runnable-track {
+            background: var(--input-darker); height: 6px; border-radius: 10px; border: 1px solid var(--popup-border);
+        }
+        #settings-fontsize-range::-webkit-slider-thumb {
+            margin-top: -6px; background: var(--primary); box-shadow: 0 0 10px rgba(var(--primary), 0.4);
+            border: 2px solid #fff; height: 18px; width: 18px; transition: transform 0.1s ease;
+            -webkit-appearance: none; border-radius: 50%;
+        }
 
-        /* Theme Toggle CSS */
-        .theme { display: flex; align-items: center; font-size: 10px; line-height: 1; }
-        .theme__toggle-wrap { position: relative; width: 6em; height: 3em; }
-        .theme__icon { transition: 0.3s; z-index: 1; position: absolute; display: block; top: 0.75em; left: 0.75em; width: 1.5em; height: 1.5em; pointer-events: none; }
-        .theme__icon-part { border-radius: 50%; box-shadow: 0.4em -0.4em 0 0.5em hsl(0,0%,100%) inset; top: calc(50% - 0.5em); left: calc(50% - 0.5em); width: 1em; height: 1em; position: absolute; transition: box-shadow 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out; transform: scale(0.5); }
-        .theme__icon-part ~ .theme__icon-part { background-color: hsl(0,0%,100%); border-radius: 0.05em; top: 50%; left: calc(50% - 0.05em); transform: rotate(0deg) translateY(0.5em); transform-origin: 50% 0; width: 0.1em; height: 0.2em; }
-        .theme__icon-part:nth-child(3) { transform: rotate(45deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(4) { transform: rotate(90deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(5) { transform: rotate(135deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(6) { transform: rotate(180deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(7) { transform: rotate(225deg) translateY(0.45em); }
-        .theme__icon-part:nth-child(8) { transform: rotate(270deg) translateY(0.5em); }
-        .theme__icon-part:nth-child(9) { transform: rotate(315deg) translateY(0.5em); }
-        .theme__toggle { background-color: hsl(48,90%,85%); border-radius: 1.5em; box-shadow: 0 0 0 0.125em rgba(255,255,255,0.5); padding: 0.25em; width: 100%; height: 100%; -webkit-appearance: none; appearance: none; transition: background-color 0.3s ease-in-out; cursor: pointer; position: relative; display: block; margin: 0; }
-        .theme__toggle:before { background-color: hsl(48,90%,55%); border-radius: 50%; content: ""; width: 2.5em; height: 2.5em; transition: 0.3s; display: block; }
-        .theme__toggle:focus { box-shadow: 0 0 0 0.125em var(--primary); outline: transparent; }
-        .theme__toggle:checked { background-color: hsl(198,90%,15%); }
-        .theme__toggle:checked:before { transform: translateX(3em); background-color: hsl(198,90%,55%); }
-        .theme__toggle:checked ~ .theme__icon { transform: translateX(3em); }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part:nth-child(1) { box-shadow: 0.2em -0.2em 0 0.2em hsl(0,0%,100%) inset; transform: scale(1); top: 0.2em; left: -0.2em; }
-        .theme__toggle:checked ~ .theme__icon .theme__icon-part ~ .theme__icon-part { opacity: 0; }
+        .cursor-pointer { cursor: pointer; }
+        .user-select-none { -webkit-user-select: none; user-select: none; }
     </style>
 
     {{-- HEADER (STICKY) --}}
@@ -169,35 +260,34 @@
     <div class="settings-group">
         <div class="settings-group-title">Giao diện & Hiển thị</div>
 
-        {{-- 1.1 Chế độ tối --}}
+        {{-- 1.1 Chế độ tối (NEW UI) --}}
         <div class="setting-item">
             <div class="setting-info">
                 <div class="setting-label"><i class="fa-solid fa-circle-half-stroke text-muted"></i> Chế độ tối</div>
                 <div class="setting-subtext" id="desc-theme">Đang sử dụng chế độ sáng</div>
             </div>
-            <div class="theme-switch-wrapper">
-                <label for="settings-theme-toggle" class="theme">
-                    <span class="theme__toggle-wrap">
-                        <input id="settings-theme-toggle" class="theme__toggle" type="checkbox" role="switch">
-                        <span class="theme__icon">
-                            <span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span>
-                            <span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span><span class="theme__icon-part"></span>
-                        </span>
-                    </span>
-                </label>
-            </div>
+
+            <label class="switch-theme">
+                <input type="checkbox" id="settings-theme-toggle">
+                <span class="slider-theme"></span>
+                <span class="clouds_stars"></span>
+            </label>
         </div>
 
-        {{-- 1.2 Cỡ chữ --}}
+        {{-- 1.2 Cỡ chữ (NEW CLICKABLE 'A') --}}
         <div class="setting-item">
             <div class="setting-info">
                 <div class="setting-label"><i class="fa-solid fa-text-height text-muted"></i> Cỡ chữ</div>
                 <div class="setting-subtext" id="desc-font">Kích thước hiện tại: 16px</div>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <small class="text-muted" style="font-size: 0.7rem;">A</small>
+                {{-- Button giảm --}}
+                <small class="text-muted cursor-pointer user-select-none" id="btn-decrease-font" style="font-size: 0.7rem;" title="Giảm cỡ chữ">A</small>
+
                 <input type="range" class="form-range" id="settings-fontsize-range" min="12" max="22" step="1" value="16">
-                <span class="text-primary fw-bold" style="font-size: 1rem;">A</span>
+
+                {{-- Button tăng --}}
+                <span class="text-primary fw-bold cursor-pointer user-select-none" id="btn-increase-font" style="font-size: 1rem;" title="Tăng cỡ chữ">A</span>
             </div>
         </div>
 
@@ -228,14 +318,16 @@
     <div class="settings-group">
         <div class="settings-group-title">Trò chuyện & Tin nhắn</div>
 
-        {{-- 2.1 Phím Enter để gửi --}}
+        {{-- 2.1 Phím Enter để gửi (NEW UI) --}}
         <div class="setting-item">
             <div class="setting-info">
                 <div class="setting-label"><i class="fa-solid fa-keyboard text-muted"></i> Enter để gửi</div>
                 <div class="setting-subtext" id="desc-enter">Gửi tin nhắn bằng phím Enter</div>
             </div>
-            <div class="form-check form-switch mb-0">
-                <input class="form-check-input" type="checkbox" role="switch" id="settings-enter-send">
+
+            <div class="toggle-switch-lite">
+                <input class="toggle-input-lite" id="settings-enter-send" type="checkbox" />
+                <label class="toggle-label-lite" for="settings-enter-send"></label>
             </div>
         </div>
     </div>
@@ -283,23 +375,47 @@
         // --- 3. FONT SIZE LOGIC (CLIENT) ---
         const fsRange = document.getElementById('settings-fontsize-range');
         const descFont = document.getElementById('desc-font');
+        const btnDecrease = document.getElementById('btn-decrease-font');
+        const btnIncrease = document.getElementById('btn-increase-font');
         const htmlEl = document.documentElement;
 
-        const updateFontText = (val) => {
+        // Function chung để áp dụng font size
+        const applyFontSize = (val) => {
+            // Giới hạn
+            if (val < 12) val = 12;
+            if (val > 22) val = 22;
+
+            if(fsRange) fsRange.value = val;
+            htmlEl.style.fontSize = val + 'px';
+            localStorage.setItem('client_global_fontsize', val);
+
             if(descFont) descFont.innerText = `Kích thước hiện tại: ${val}px`;
         };
 
+        // Load init
         const savedFs = localStorage.getItem('client_global_fontsize') || '16';
-        if(fsRange) {
-            fsRange.value = savedFs;
-            htmlEl.style.fontSize = savedFs + 'px';
-            updateFontText(savedFs);
+        applyFontSize(parseInt(savedFs));
 
+        // Event: Kéo slider
+        if(fsRange) {
             fsRange.addEventListener('input', (e) => {
-                const val = e.target.value;
-                htmlEl.style.fontSize = val + 'px';
-                localStorage.setItem('client_global_fontsize', val);
-                updateFontText(val);
+                applyFontSize(parseInt(e.target.value));
+            });
+        }
+
+        // Event: Click chữ 'a' nhỏ (Giảm)
+        if(btnDecrease) {
+            btnDecrease.addEventListener('click', () => {
+                const current = parseInt(fsRange.value || 16);
+                applyFontSize(current - 1);
+            });
+        }
+
+        // Event: Click chữ 'A' lớn (Tăng)
+        if(btnIncrease) {
+            btnIncrease.addEventListener('click', () => {
+                const current = parseInt(fsRange.value || 16);
+                applyFontSize(current + 1);
             });
         }
 

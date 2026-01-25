@@ -1,16 +1,14 @@
-<div id="bubble-wrapper" style="position: fixed; bottom: 30px; right: 30px; z-index: 10000;">
+<div id="bubble-wrapper" style="position: fixed; bottom: 1.875rem; right: 1.875rem; z-index: 10000;">
     {{-- 3 BONG BÓNG CON --}}
     <div class="sub-bubbles-container">
-        {{-- 1. Bong bóng Menu --}}
         <div class="sub-bubble" id="btn-open-menu" title="Menu chức năng">
             <i class="fa-solid fa-table-cells"></i>
         </div>
-        {{-- 2. Bong bóng ChatConversation --}}
         <div class="sub-bubble" id="btn-open-chat" title="Tin nhắn">
             <i class="fa-solid fa-comments"></i>
+            {{-- Badge đếm số lượng --}}
             <span class="badge-counter">1</span>
         </div>
-        {{-- 3. Bong bóng Cài đặt (MỚI) --}}
         <div class="sub-bubble" id="btn-open-settings" title="Cài đặt">
             <i class="fa-solid fa-gear"></i>
         </div>
@@ -18,127 +16,201 @@
 
     {{-- BONG BÓNG CHÍNH --}}
     <div id="nav-bubble" title="Mở rộng">
-        {{-- Icon nằm riêng để xoay độc lập --}}
+        {{-- Icon sẽ xoay riêng biệt --}}
         <i class="fa-solid fa-bars" id="bubble-icon"></i>
+
+        {{-- Chấm đỏ thông báo --}}
         <span class="main-bubble-badge"></span>
     </div>
 </div>
 
 <style>
-    /* --- DEFINITIONS --- */
+    /* --- BIẾN MÀU --- */
     :root {
-        --primary-rgb: 14, 165, 233; /* Màu chủ đạo client */
+        --neon-primary: 0, 191, 255;
+        --neon-danger: 255, 49, 49;
+
+        --transition-speed: 0.3s;
+        --sub-bg: #ffffff;
+        --sub-border: #d1d5db;
+        --sub-text: #374151;
+        --scrollbar-thumb: #cbd5e1; /* Thêm biến scrollbar nếu chưa có */
     }
 
-    /* CSS CONTAINER */
-    #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
-    #nav-backdrop.active { opacity: 1; visibility: visible; }
+    body.dark-mode {
+        --sub-bg: #1e293b;
+        --sub-border: #334155;
+        --sub-text: #f8fafc;
+        --scrollbar-thumb: #334155;
+    }
 
+    /* WRAPPER */
     #bubble-wrapper {
-        position: fixed; bottom: 30px; right: 30px; z-index: 10000;
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        position: fixed; z-index: 10000;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease, visibility 0.3s;
+        opacity: 1; visibility: visible; transform: scale(1);
     }
 
+    /* ẨN KHI SCROLL */
     #bubble-wrapper.scroll-hidden {
-        transform: scale(0) !important;
-        opacity: 0;
-        pointer-events: none;
+        transform: scale(0.9); opacity: 0; visibility: hidden; pointer-events: none;
     }
 
-    /* MAIN BUBBLE */
+    /* --- BONG BÓNG CHÍNH --- */
     #nav-bubble {
-        width: 60px; height: 60px;
+        width: 3.75rem; height: 3.75rem;
         background: linear-gradient(135deg, #0ea5e9, #0284c7);
         color: #fff; border-radius: 50%;
-        box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.5);
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px; cursor: pointer; position: relative; z-index: 2;
-        transition: all 0.3s ease;
-    }
-    #nav-bubble:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(14, 165, 233, 0.6); }
-    #nav-bubble:active { transform: scale(0.95); }
+        font-size: 1.5rem; cursor: pointer; position: relative; z-index: 10;
+        transition: all var(--transition-speed) ease;
 
-    /* TRẠNG THÁI RED MODE (KHI MỞ) */
+        /* Viền mỏng 1px */
+        border: 0.0625rem solid transparent;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    }
+
+    #nav-bubble:hover {
+        transform: scale(1.05);
+        border-color: #fff;
+        /* Glow rộng (Admin Style) */
+        box-shadow:
+            0 0 0.1rem rgb(var(--neon-primary)) inset,
+            0 0 0.5rem rgb(var(--neon-primary)) inset,
+            0 0 1rem rgb(var(--neon-primary)),
+            0 0 2.5rem rgb(var(--neon-primary));
+    }
+
+    #nav-bubble:hover #bubble-icon {
+        filter: drop-shadow(0 0 0.3rem rgb(var(--neon-primary)));
+    }
+
+    /* Trạng thái Mở (Red Mode) */
     #nav-bubble.red-mode {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.5);
-        transform: scale(1);
+        border-color: #fff !important;
+
+        box-shadow:
+            0 0 0.1rem rgb(var(--neon-danger)) inset,
+            0 0 0.5rem rgb(var(--neon-danger)) inset,
+            0 0 1.5rem rgb(var(--neon-danger)),
+            0 0 3.5rem rgb(var(--neon-danger)) !important;
+
+        transform: scale(1.1);
     }
 
-    /* ICON BÊN TRONG (SẼ XOAY) */
-    #bubble-icon {
-        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    }
     #nav-bubble.red-mode #bubble-icon {
-        transform: rotate(180deg);
+        filter: drop-shadow(0 0 0.5rem rgb(var(--neon-danger)));
+        transform: rotate(90deg);
     }
 
-    /* DẤU CHẤM ĐỎ (BADGE) */
+    #bubble-icon { transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+
+    /* --- CHẤM ĐỎ THÔNG BÁO --- */
     .main-bubble-badge {
         position: absolute; top: 0; right: 0;
-        width: 18px; height: 18px;
+        width: 1rem; height: 1rem;
         background-color: #ef4444;
-        border: 2px solid #fff; border-radius: 50%;
-        display: block;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        z-index: 10;
+
+        /* Viền mỏng 1px */
+        border: 0.0625rem solid #fff;
+        border-radius: 50%; z-index: 11;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+        transition: all 0.3s ease;
+        pointer-events: auto;
     }
-    body.dark-mode .main-bubble-badge { border-color: #0f172a; }
 
-    /* SUB BUBBLES CONTAINER */
-    .sub-bubbles-container { position: absolute; left: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 20px; pointer-events: none; }
+    .main-bubble-badge:hover {
+        transform: scale(1.2);
+        box-shadow:
+            0 0 0.1rem rgb(var(--neon-danger)) inset,
+            0 0 0.5rem rgb(var(--neon-danger)),
+            0 0 1rem rgb(var(--neon-danger));
+        border-color: #fff;
+    }
 
-    /* SUB BUBBLES STYLE - NORMAL STATE */
+    /* --- SỐ ĐẾM TIN NHẮN --- */
+    .badge-counter {
+        position: absolute; top: -0.3rem; right: -0.3rem;
+        background: #ef4444; color: white;
+        font-size: 0.65rem; padding: 0.15rem 0.4rem;
+        border-radius: 1rem; font-weight: bold;
+
+        /* Viền mỏng 1px */
+        border: 0.0625rem solid #fff;
+        box-shadow: 0 0 0.3rem rgba(255, 49, 49, 0.6);
+    }
+
+    /* --- SUB BUBBLES --- */
+    .sub-bubbles-container {
+        position: absolute; left: 0; width: 3.75rem;
+        display: flex; flex-direction: column; align-items: center; gap: 1rem;
+        pointer-events: none; z-index: 1;
+    }
+
     .sub-bubble {
-        width: 50px; height: 50px;
-        background-color: var(--popup-bg);
-        border: 1px solid var(--popup-border);
-        color: var(--text-color);
-        backdrop-filter: blur(10px); border-radius: 50%;
+        width: 3.125rem; height: 3.125rem;
+        background-color: var(--sub-bg);
+        border: 0.0625rem solid var(--sub-border); /* Viền mỏng */
+        color: var(--sub-text);
+        backdrop-filter: blur(0.6rem); border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        font-size: 20px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        font-size: 1.25rem;
         cursor: pointer; opacity: 0; transform: scale(0);
-        /* Transition mượt mà cho hiệu ứng toả sáng */
-        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         position: relative;
     }
-    .sub-bubble:hover {
-        background-color: #fff;
-        color: var(--primary);
-        transform: translateY(-2px);
-    }
 
-    /* ACTIVE STATE (ĐƯỢC CHỌN - TĨNH, KHÔNG NHẤP NHÁY) */
+    .sub-bubble:not(.active):hover { transform: scale(1.1) !important; }
+
+    /* Sub-bubble Active */
     .sub-bubble.active {
-        background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
+        background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+        border: 0.0625rem solid #fff !important; /* Viền mỏng 1px */
         color: #fff !important;
-        border: 1px solid rgba(255,255,255,0.4) !important;
         transform: scale(1.15) !important;
         box-shadow:
-            0 0 0 4px rgba(14, 165, 233, 0.2),
-            0 10px 25px -5px rgba(14, 165, 233, 0.7),
-            0 0 20px rgba(14, 165, 233, 0.5) !important;
+            0 0 0.1rem rgb(var(--neon-primary)) inset,
+            0 0 0.5rem rgb(var(--neon-primary)) inset,
+            0 0 1rem rgb(var(--neon-primary)),
+            0 0 2.5rem rgb(var(--neon-primary)) !important;
     }
+    .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgb(var(--neon-primary))); }
 
-    #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
-
-    .badge-counter { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-
-    /* POPUP CONTAINER STYLE */
+    /* --- POPUP (FIX TRÀN MÀN HÌNH - CLIENT) --- */
     #nav-popup {
-        position: fixed; z-index: 9999;
-        background: var(--popup-bg);
-        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-        border: 1px solid var(--popup-border);
+        position: fixed; z-index: 9999; background: var(--popup-bg);
+        backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border);
         box-shadow: var(--popup-shadow);
-        border-radius: 16px;
+        border-radius: 1.25rem !important; overflow: hidden !important;
+
+        /* FIX: Thêm Scroll nếu nội dung quá dài */
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+
         opacity: 0; visibility: hidden; transform: scale(0.95);
         transition: opacity 0.2s, transform 0.2s;
-        width: fit-content; max-width: 95vw;
-        overflow: hidden; display: flex; flex-direction: column; overscroll-behavior: contain;
+        width: fit-content; max-width: 95vw; display: flex; flex-direction: column;
+
+        /* Custom Scrollbar */
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) transparent;
     }
+
+    #nav-popup::-webkit-scrollbar { width: 4px; }
+    #nav-popup::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+
     #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
+
+    /* BACKDROP */
+    #nav-backdrop {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998;
+        opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px);
+    }
+    #nav-backdrop.active { opacity: 1; visibility: visible; }
+
+    #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
 </style>
 
 <script>
@@ -149,149 +221,173 @@
         const popup = document.getElementById('nav-popup');
         const backdrop = document.getElementById('nav-backdrop');
         const icon = document.getElementById('bubble-icon');
+        const btns = {
+            menu: document.getElementById('btn-open-menu'),
+            chat: document.getElementById('btn-open-chat'),
+            settings: document.getElementById('btn-open-settings')
+        };
 
-        // Buttons
-        const btnMenu = document.getElementById('btn-open-menu');
-        const btnChatConversation = document.getElementById('btn-open-chat');
-        const btnSettings = document.getElementById('btn-open-settings'); // MỚI
-
-        // Global state
         window.isSystemOpen = false;
         window.currentPopupMode = 'menu';
 
-        // --- 1. LOGIC DRAG & DROP ---
+        // --- POSITION RESTORE (CLIENT KEY) ---
         let isDragging = false, startX, startY, initialLeft, initialTop;
-        const savedPos = localStorage.getItem('client_bubblePos');
-        if (savedPos) { const pos = JSON.parse(savedPos); wrapper.style.left = pos.left; wrapper.style.top = pos.top; wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto'; }
+        const restorePosition = () => {
+            const savedPos = localStorage.getItem('client_bubblePos');
+            if (savedPos) {
+                try {
+                    const pos = JSON.parse(savedPos);
+                    let left = parseFloat(pos.left), top = parseFloat(pos.top);
+                    const winW = window.innerWidth, winH = window.innerHeight, bubbleSize = 60;
+                    if (isNaN(left) || isNaN(top)) return;
+                    left = Math.min(Math.max(0, left), winW - bubbleSize);
+                    top = Math.min(Math.max(0, top), winH - bubbleSize);
+                    wrapper.style.left = left + 'px'; wrapper.style.top = top + 'px';
+                    wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
+                } catch (e) { localStorage.removeItem('client_bubblePos'); }
+            }
+        };
+        restorePosition();
 
-        const getClientPos = (e) => e.touches ? e.touches[0] : e;
+        window.addEventListener('resize', () => {
+            if(!isDragging && wrapper.style.left) {
+                const r = wrapper.getBoundingClientRect();
+                const winW = window.innerWidth, winH = window.innerHeight;
+                let newLeft = r.left, newTop = r.top;
+                if (newLeft + r.width > winW) newLeft = winW - r.width - 10;
+                if (newTop + r.height > winH) newTop = winH - r.height - 10;
+                wrapper.style.left = Math.max(0, newLeft) + 'px'; wrapper.style.top = Math.max(0, newTop) + 'px';
+            }
+            if (window.isSystemOpen) window.positionPopup(window.currentPopupMode);
+        });
+
+        const getPos = (e) => e.touches ? e.touches[0] : e;
         const onDragStart = (e) => {
-            isDragging = false; const pos = getClientPos(e); startX = pos.clientX; startY = pos.clientY;
-            const rect = wrapper.getBoundingClientRect(); initialLeft = rect.left; initialTop = rect.top;
-            wrapper.style.left = rect.left + 'px'; wrapper.style.top = rect.top + 'px'; wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
-            wrapper.style.transition = 'none'; document.body.classList.add('no-select');
-            if(window.isSystemOpen) popup.style.transition = 'none';
+            isDragging = false; const p = getPos(e); startX = p.clientX; startY = p.clientY;
+            const r = wrapper.getBoundingClientRect(); initialLeft = r.left; initialTop = r.top;
+            Object.assign(wrapper.style, { left: r.left + 'px', top: r.top + 'px', bottom: 'auto', right: 'auto', transition: 'none' });
+            document.body.classList.add('no-select');
             document.addEventListener('mousemove', onDragMove); document.addEventListener('mouseup', onDragEnd);
             document.addEventListener('touchmove', onDragMove, { passive: false }); document.addEventListener('touchend', onDragEnd);
         };
         const onDragMove = (e) => {
-            const pos = getClientPos(e);
-            if (Math.abs(pos.clientX - startX) > 5 || Math.abs(pos.clientY - startY) > 5) {
-                isDragging = true; if(e.cancelable) e.preventDefault();
-                let newLeft = initialLeft + (pos.clientX - startX); let newTop = initialTop + (pos.clientY - startY);
-                newLeft = Math.min(Math.max(0, newLeft), window.innerWidth - wrapper.offsetWidth);
-                newTop = Math.min(Math.max(0, newTop), window.innerHeight - wrapper.offsetHeight);
-                wrapper.style.left = `${newLeft}px`; wrapper.style.top = `${newTop}px`;
+            const p = getPos(e);
+            if (Math.abs(p.clientX - startX) > 5 || Math.abs(p.clientY - startY) > 5) {
+                isDragging = true; e.preventDefault();
+                let nL = initialLeft + (p.clientX - startX), nT = initialTop + (p.clientY - startY);
+                nL = Math.min(Math.max(0, nL), window.innerWidth - wrapper.offsetWidth);
+                nT = Math.min(Math.max(0, nT), window.innerHeight - wrapper.offsetHeight);
+                wrapper.style.left = `${nL}px`; wrapper.style.top = `${nT}px`;
                 if (window.isSystemOpen) { expandBubblesVisual(); window.positionPopup(window.currentPopupMode); }
             }
         };
         const onDragEnd = () => {
             document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd);
             document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', onDragEnd);
-            document.body.classList.remove('no-select');
-            popup.style.transition = 'opacity 0.2s, transform 0.2s';
-            wrapper.style.transition = '';
-            if (isDragging) { localStorage.setItem('client_bubblePos', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top })); setTimeout(() => { isDragging = false; }, 50); }
+            document.body.classList.remove('no-select'); wrapper.style.transition = '';
+            if (isDragging) { localStorage.setItem('client_bubblePos', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top })); setTimeout(() => isDragging = false, 50); }
         };
-        mainBubble.addEventListener('mousedown', onDragStart); mainBubble.addEventListener('touchstart', onDragStart, { passive: false });
+        mainBubble.addEventListener('mousedown', onDragStart);
+        mainBubble.addEventListener('touchstart', onDragStart, { passive: false });
 
-        // --- CLICK MAIN BUBBLE ---
-        mainBubble.onclick = (e) => {
-            if (isDragging) return;
-            if (e.cancelable && e.type === 'touchend') e.preventDefault();
+        mainBubble.onclick = () => { if (!isDragging) window.isSystemOpen ? closeAll() : openAll('menu'); };
 
-            if (window.isSystemOpen) {
-                closeAll();
-            } else {
-                openAll('menu'); // Mặc định mở Menu
-            }
-        };
-
-        // --- 2. HỆ THỐNG ĐIỀU KHIỂN ---
-        window.openAll = function(mode) {
+        window.openAll = (mode) => {
             window.isSystemOpen = true; window.currentPopupMode = mode;
             expandBubblesVisual();
-
-            wrapper.classList.remove('scroll-hidden');
-
-            // Render Content
             if(mode === 'menu' && typeof window.renderMenuContent === 'function') window.renderMenuContent();
             if(mode === 'chat' && typeof window.renderChatConversationContent === 'function') window.renderChatConversationContent();
-            if(mode === 'settings' && typeof window.renderSettingsContent === 'function') window.renderSettingsContent(); // MỚI
+            if(mode === 'settings' && typeof window.renderSettingsContent === 'function') window.renderSettingsContent();
 
             wrapper.classList.add('expanded');
             icon.classList.replace('fa-bars', 'fa-xmark');
             backdrop.classList.add('active');
             popup.classList.add('active');
-
             mainBubble.classList.add('red-mode');
-            highlightActiveBubble(mode);
 
-            setTimeout(() => window.positionPopup(mode), 10);
+            highlight(mode); setTimeout(() => window.positionPopup(mode), 10);
         };
 
-        window.closeAll = function() {
-            window.isSystemOpen = false;
-            wrapper.classList.remove('expanded'); popup.classList.remove('active');
+        window.closeAll = () => {
+            window.isSystemOpen = false; wrapper.classList.remove('expanded'); popup.classList.remove('active');
             icon.classList.replace('fa-xmark', 'fa-bars'); backdrop.classList.remove('active');
-
             mainBubble.classList.remove('red-mode');
-            btnMenu.classList.remove('active');
-            btnChatConversation.classList.remove('active');
-            btnSettings.classList.remove('active'); // MỚI
+            highlight(null);
         };
 
-        function highlightActiveBubble(mode) {
-            btnMenu.classList.remove('active');
-            btnChatConversation.classList.remove('active');
-            btnSettings.classList.remove('active'); // MỚI
+        const highlight = (mode) => { Object.values(btns).forEach(b => b?.classList.remove('active')); if (btns[mode]) btns[mode].classList.add('active'); };
 
-            if (mode === 'menu') btnMenu.classList.add('active');
-            if (mode === 'chat') btnChatConversation.classList.add('active');
-            if (mode === 'settings') btnSettings.classList.add('active');
-        }
-
-        window.expandBubblesVisual = function() {
-            const rect = wrapper.getBoundingClientRect(); const screenW = window.innerWidth; const screenH = window.innerHeight; const isMobile = screenW < 998;
-            subBubblesContainer.style.cssText = 'position: absolute; display: flex; gap: 20px; pointer-events: none;';
+        window.expandBubblesVisual = () => {
+            const r = wrapper.getBoundingClientRect(); const sw = window.innerWidth; const sh = window.innerHeight;
+            const isMobile = sw < 998;
+            subBubblesContainer.style.cssText = 'position: absolute; display: flex; gap: 1rem; pointer-events: none;';
             if (isMobile) {
-                subBubblesContainer.style.flexDirection = 'row'; subBubblesContainer.style.top = '5px'; subBubblesContainer.style.width = 'max-content';
-                if (rect.left > screenW / 2) { subBubblesContainer.style.right = '70px'; subBubblesContainer.style.left = 'auto'; subBubblesContainer.style.justifyContent = 'flex-end'; }
-                else { subBubblesContainer.style.left = '70px'; subBubblesContainer.style.right = 'auto'; subBubblesContainer.style.justifyContent = 'flex-start'; }
+                subBubblesContainer.style.flexDirection = 'row'; subBubblesContainer.style.top = '0.3rem'; subBubblesContainer.style.width = 'max-content';
+                if (r.left > sw / 2) { subBubblesContainer.style.right = '4.5rem'; subBubblesContainer.style.left = 'auto'; subBubblesContainer.style.justifyContent = 'flex-end'; }
+                else { subBubblesContainer.style.left = '4.5rem'; subBubblesContainer.style.right = 'auto'; subBubblesContainer.style.justifyContent = 'flex-start'; }
             } else {
-                subBubblesContainer.style.width = '60px'; subBubblesContainer.style.left = '0'; subBubblesContainer.style.flexDirection = 'column';
-                if (rect.top > screenH / 2) { subBubblesContainer.style.bottom = '70px'; subBubblesContainer.style.top = 'auto'; }
-                else { subBubblesContainer.style.top = '70px'; subBubblesContainer.style.bottom = 'auto'; }
+                subBubblesContainer.style.width = '3.75rem'; subBubblesContainer.style.left = '0'; subBubblesContainer.style.flexDirection = 'column';
+                r.top > sh / 2 ? (subBubblesContainer.style.bottom = '4.5rem', subBubblesContainer.style.top = 'auto') : (subBubblesContainer.style.top = '4.5rem', subBubblesContainer.style.bottom = 'auto');
             }
         };
 
-        window.positionPopup = function(type) {
-            const rect = wrapper.getBoundingClientRect(); const screenW = window.innerWidth; const screenH = window.innerHeight; const gap = 20; const edgePadding = 20;
-            popup.style.removeProperty('inset'); popup.style.left = ''; popup.style.right = ''; popup.style.top = ''; popup.style.bottom = '';
+        // --- LOGIC VỊ TRÍ POPUP (FIX TRÀN MÀN HÌNH - CLIENT) ---
+        window.positionPopup = (type) => {
+            const r = wrapper.getBoundingClientRect();
+            const sw = window.innerWidth;
+            const sh = window.innerHeight;
+            const gap = 15; // Khoảng cách an toàn
 
-            if (screenW < 998) { // Mobile
-                let vwUnit = 88; if (screenW < 400) vwUnit = 92;
-                popup.style.width = `${vwUnit}vw`; popup.style.maxWidth = `${vwUnit}vw`; popup.style.left = '50%'; popup.style.transform = 'translateX(-50%)';
-                if (rect.top > screenH / 2) { popup.style.bottom = (screenH - rect.top + gap) + 'px'; popup.style.top = 'auto'; popup.style.maxHeight = (rect.top - gap - edgePadding) + 'px'; popup.style.transformOrigin = 'bottom center'; }
-                else { popup.style.top = (rect.bottom + gap) + 'px'; popup.style.bottom = 'auto'; popup.style.maxHeight = (screenH - rect.bottom - gap - edgePadding) + 'px'; popup.style.transformOrigin = 'top center'; }
-            } else { // PC
-                popup.style.width = (type === 'menu' || type === 'settings') ? 'fit-content' : 'max-content';
-                popup.style.maxWidth = '95vw';
-                if (rect.left > screenW / 2) { popup.style.right = (screenW - rect.left + gap) + 'px'; popup.style.left = 'auto'; popup.style.transformOrigin = 'right center'; }
-                else { popup.style.left = (rect.right + gap) + 'px'; popup.style.right = 'auto'; popup.style.transformOrigin = 'left center'; }
+            popup.style.left = ''; popup.style.right = ''; popup.style.top = ''; popup.style.bottom = '';
 
-                const pHeight = popup.scrollHeight; const bubbleCenterY = rect.top + (rect.height / 2); let idealTop = bubbleCenterY - (pHeight / 2);
-                const minTop = 20; const maxTop = screenH - pHeight - 20;
-                popup.style.top = Math.max(minTop, Math.min(idealTop, maxTop)) + 'px'; popup.style.maxHeight = (screenH - 40) + 'px';
+            // 1. MOBILE LOGIC
+            if (sw < 998) {
+                popup.style.width = '90vw'; popup.style.left = '50%'; popup.style.transform = 'translateX(-50%)';
+
+                // Nếu bong bóng ở nửa dưới màn hình -> Popup hiện ở trên
+                if (r.top > sh / 2) {
+                    let availableHeight = r.top - gap - gap;
+                    popup.style.maxHeight = availableHeight + 'px';
+                    popup.style.bottom = (sh - r.top + gap) + 'px';
+                }
+                // Nếu bong bóng ở nửa trên màn hình -> Popup hiện ở dưới
+                else {
+                    let availableHeight = sh - r.bottom - gap - gap;
+                    popup.style.maxHeight = availableHeight + 'px';
+                    popup.style.top = (r.bottom + gap) + 'px';
+                }
+            }
+            // 2. DESKTOP LOGIC
+            else {
+                // Trái/Phải
+                if (r.left > sw / 2) popup.style.right = (sw - r.left + gap) + 'px';
+                else popup.style.left = (r.right + gap) + 'px';
+
+                // Giới hạn chiều cao tổng quát
+                popup.style.maxHeight = (sh - (gap * 2)) + 'px';
+
+                const ph = popup.offsetHeight;
+                let finalTop = r.top;
+
+                // Nếu bong bóng ở nửa dưới -> Căn đáy popup bằng đáy bong bóng
+                if (r.top >= sh / 2) {
+                    finalTop = r.bottom - ph;
+                }
+
+                // Kẹp vị trí (Clamping)
+                if (finalTop + ph > sh - gap) {
+                    finalTop = sh - ph - gap;
+                }
+                if (finalTop < gap) {
+                    finalTop = gap;
+                }
+
+                popup.style.top = finalTop + 'px';
             }
         };
 
-        // --- 3. BẮT SỰ KIỆN SUB-BUBBLES ---
-        if(btnMenu) btnMenu.addEventListener('click', (e) => { e.stopPropagation(); openAll('menu'); });
-        if(btnChatConversation) btnChatConversation.addEventListener('click', (e) => { e.stopPropagation(); openAll('chat'); });
-        if(btnSettings) btnSettings.addEventListener('click', (e) => { e.stopPropagation(); openAll('settings'); }); // MỚI
-
-        let resizeTimer;
-        window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (window.isSystemOpen) { expandBubblesVisual(); window.positionPopup(window.currentPopupMode); } }, 100); });
+        btns.menu?.addEventListener('click', (e) => { e.stopPropagation(); openAll('menu'); });
+        btns.chat?.addEventListener('click', (e) => { e.stopPropagation(); openAll('chat'); });
+        btns.settings?.addEventListener('click', (e) => { e.stopPropagation(); openAll('settings'); });
     });
 </script>
