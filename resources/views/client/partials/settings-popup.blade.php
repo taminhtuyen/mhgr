@@ -260,7 +260,7 @@
     <div class="settings-group">
         <div class="settings-group-title">Giao diện & Hiển thị</div>
 
-        {{-- 1.1 Chế độ tối (NEW UI) --}}
+        {{-- 1.1 Chế độ tối --}}
         <div class="setting-item">
             <div class="setting-info">
                 <div class="setting-label"><i class="fa-solid fa-circle-half-stroke text-muted"></i> Chế độ tối</div>
@@ -274,7 +274,20 @@
             </label>
         </div>
 
-        {{-- 1.2 Cỡ chữ (NEW CLICKABLE 'A') --}}
+        {{-- 1.1.5 Tự tắt Neon (NEW FEATURE) --}}
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-label"><i class="fa-solid fa-lightbulb text-muted"></i> Tự tắt Neon</div>
+                <div class="setting-subtext" id="desc-neon">Tắt hiệu ứng sau 5s</div>
+            </div>
+
+            <div class="toggle-switch-lite">
+                <input class="toggle-input-lite" id="settings-neon-toggle" type="checkbox" />
+                <label class="toggle-label-lite" for="settings-neon-toggle"></label>
+            </div>
+        </div>
+
+        {{-- 1.2 Cỡ chữ --}}
         <div class="setting-item">
             <div class="setting-info">
                 <div class="setting-label"><i class="fa-solid fa-text-height text-muted"></i> Cỡ chữ</div>
@@ -318,7 +331,7 @@
     <div class="settings-group">
         <div class="settings-group-title">Trò chuyện & Tin nhắn</div>
 
-        {{-- 2.1 Phím Enter để gửi (NEW UI) --}}
+        {{-- 2.1 Phím Enter để gửi --}}
         <div class="setting-item">
             <div class="setting-info">
                 <div class="setting-label"><i class="fa-solid fa-keyboard text-muted"></i> Enter để gửi</div>
@@ -346,7 +359,7 @@
             if (settings) settings.classList.remove('d-none');
         }
 
-        // --- 2. DARK MODE LOGIC (CLIENT) ---
+        // --- 2. DARK MODE LOGIC ---
         const themeToggle = document.getElementById('settings-theme-toggle');
         const descTheme = document.getElementById('desc-theme');
         const body = document.body;
@@ -355,7 +368,6 @@
             if(descTheme) descTheme.innerText = isDark ? 'Đang bật chế độ tối (Dark Mode)' : 'Đang sử dụng chế độ sáng (Light Mode)';
         };
 
-        // Init Check
         if(localStorage.getItem('client_theme_preference') === 'dark') {
             if(themeToggle) themeToggle.checked = true;
             updateThemeText(true);
@@ -372,16 +384,38 @@
             });
         }
 
-        // --- 3. FONT SIZE LOGIC (CLIENT) ---
+        // --- 2.5 AUTO OFF NEON LOGIC (NEW) ---
+        const neonToggle = document.getElementById('settings-neon-toggle');
+        const descNeon = document.getElementById('desc-neon');
+
+        const updateNeonText = (isOn) => {
+            if(descNeon) descNeon.innerText = isOn ? 'Đang BẬT: Tắt sau 5s không thao tác' : 'Đang TẮT: Hiệu ứng luôn bật';
+        };
+
+        const savedNeon = localStorage.getItem('client_neon_auto_off') === 'true';
+        if(neonToggle) {
+            neonToggle.checked = savedNeon;
+            updateNeonText(savedNeon);
+        }
+
+        if(neonToggle) {
+            neonToggle.addEventListener('change', (e) => {
+                const isEnabled = e.target.checked;
+                localStorage.setItem('client_neon_auto_off', isEnabled);
+                updateNeonText(isEnabled);
+                // Trigger global update in bubbles.blade.php
+                if(window.initNeonEffect) window.initNeonEffect();
+            });
+        }
+
+        // --- 3. FONT SIZE LOGIC ---
         const fsRange = document.getElementById('settings-fontsize-range');
         const descFont = document.getElementById('desc-font');
         const btnDecrease = document.getElementById('btn-decrease-font');
         const btnIncrease = document.getElementById('btn-increase-font');
         const htmlEl = document.documentElement;
 
-        // Function chung để áp dụng font size
         const applyFontSize = (val) => {
-            // Giới hạn
             if (val < 12) val = 12;
             if (val > 22) val = 22;
 
@@ -392,34 +426,14 @@
             if(descFont) descFont.innerText = `Kích thước hiện tại: ${val}px`;
         };
 
-        // Load init
         const savedFs = localStorage.getItem('client_global_fontsize') || '16';
         applyFontSize(parseInt(savedFs));
 
-        // Event: Kéo slider
-        if(fsRange) {
-            fsRange.addEventListener('input', (e) => {
-                applyFontSize(parseInt(e.target.value));
-            });
-        }
+        if(fsRange) fsRange.addEventListener('input', (e) => applyFontSize(parseInt(e.target.value)));
+        if(btnDecrease) btnDecrease.addEventListener('click', () => applyFontSize(parseInt(fsRange.value || 16) - 1));
+        if(btnIncrease) btnIncrease.addEventListener('click', () => applyFontSize(parseInt(fsRange.value || 16) + 1));
 
-        // Event: Click chữ 'a' nhỏ (Giảm)
-        if(btnDecrease) {
-            btnDecrease.addEventListener('click', () => {
-                const current = parseInt(fsRange.value || 16);
-                applyFontSize(current - 1);
-            });
-        }
-
-        // Event: Click chữ 'A' lớn (Tăng)
-        if(btnIncrease) {
-            btnIncrease.addEventListener('click', () => {
-                const current = parseInt(fsRange.value || 16);
-                applyFontSize(current + 1);
-            });
-        }
-
-        // --- 4. MENU VIEW TOGGLE (CLIENT) ---
+        // --- 4. MENU VIEW TOGGLE ---
         const viewBtn = document.getElementById('settings-view-toggle');
         const viewIcon = viewBtn ? viewBtn.querySelector('i') : null;
         const descView = document.getElementById('desc-view');
@@ -461,7 +475,7 @@
             });
         }
 
-        // --- 5. ENTER TO SEND LOGIC (CLIENT) ---
+        // --- 5. ENTER TO SEND LOGIC ---
         const enterSwitch = document.getElementById('settings-enter-send');
         const descEnter = document.getElementById('desc-enter');
 
@@ -484,7 +498,7 @@
             });
         }
 
-        // --- 6. RESET MENU ORDER (CLIENT) ---
+        // --- 6. RESET MENU ORDER ---
         const btnResetMenu = document.getElementById('settings-reset-menu');
         if(btnResetMenu) {
             btnResetMenu.addEventListener('click', () => {

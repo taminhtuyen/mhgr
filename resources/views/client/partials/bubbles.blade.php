@@ -34,7 +34,7 @@
         --sub-bg: #ffffff;
         --sub-border: #d1d5db;
         --sub-text: #374151;
-        --scrollbar-thumb: #cbd5e1; /* Thêm biến scrollbar nếu chưa có */
+        --scrollbar-thumb: #cbd5e1;
     }
 
     body.dark-mode {
@@ -70,10 +70,10 @@
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
     }
 
-    #nav-bubble:hover {
+    /* Hiệu ứng Glow mặc định (khi chưa tắt Neon) */
+    #nav-bubble:not(.no-hover-glow):hover {
         transform: scale(1.05);
         border-color: #fff;
-        /* Glow rộng (Admin Style) */
         box-shadow:
             0 0 0.1rem rgb(var(--neon-primary)) inset,
             0 0 0.5rem rgb(var(--neon-primary)) inset,
@@ -81,11 +81,66 @@
             0 0 2.5rem rgb(var(--neon-primary));
     }
 
-    #nav-bubble:hover #bubble-icon {
+    #nav-bubble:not(.no-hover-glow):hover #bubble-icon {
         filter: drop-shadow(0 0 0.3rem rgb(var(--neon-primary)));
     }
 
-    /* Trạng thái Mở (Red Mode) */
+    /* --- [QUAN TRỌNG] CLASS TẮT NEON --- */
+
+    /* 1. Tắt bóng xanh (Blue Mode) */
+    body.neon-off #nav-bubble {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important; /* Bóng đen mờ thường */
+        border-color: transparent !important;
+        animation: none !important;
+    }
+
+    /* 2. Tắt bóng đỏ (Red Mode - Menu Open) */
+    body.neon-off #nav-bubble.red-mode {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4) !important;
+        border-color: transparent !important;
+    }
+
+    /* 3. XỬ LÝ BONG BÓNG CON KHI TẮT NEON (THEO YÊU CẦU CỦA BẠN) */
+    body.neon-off .sub-bubble.active {
+        /* GIỮ NGUYÊN KÍCH THƯỚC TO (QUAN TRỌNG) */
+        transform: scale(1.15) !important;
+
+        /* THAY ĐỔI VIỀN THÀNH MÀU TRẮNG */
+        border: 0.0625rem solid #fff !important;
+
+        /* Giữ màu nền xanh active */
+        background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+        color: #fff !important;
+
+        /* Tắt hiệu ứng phát sáng neon, chỉ để bóng đổ thường */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+    }
+
+    /* 4. Tắt hiệu ứng Glow của Icon bên trong */
+    body.neon-off #nav-bubble #bubble-icon,
+    body.neon-off #nav-bubble.red-mode #bubble-icon,
+    body.neon-off .sub-bubble.active i {
+        filter: none !important;
+    }
+
+    /* 5. Hover khi tắt Neon (Vẫn scale nhẹ để biết là nút bấm nhưng không sáng) */
+    body.neon-off #nav-bubble:hover,
+    body.neon-off .sub-bubble:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.25) !important;
+    }
+    /* Riêng bong bóng active thì hover vẫn giữ nguyên scale to */
+    body.neon-off .sub-bubble.active:hover {
+        transform: scale(1.15) !important;
+    }
+
+    body.neon-off #nav-bubble.red-mode:hover {
+        box-shadow: 0 5px 15px rgba(220, 38, 38, 0.5) !important;
+    }
+
+
+    /* --- TRẠNG THÁI RED MODE (GỐC) --- */
     #nav-bubble.red-mode {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
         border-color: #fff !important;
@@ -111,14 +166,17 @@
         position: absolute; top: 0; right: 0;
         width: 1rem; height: 1rem;
         background-color: #ef4444;
-
-        /* Viền mỏng 1px */
         border: 0.0625rem solid #fff;
         border-radius: 50%; z-index: 11;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-
         transition: all 0.3s ease;
         pointer-events: auto;
+    }
+
+    /* Khi tắt Neon thì chấm đỏ cũng tắt glow */
+    body.neon-off .main-bubble-badge {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+        border-color: #fff !important;
     }
 
     .main-bubble-badge:hover {
@@ -136,8 +194,6 @@
         background: #ef4444; color: white;
         font-size: 0.65rem; padding: 0.15rem 0.4rem;
         border-radius: 1rem; font-weight: bold;
-
-        /* Viền mỏng 1px */
         border: 0.0625rem solid #fff;
         box-shadow: 0 0 0.3rem rgba(255, 49, 49, 0.6);
     }
@@ -164,7 +220,7 @@
 
     .sub-bubble:not(.active):hover { transform: scale(1.1) !important; }
 
-    /* Sub-bubble Active */
+    /* Sub-bubble Active (Trạng thái bình thường - Có Neon) */
     .sub-bubble.active {
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
         border: 0.0625rem solid #fff !important; /* Viền mỏng 1px */
@@ -178,29 +234,22 @@
     }
     .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgb(var(--neon-primary))); }
 
-    /* --- POPUP (FIX TRÀN MÀN HÌNH - CLIENT) --- */
+    /* --- POPUP (FIX TRÀN MÀN HÌNH) --- */
     #nav-popup {
         position: fixed; z-index: 9999; background: var(--popup-bg);
         backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border);
         box-shadow: var(--popup-shadow);
         border-radius: 1.25rem !important; overflow: hidden !important;
-
-        /* FIX: Thêm Scroll nếu nội dung quá dài */
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-
+        overflow-y: auto !important; -webkit-overflow-scrolling: touch;
         opacity: 0; visibility: hidden; transform: scale(0.95);
         transition: opacity 0.2s, transform 0.2s;
         width: fit-content; max-width: 95vw; display: flex; flex-direction: column;
-
-        /* Custom Scrollbar */
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-thumb) transparent;
     }
 
     #nav-popup::-webkit-scrollbar { width: 4px; }
     #nav-popup::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
-
     #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
 
     /* BACKDROP */
@@ -226,11 +275,60 @@
             chat: document.getElementById('btn-open-chat'),
             settings: document.getElementById('btn-open-settings')
         };
+        const allBubbles = [mainBubble, btns.menu, btns.chat, btns.settings];
 
         window.isSystemOpen = false;
         window.currentPopupMode = 'menu';
 
-        // --- POSITION RESTORE (CLIENT KEY) ---
+        // --- 1. LOGIC NEON AUTO OFF (STRICT CLICK MODE) ---
+        let neonTimeout;
+
+        // Hàm bắt đầu đếm ngược 5s
+        const startNeonCountdown = () => {
+            // Chỉ chạy nếu tính năng đang bật trong cài đặt
+            if(localStorage.getItem('client_neon_auto_off') === 'true') {
+                clearTimeout(neonTimeout);
+                neonTimeout = setTimeout(() => {
+                    document.body.classList.add('neon-off');
+                }, 5000);
+            }
+        };
+
+        // Hàm "Đánh thức" Neon (Chỉ gọi khi CLICK)
+        const wakeUpNeon = () => {
+            // 1. Sáng đèn ngay lập tức
+            document.body.classList.remove('neon-off');
+            // 2. Reset và đếm lại 5s
+            startNeonCountdown();
+        };
+
+        // Hàm khởi tạo Global (được gọi từ settings-popup)
+        window.initNeonEffect = function() {
+            const isAutoOff = localStorage.getItem('client_neon_auto_off') === 'true';
+            clearTimeout(neonTimeout);
+
+            if (!isAutoOff) {
+                // Nếu tắt tính năng -> Luôn sáng
+                document.body.classList.remove('neon-off');
+            } else {
+                // Nếu bật tính năng -> Bắt đầu đếm ngay từ lúc bật
+                startNeonCountdown();
+            }
+        };
+
+        // Gán sự kiện CLICK cho tất cả bong bóng
+        // LƯU Ý: Chỉ dùng 'click' để tránh hiện tượng nháy sáng (flash) khi chuyển bong bóng
+        allBubbles.forEach(bubble => {
+            if(bubble) {
+                bubble.addEventListener('click', wakeUpNeon);
+            }
+        });
+
+        // Chạy lần đầu
+        window.initNeonEffect();
+
+
+        // --- 2. POSITION RESTORE ---
         let isDragging = false, startX, startY, initialLeft, initialTop;
         const restorePosition = () => {
             const savedPos = localStorage.getItem('client_bubblePos');
@@ -263,6 +361,9 @@
 
         const getPos = (e) => e.touches ? e.touches[0] : e;
         const onDragStart = (e) => {
+            // Drag cũng được coi là tương tác -> Wake up neon
+            wakeUpNeon();
+
             isDragging = false; const p = getPos(e); startX = p.clientX; startY = p.clientY;
             const r = wrapper.getBoundingClientRect(); initialLeft = r.left; initialTop = r.top;
             Object.assign(wrapper.style, { left: r.left + 'px', top: r.top + 'px', bottom: 'auto', right: 'auto', transition: 'none' });
@@ -293,6 +394,9 @@
         mainBubble.onclick = () => { if (!isDragging) window.isSystemOpen ? closeAll() : openAll('menu'); };
 
         window.openAll = (mode) => {
+            // Click mở menu -> Wake up
+            wakeUpNeon();
+
             window.isSystemOpen = true; window.currentPopupMode = mode;
             expandBubblesVisual();
             if(mode === 'menu' && typeof window.renderMenuContent === 'function') window.renderMenuContent();
@@ -309,6 +413,9 @@
         };
 
         window.closeAll = () => {
+            // Click đóng menu -> Wake up
+            wakeUpNeon();
+
             window.isSystemOpen = false; wrapper.classList.remove('expanded'); popup.classList.remove('active');
             icon.classList.replace('fa-xmark', 'fa-bars'); backdrop.classList.remove('active');
             mainBubble.classList.remove('red-mode');
@@ -331,57 +438,35 @@
             }
         };
 
-        // --- LOGIC VỊ TRÍ POPUP (FIX TRÀN MÀN HÌNH - CLIENT) ---
+        // --- LOGIC VỊ TRÍ POPUP ---
         window.positionPopup = (type) => {
             const r = wrapper.getBoundingClientRect();
             const sw = window.innerWidth;
             const sh = window.innerHeight;
-            const gap = 15; // Khoảng cách an toàn
+            const gap = 15;
 
             popup.style.left = ''; popup.style.right = ''; popup.style.top = ''; popup.style.bottom = '';
 
-            // 1. MOBILE LOGIC
             if (sw < 998) {
                 popup.style.width = '90vw'; popup.style.left = '50%'; popup.style.transform = 'translateX(-50%)';
-
-                // Nếu bong bóng ở nửa dưới màn hình -> Popup hiện ở trên
                 if (r.top > sh / 2) {
                     let availableHeight = r.top - gap - gap;
                     popup.style.maxHeight = availableHeight + 'px';
                     popup.style.bottom = (sh - r.top + gap) + 'px';
-                }
-                // Nếu bong bóng ở nửa trên màn hình -> Popup hiện ở dưới
-                else {
+                } else {
                     let availableHeight = sh - r.bottom - gap - gap;
                     popup.style.maxHeight = availableHeight + 'px';
                     popup.style.top = (r.bottom + gap) + 'px';
                 }
-            }
-            // 2. DESKTOP LOGIC
-            else {
-                // Trái/Phải
+            } else {
                 if (r.left > sw / 2) popup.style.right = (sw - r.left + gap) + 'px';
                 else popup.style.left = (r.right + gap) + 'px';
-
-                // Giới hạn chiều cao tổng quát
                 popup.style.maxHeight = (sh - (gap * 2)) + 'px';
-
                 const ph = popup.offsetHeight;
                 let finalTop = r.top;
-
-                // Nếu bong bóng ở nửa dưới -> Căn đáy popup bằng đáy bong bóng
-                if (r.top >= sh / 2) {
-                    finalTop = r.bottom - ph;
-                }
-
-                // Kẹp vị trí (Clamping)
-                if (finalTop + ph > sh - gap) {
-                    finalTop = sh - ph - gap;
-                }
-                if (finalTop < gap) {
-                    finalTop = gap;
-                }
-
+                if (r.top >= sh / 2) finalTop = r.bottom - ph;
+                if (finalTop + ph > sh - gap) finalTop = sh - ph - gap;
+                if (finalTop < gap) finalTop = gap;
                 popup.style.top = finalTop + 'px';
             }
         };
