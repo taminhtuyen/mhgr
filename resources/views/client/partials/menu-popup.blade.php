@@ -1,126 +1,207 @@
+{{-- resources/views/client/partials/menu-popup.blade.php --}}
 {{-- 1. THƯ VIỆN SORTABLE (LOCAL) --}}
 <script src="{{ asset('js/Sortable.min.js') }}"></script>
 
 <div id="menu-interface" class="d-none">
     <style>
-        /* --- 1. CSS VARIABLES CHO BORDER NỔI BẬT --- */
+        /* --- 1. BIẾN MÀU SẮC NEON (SHARP STYLE) --- */
         :root {
-            --popup-border-highlight: rgba(0, 0, 0, 0.15);
+            --popup-border-highlight: rgba(0, 0, 0, 0.1);
+            --neon-glow: var(--primary);
+            --link-hover-bg: rgba(0, 0, 0, 0.03);
         }
+
         body.dark-mode {
-            --popup-border-highlight: rgba(255, 255, 255, 0.2);
+            --popup-border-highlight: rgba(255, 255, 255, 0.1);
+            --link-hover-bg: rgba(255, 255, 255, 0.05);
         }
 
-        .glass-effect.dropdown-menu {
-            border: 1.5px solid var(--popup-border-highlight) !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+        /* Định nghĩa màu Neon riêng cho từng nhóm */
+        .menu-group-box[data-group="explore"] { --neon-glow: #007bff; }
+        .menu-group-box[data-group="personal"] { --neon-glow: #28a745; }
+        .menu-group-box[data-group="shopping"] { --neon-glow: #ffc107; }
+        .menu-group-box[data-group="support"]  { --neon-glow: #17a2b8; }
+
+        /* --- 2. ĐỊNH DẠNG CHUNG (CLEAN TEXT) --- */
+        .menu-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none !important;
+            color: var(--text-color);
+            transition: all 0.25s ease;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            position: relative; /* QUAN TRỌNG: Làm mốc cho nhãn badge absolute */
         }
 
-        .dropdown-item { color: var(--text-color) !important; transition: all 0.2s; font-weight: 500; }
-        .dropdown-item:hover { background-color: var(--link-hover-bg) !important; color: var(--link-hover-text) !important; }
-        .dropdown-item i { width: 20px; text-align: center; color: var(--text-muted); }
-        .dropdown-item:hover i { color: var(--link-hover-text); }
+        .menu-link span, .menu-link i {
+            transition: all 0.2s ease;
+        }
 
-        /* 3. LAYOUT CHUNG & SCROLL */
-        #menu-interface { width: 100%; overflow-y: auto; max-height: 80vh; scrollbar-width: thin; overscroll-behavior: contain; }
-        #menu-interface::-webkit-scrollbar { width: 6px; }
-        #menu-interface::-webkit-scrollbar-track { background: transparent; }
-        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
+        /* Định dạng riêng cho Nhãn số lượng (Badge) */
+        .cart-badge {
+            position: absolute;
+            top: 0.375rem;
+            right: 0.375rem;
+            font-size: 0.625rem;
+            padding: 0.25rem 0.4rem;
+            min-width: 1.125rem;
+            z-index: 5;
+            line-height: 1;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.2);
+        }
 
-        /* [CẬP NHẬT] STICKY HEADER CHO MENU CLIENT - ĐÃ GIẢM OPACITY */
+        /* --- 3. XỬ LÝ HOVER THEO CHẾ ĐỘ --- */
+
+        /* Mặc định cho Dark Mode List */
+        .menu-link:hover span,
+        .menu-link:hover i {
+            color: #ffffff !important;
+            text-shadow:
+                0 0 0.125rem #ffffff,
+                0 0 0.3125rem var(--neon-glow),
+                0 0 0.625rem var(--neon-glow);
+        }
+
+        /* [LIGHT MODE] - CHẾ ĐỘ DANH SÁCH */
+        body:not(.dark-mode) .view-mode-list .menu-link:hover span,
+        body:not(.dark-mode) .view-mode-list .menu-link:hover i {
+            color: var(--text-color) !important;
+            text-shadow: 0 0 0.5rem var(--neon-glow);
+        }
+
+        /* [LIGHT MODE] - CHẾ ĐỘ LƯỚI: Đổi màu chữ theo nhóm, không đổ bóng */
+        body:not(.dark-mode) .view-mode-grid .menu-link:hover span,
+        body:not(.dark-mode) .view-mode-grid .menu-link:hover i {
+            color: var(--neon-glow) !important;
+            text-shadow: none !important;
+        }
+
+        /* [DARK MODE] - CHẾ ĐỘ LƯỚI: Giảm chói */
+        body.dark-mode .view-mode-grid .menu-link:hover span,
+        body.dark-mode .view-mode-grid .menu-link:hover i {
+            text-shadow: 0 0 0.3125rem var(--neon-glow) !important;
+        }
+
+        /* --- 4. CHẾ ĐỘ DANH SÁCH (LIST VIEW) --- */
+        .view-mode-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+
+        .view-mode-list .menu-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3125rem;
+        }
+
+        .view-mode-list .menu-link { padding: 0.625rem 0.875rem; }
+        .view-mode-list .menu-link:hover { background-color: var(--link-hover-bg); }
+
+        .view-mode-list .menu-link i {
+            width: 1.5rem;
+            margin-right: 0.75rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* --- 5. CHẾ ĐỘ LƯỚI (GRID VIEW) --- */
+        .view-mode-grid .menu-items-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9375rem;
+        }
+
+        .view-mode-grid .menu-link {
+            flex-direction: column;
+            justify-content: center;
+            width: 5.75rem;
+            height: 5.75rem;
+            background: transparent;
+            border: 0.0625rem solid var(--popup-border-highlight);
+            border-radius: 0.75rem;
+        }
+
+        .view-mode-grid .menu-link:hover {
+            background-color: transparent !important;
+            border-color: #ffffff !important;
+            box-shadow:
+                inset 0 0 0.3125rem var(--neon-glow),
+                0 0 0.3125rem var(--neon-glow),
+                0 0 0.9375rem var(--neon-glow);
+            transform: none !important;
+        }
+
+        .view-mode-grid .menu-link i {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: var(--neon-glow);
+        }
+
+        .view-mode-grid .menu-link span {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* --- 6. GIAO DIỆN HEADER & SCROLL --- */
+        #menu-interface {
+            width: 100%;
+            overflow-y: auto;
+            max-height: 80vh;
+            scrollbar-width: thin;
+            overscroll-behavior: contain;
+        }
+
+        #menu-interface::-webkit-scrollbar { width: 0.375rem; }
+        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 0.625rem; }
+
         .popup-header {
-            padding: 18px 25px 15px 25px;
-            border-bottom: 1px solid var(--popup-border);
-
-            /* Sticky Logic */
+            padding: 1.125rem 1.5625rem;
+            border-bottom: 0.0625rem solid var(--popup-border);
             position: sticky;
             top: 0;
             z-index: 50;
-
-            /* [QUAN TRỌNG] Chỉnh màu nền trong suốt hơn (0.8) để thấy nội dung mờ bên dưới */
             background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px); /* Tăng độ blur lên một chút */
-            -webkit-backdrop-filter: blur(12px);
-
-            margin-top: -1px;
+            backdrop-filter: blur(0.75rem);
+            -webkit-backdrop-filter: blur(0.75rem);
         }
 
-        /* Màu nền header riêng cho Dark Mode */
-        body.dark-mode .popup-header {
-            background-color: rgba(15, 23, 42, 0.8); /* Màu tối nhưng trong suốt 80% */
-        }
+        body.dark-mode .popup-header { background-color: rgba(15, 23, 42, 0.8); }
 
-        .menu-main-wrapper { padding: 25px; gap: 20px; }
-        .menu-group-box { display: flex; flex-direction: column; margin-bottom: 5px; }
+        .menu-main-wrapper { padding: 1.5625rem; }
 
         .group-title {
-            font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
-            color: var(--text-muted); margin-bottom: 10px; letter-spacing: 0.8px;
-            padding-bottom: 5px; border-bottom: 2px solid rgba(0,0,0,0.03);
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.0625rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 0.125rem solid rgba(0,0,0,0.03);
         }
         body.dark-mode .group-title { border-bottom-color: rgba(255,255,255,0.05); }
 
-        /* 4. CHIA CỘT THÔNG MINH */
-        .menu-link {
-            display: flex; align-items: center; color: var(--text-color); text-decoration: none;
-            border-radius: 10px; font-weight: 500; font-size: 0.92rem; transition: all 0.2s;
-            white-space: nowrap; overflow: hidden;
-        }
-        .menu-link span { text-overflow: ellipsis; overflow: hidden; }
-
-        /* Chế độ Danh sách */
-        .view-mode-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .view-mode-list .menu-group-box { break-inside: avoid; }
-        .view-mode-list .menu-items-container { display: flex; flex-direction: column; gap: 5px; }
-        .view-mode-list .menu-link { padding: 9px 14px; }
-        .view-mode-list .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateX(5px); }
-        .view-mode-list .menu-link i { width: 24px; color: var(--text-muted); margin-right: 10px; text-align: center; font-size: 1rem; }
-
         @media (max-width: 998px) { .view-mode-list { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 767.98px) { .view-mode-list { grid-template-columns: 1fr; } }
-
-        /* Chế độ Lưới (Grid) */
-        .view-mode-grid { display: block; }
-        .view-mode-grid .menu-group-box { margin-bottom: 25px; width: 100%; }
-        .view-mode-grid .menu-items-container { display: flex; flex-wrap: wrap; gap: 15px; }
-        .view-mode-grid .menu-link { flex-direction: column; align-items: center; justify-content: center; padding: 12px 5px; width: 92px; height: 92px; background: rgba(127, 127, 127, 0.05); border: 1px solid transparent; position: relative; }
-        .view-mode-grid .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateY(-4px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); border-color: var(--popup-border); }
-        .view-mode-grid .menu-link i { font-size: 28px; margin-bottom: 10px; color: var(--primary); }
-        .view-mode-grid .menu-link span { font-size: 0.75rem; font-weight: 600; line-height: 1.2; text-align: center; }
-
-        .view-switcher { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--popup-border); background: var(--popup-bg); color: var(--text-muted); transition: all 0.2s; }
-        .view-switcher:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.05); }
-
-        /* Style nút đóng */
-        .btn-close-popup {
-            width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s;
-            color: var(--text-muted);
-            border: 1px solid transparent;
-        }
-        .btn-close-popup:hover {
-            background-color: rgba(127,127,127,0.1);
-            color: var(--text-color);
-        }
+        @media (max-width: 576px) { .view-mode-list { grid-template-columns: 1fr; } }
     </style>
 
-    {{-- HEADER CỦA MENU (STICKY) --}}
+    {{-- HEADER --}}
     <div class="popup-header d-flex justify-content-between align-items-center">
         <div class="h5 mb-0 fw-bold d-flex align-items-center" style="color: var(--text-color);">
             <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>MENU
         </div>
-        {{-- Nút đóng popup --}}
-        <button class="btn btn-sm btn-icon text-muted btn-close-popup bg-transparent border-0" onclick="closeAll()" title="Đóng">
-            <i class="fa-solid fa-xmark" style="font-size: 1.2rem;"></i>
+        <button class="btn btn-icon text-muted border-0 bg-transparent" onclick="closeAll()" style="width: 2.5rem; height: 2.5rem; border-radius: 50%;">
+            <i class="fa-solid fa-xmark" style="font-size: 1.25rem;"></i>
         </button>
     </div>
 
-    {{-- CONTENT CỦA MENU --}}
+    {{-- CONTENT --}}
     <div class="menu-main-wrapper view-mode-list" id="menu-container">
         {{-- GROUP 1: KHÁM PHÁ --}}
-        <div class="menu-group-box">
+        <div class="menu-group-box" data-group="explore">
             <div class="group-title text-primary">KHÁM PHÁ</div>
             <div class="menu-items-container" data-group-id="explore">
                 <a href="/" class="menu-link" data-id="home"><i class="fa-solid fa-house"></i> <span>Trang Chủ</span></a>
@@ -131,7 +212,7 @@
         </div>
 
         {{-- GROUP 2: CÁ NHÂN --}}
-        <div class="menu-group-box">
+        <div class="menu-group-box" data-group="personal">
             <div class="group-title text-success">CÁ NHÂN</div>
             <div class="menu-items-container" data-group-id="personal">
                 <a href="#" class="menu-link" data-id="account"><i class="fa-solid fa-user-gear"></i> <span>Tài Khoản</span></a>
@@ -140,17 +221,21 @@
         </div>
 
         {{-- GROUP 3: MUA SẮM --}}
-        <div class="menu-group-box">
+        <div class="menu-group-box" data-group="shopping">
             <div class="group-title text-warning">MUA SẮM</div>
             <div class="menu-items-container" data-group-id="shopping">
-                <a href="#" class="menu-link" data-id="cart"><i class="fa-solid fa-cart-shopping"></i> <span>Giỏ Hàng</span> <span class="badge bg-danger ms-auto rounded-pill badge-num">3</span></a>
+                <a href="#" class="menu-link" data-id="cart">
+                    <i class="fa-solid fa-cart-shopping"></i> <span>Giỏ Hàng</span>
+                    {{-- NHÃN SỐ LƯỢNG ĐÃ ĐƯỢC ĐƯA LÊN GÓC CAO BÊN PHẢI --}}
+                    <span class="badge bg-danger rounded-pill cart-badge">3</span>
+                </a>
                 <a href="#" class="menu-link" data-id="orders"><i class="fa-solid fa-truck-fast"></i> <span>Đơn Mua</span></a>
                 <a href="#" class="menu-link" data-id="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch Sử</span></a>
             </div>
         </div>
 
         {{-- GROUP 4: HỖ TRỢ --}}
-        <div class="menu-group-box">
+        <div class="menu-group-box" data-group="support">
             <div class="group-title text-info">HỖ TRỢ</div>
             <div class="menu-items-container" data-group-id="support">
                 <a href="#" class="menu-link" data-id="help"><i class="fa-solid fa-circle-question"></i> <span>Trợ Giúp</span></a>
@@ -162,7 +247,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. VIEW MODE LOGIC (CLIENT) ---
         const menuWrapper = document.getElementById('menu-container');
         const savedView = localStorage.getItem('client_menu_view') || 'list';
         applyMenuView(savedView);
@@ -177,7 +261,6 @@
             }
         }
 
-        // --- 2. SORTABLE JS LOGIC ---
         const groups = document.querySelectorAll('.menu-items-container');
         groups.forEach(group => {
             const groupId = group.getAttribute('data-group-id');
@@ -188,11 +271,11 @@
                 dragClass: 'sortable-drag',
                 delay: 100, delayOnTouchOnly: true,
                 store: {
-                    get: function (sortable) {
+                    get: (sortable) => {
                         const order = localStorage.getItem('client_menu_order_' + groupId);
                         return order ? order.split('|') : [];
                     },
-                    set: function (sortable) {
+                    set: (sortable) => {
                         const order = sortable.toArray();
                         localStorage.setItem('client_menu_order_' + groupId, order.join('|'));
                     }
@@ -200,7 +283,6 @@
             });
         });
 
-        // --- 3. EXPORT RENDER FUNCTION ---
         window.renderMenuContent = function() {
             const menuInterface = document.getElementById('menu-interface');
             const chatInterface = document.getElementById('chat-interface');

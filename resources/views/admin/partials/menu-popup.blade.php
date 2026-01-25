@@ -1,93 +1,192 @@
+{{-- resources/views/admin/partials/menu-popup.blade.php --}}
 {{-- 1. THƯ VIỆN SORTABLE (LOCAL) --}}
 <script src="{{ asset('js/Sortable.min.js') }}"></script>
 
 <div id="menu-interface" class="d-none">
     <style>
-        /* --- 1. CSS VARIABLES CHO BORDER NỔI BẬT --- */
+        /* --- 1. BIẾN MÀU SẮC NEON SẮC NÉT --- */
         :root {
-            --popup-border-highlight: rgba(0, 0, 0, 0.15); /* Chế độ sáng: Viền tối */
+            --popup-border-highlight: rgba(0, 0, 0, 0.1);
+            --neon-glow: var(--primary);
+            --link-hover-bg: rgba(0, 0, 0, 0.03);
         }
+
         body.dark-mode {
-            --popup-border-highlight: rgba(255, 255, 255, 0.2); /* Chế độ tối: Viền sáng */
+            --popup-border-highlight: rgba(255, 255, 255, 0.1);
+            --link-hover-bg: rgba(255, 255, 255, 0.05);
         }
 
-        /* 3. LAYOUT CHUNG & SCROLL */
-        #menu-interface { width: 100%; overflow-y: auto; max-height: 80vh; scrollbar-width: thin; overscroll-behavior: contain; }
-        #menu-interface::-webkit-scrollbar { width: 6px; }
-        #menu-interface::-webkit-scrollbar-track { background: transparent; }
-        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; }
+        /* Định nghĩa màu đặc trưng riêng cho từng nhóm chức năng Admin */
+        .menu-group-box[data-group-id="overview"]    { --neon-glow: #0d6efd; } /* Blue */
+        .menu-group-box[data-group-id="sales"]       { --neon-glow: #198754; } /* Green */
+        .menu-group-box[data-group-id="system"]      { --neon-glow: #6c757d; } /* Gray/Dark */
+        .menu-group-box[data-group-id="products"]    { --neon-glow: #ffc107; } /* Warning */
+        .menu-group-box[data-group-id="inventory"]   { --neon-glow: #dc3545; } /* Danger */
+        .menu-group-box[data-group-id="finance"]     { --neon-glow: #6610f2; } /* Indigo */
+        .menu-group-box[data-group-id="consignment"] { --neon-glow: #adb5bd; } /* Secondary */
+        .menu-group-box[data-group-id="marketing"]   { --neon-glow: #0dcaf0; } /* Info */
+        .menu-group-box[data-group-id="content"]     { --neon-glow: #6f42c1; } /* Purple */
+        .menu-group-box[data-group-id="crm"]         { --neon-glow: #fd7e14; } /* Orange */
 
-        /* --- [CẬP NHẬT] STICKY HEADER CHO MENU --- */
-        .popup-header {
-            padding: 18px 25px 15px 25px;
-            border-bottom: 1px solid var(--popup-border);
-
-            /* Sticky Logic */
-            position: sticky;
-            top: 0;
-            z-index: 50; /* Đảm bảo nằm trên nội dung khi cuộn */
-            background-color: var(--popup-bg); /* Nền để che nội dung trôi qua */
-            backdrop-filter: blur(10px); /* Hiệu ứng mờ hiện đại */
-            margin-top: -1px; /* Fix lỗi hở pixel trên một số màn hình */
+        /* --- 2. ĐỊNH DẠNG CHUNG (CLEAN TEXT) --- */
+        .menu-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none !important;
+            color: var(--text-color);
+            transition: all 0.25s ease;
+            border-radius: 0.625rem;
+            font-weight: 500;
+            font-size: 0.92rem;
+            white-space: nowrap;
         }
 
-        .menu-main-wrapper { padding: 25px; gap: 20px; }
-        .menu-group-box { display: flex; flex-direction: column; margin-bottom: 5px; }
+        /* --- 3. XỬ LÝ HOVER TỐI ƯU --- */
 
-        .group-title {
-            font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
-            color: var(--text-muted); margin-bottom: 10px; letter-spacing: 0.8px;
-            padding-bottom: 5px; border-bottom: 2px solid rgba(0,0,0,0.03);
+        /* Mặc định cho List Mode hoặc Dark Mode */
+        .menu-link:hover span,
+        .menu-link:hover i {
+            color: #ffffff !important;
+            text-shadow: 0 0 0.3125rem var(--neon-glow);
         }
-        body.dark-mode .group-title { border-bottom-color: rgba(255,255,255,0.05); }
 
-        /* 4. MENU LINKS & MODES */
-        .menu-link { display: flex; align-items: center; color: var(--text-color); text-decoration: none; border-radius: 10px; font-weight: 500; font-size: 0.92rem; transition: all 0.2s; white-space: nowrap; }
+        /* [LIGHT MODE] - CHẾ ĐỘ LƯỚI (GRID): Chỉ đổi màu chữ theo nhóm, KHÔNG ĐỔ BÓNG/NHOÈ CHỮ */
+        body:not(.dark-mode) .view-mode-grid .menu-link:hover span,
+        body:not(.dark-mode) .view-mode-grid .menu-link:hover i {
+            color: var(--neon-glow) !important;
+            text-shadow: none !important; /* Loại bỏ đổ bóng làm nhòe chữ */
+        }
 
-        .view-mode-list { display: grid; grid-template-columns: repeat(4, 1fr); }
-        .view-mode-list .menu-group-box { break-inside: avoid; }
-        .view-mode-list .menu-items-container { display: flex; flex-direction: column; gap: 5px; }
-        .view-mode-list .menu-link { padding: 9px 14px; margin-bottom: 2px; }
-        .view-mode-list .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateX(5px); }
-        .view-mode-list .menu-link i { width: 24px; color: var(--text-muted); margin-right: 10px; text-align: center; font-size: 1rem; }
+        /* [LIGHT MODE] - CHẾ ĐỘ DANH SÁCH (LIST): Giữ màu text mặc định, bóng nhẹ để tách nền */
+        body:not(.dark-mode) .view-mode-list .menu-link:hover span,
+        body:not(.dark-mode) .view-mode-list .menu-link:hover i {
+            color: var(--text-color) !important;
+            text-shadow: 0 0 0.25rem rgba(0,0,0,0.1);
+        }
+
+        /* --- 4. CHẾ ĐỘ DANH SÁCH (LIST VIEW) --- */
+        .view-mode-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5625rem;
+        }
+
+        .view-mode-list .menu-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3125rem;
+        }
+
+        .view-mode-list .menu-link { padding: 0.5625rem 0.875rem; }
+        .view-mode-list .menu-link:hover { background-color: var(--link-hover-bg); }
+
+        .view-mode-list .menu-link i {
+            width: 1.5rem;
+            margin-right: 0.625rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
 
         @media (max-width: 998px) { .view-mode-list { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 576px) { .view-mode-list { grid-template-columns: 1fr; } }
 
-        .view-mode-grid { display: block; }
-        .view-mode-grid .menu-group-box { margin-bottom: 25px; width: 100%; }
-        .view-mode-grid .menu-items-container { display: flex; flex-wrap: wrap; gap: 15px; }
-        .view-mode-grid .menu-link { flex-direction: column; align-items: center; justify-content: center; padding: 12px 5px; width: 92px; height: 92px; background: rgba(127, 127, 127, 0.05); border: 1px solid transparent; position: relative; }
-        .view-mode-grid .menu-link:hover { background-color: var(--link-hover-bg); color: var(--link-hover-text); transform: translateY(-4px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); border-color: var(--popup-border); }
-        .view-mode-grid .menu-link i { font-size: 28px; margin-bottom: 10px; color: var(--primary); }
-        .view-mode-grid .menu-link span { font-size: 0.75rem; font-weight: 600; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; text-align: center; }
+        /* --- 5. CHẾ ĐỘ LƯỚI (GRID VIEW) --- */
+        .view-mode-grid .menu-items-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9375rem;
+        }
 
-        .view-switcher { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--popup-border); background: var(--popup-bg); color: var(--text-muted); transition: all 0.2s; }
-        .view-switcher:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.05); }
+        .view-mode-grid .menu-group-box {
+            width: 100%;
+            margin-bottom: 1.5625rem;
+        }
 
-        /* Dropdown Item Style */
-        .dropdown-item { color: var(--text-color) !important; transition: all 0.2s; font-weight: 500; }
-        .dropdown-item:hover { background-color: var(--link-hover-bg) !important; color: var(--link-hover-text) !important; }
-        .dropdown-item i { width: 20px; text-align: center; color: var(--text-muted); }
-        .dropdown-item:hover i { color: var(--link-hover-text); }
-        .glass-effect.dropdown-menu { border: 1.5px solid var(--popup-border-highlight) !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important; }
+        .view-mode-grid .menu-link {
+            flex-direction: column;
+            justify-content: center;
+            width: 5.75rem;
+            height: 5.75rem;
+            background: transparent;
+            border: 0.0625rem solid var(--popup-border-highlight);
+            border-radius: 0.75rem;
+            padding: 0.75rem 0.3125rem;
+        }
 
-        /* Close Button Style */
+        /* Hiệu ứng khung Neon cho Grid Mode */
+        .view-mode-grid .menu-link:hover {
+            background-color: transparent !important;
+            border-color: #ffffff !important;
+            box-shadow:
+                inset 0 0 0.3125rem var(--neon-glow),
+                0 0 0.3125rem var(--neon-glow),
+                0 0 0.9375rem var(--neon-glow);
+            transform: none !important; /* Tuyệt đối không phóng to */
+        }
+
+        .view-mode-grid .menu-link i {
+            font-size: 1.75rem;
+            margin-bottom: 0.625rem;
+            color: var(--neon-glow);
+        }
+
+        .view-mode-grid .menu-link span {
+            font-size: 0.75rem;
+            font-weight: 700; /* Tăng độ đậm để chữ rõ hơn ở dạng lưới */
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        /* --- 6. LAYOUT HEADER & SCROLL --- */
+        #menu-interface {
+            width: 100%;
+            overflow-y: auto;
+            max-height: 80vh;
+            scrollbar-width: thin;
+            overscroll-behavior: contain;
+        }
+
+        #menu-interface::-webkit-scrollbar { width: 0.375rem; }
+        #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 0.625rem; }
+
+        .popup-header {
+            padding: 1.125rem 1.5625rem;
+            border-bottom: 0.0625rem solid var(--popup-border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: var(--popup-bg);
+            backdrop-filter: blur(0.625rem);
+            -webkit-backdrop-filter: blur(0.625rem);
+            margin-top: -0.0625rem;
+        }
+
+        .menu-main-wrapper { padding: 1.5625rem; }
+
+        .group-title {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.625rem;
+            letter-spacing: 0.05rem;
+            padding-bottom: 0.3125rem;
+            border-bottom: 0.125rem solid rgba(0,0,0,0.03);
+        }
+        body.dark-mode .group-title { border-bottom-color: rgba(255,255,255,0.05); }
+
         .btn-close-popup {
-            width: 32px; height: 32px;
+            width: 2rem; height: 2rem;
             display: flex; align-items: center; justify-content: center;
             border-radius: 50%;
             transition: all 0.2s;
             color: var(--text-muted);
-            border: 1px solid transparent;
         }
-        .btn-close-popup:hover {
-            background-color: rgba(127,127,127,0.1);
-            color: var(--text-color);
-        }
+        .btn-close-popup:hover { background-color: rgba(127,127,127,0.1); color: var(--text-color); }
     </style>
 
-    {{-- HEADER CỦA MENU (STICKY) --}}
+    {{-- HEADER CỦA MENU --}}
     <div class="popup-header d-flex justify-content-between align-items-center">
         <div class="h5 mb-0 fw-bold d-flex align-items-center" style="color: var(--text-color);">
             <i class="fa-solid fa-bars-staggered me-2 text-primary"></i>MENU
@@ -99,17 +198,18 @@
 
     {{-- CONTAINER CHÍNH --}}
     <div class="menu-main-wrapper view-mode-list" id="admin-menu-container">
-        {{-- === NHÓM 1: TỔNG QUAN === --}}
-        <div class="menu-group-box">
+        {{-- NHÓM 1: TỔNG QUAN --}}
+        <div class="menu-group-box" data-group-id="overview">
             <div class="group-title text-primary">TỔNG QUAN</div>
-            <div class="menu-items-container" data-group-id="overview">
+            <div class="menu-items-container" data-sort-group="overview">
                 <a href="{{ route('admin.dashboard') }}" class="menu-link" data-id="dashboard"><i class="fa-solid fa-gauge"></i> <span>Tổng Quan</span></a>
             </div>
         </div>
-        {{-- === NHÓM 2: BÁN HÀNG === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 2: BÁN HÀNG --}}
+        <div class="menu-group-box" data-group-id="sales">
             <div class="group-title text-success">BÁN HÀNG</div>
-            <div class="menu-items-container" data-group-id="sales">
+            <div class="menu-items-container" data-sort-group="sales">
                 <a href="{{ route('admin.sales.orders.index') }}" class="menu-link" data-id="orders"><i class="fa-solid fa-cart-shopping"></i> <span>Đơn Hàng</span></a>
                 <a href="{{ route('admin.sales.shipping-shipments.index') }}" class="menu-link" data-id="deliveries"><i class="fa-solid fa-truck"></i> <span>Vận Chuyển</span></a>
                 <a href="{{ route('admin.sales.returns.index') }}" class="menu-link" data-id="returns"><i class="fa-solid fa-rotate-left"></i> <span>Trả Hàng</span></a>
@@ -117,10 +217,11 @@
                 <a href="{{ route('admin.sales.carts.index') }}" class="menu-link" data-id="carts"><i class="fa-solid fa-cart-arrow-down"></i> <span>Giỏ Treo</span></a>
             </div>
         </div>
-        {{-- === NHÓM 3: HỆ THỐNG === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 3: HỆ THỐNG --}}
+        <div class="menu-group-box" data-group-id="system">
             <div class="group-title text-dark">HỆ THỐNG</div>
-            <div class="menu-items-container" data-group-id="system">
+            <div class="menu-items-container" data-sort-group="system">
                 <a href="{{ route('admin.system.settings.index') }}" class="menu-link" data-id="settings"><i class="fa-solid fa-gear"></i> <span>Cài Đặt</span></a>
                 <a href="{{ route('admin.system.users.index') }}" class="menu-link" data-id="users"><i class="fa-solid fa-user-shield"></i> <span>Quản Trị</span></a>
                 <a href="{{ route('admin.system.roles.index') }}" class="menu-link" data-id="roles"><i class="fa-solid fa-user-lock"></i> <span>Phân Quyền</span></a>
@@ -128,10 +229,11 @@
                 <a href="{{ route('admin.system.logs.index') }}" class="menu-link" data-id="logs"><i class="fa-solid fa-terminal"></i> <span>Logs</span></a>
             </div>
         </div>
-        {{-- === NHÓM 4: SẢN PHẨM === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 4: SẢN PHẨM --}}
+        <div class="menu-group-box" data-group-id="products">
             <div class="group-title text-warning">SẢN PHẨM</div>
-            <div class="menu-items-container" data-group-id="products">
+            <div class="menu-items-container" data-sort-group="products">
                 <a href="{{ route('admin.catalog.products.index') }}" class="menu-link" data-id="products_list"><i class="fa-solid fa-box-open"></i> <span>Sản Phẩm</span></a>
                 <a href="{{ route('admin.catalog.categories.index') }}" class="menu-link" data-id="categories"><i class="fa-solid fa-layer-group"></i> <span>Danh Mục</span></a>
                 <a href="{{ route('admin.catalog.attributes.index') }}" class="menu-link" data-id="attributes"><i class="fa-solid fa-tags"></i> <span>Thuộc Tính</span></a>
@@ -139,47 +241,52 @@
                 <a href="{{ route('admin.catalog.product-reviews.index') }}" class="menu-link" data-id="reviews"><i class="fa-solid fa-star"></i> <span>Đánh Giá</span></a>
             </div>
         </div>
-        {{-- === NHÓM 5: KHO HÀNG === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 5: KHO HÀNG --}}
+        <div class="menu-group-box" data-group-id="inventory">
             <div class="group-title text-danger">KHO HÀNG</div>
-            <div class="menu-items-container" data-group-id="inventory">
+            <div class="menu-items-container" data-sort-group="inventory">
                 <a href="{{ route('admin.inventory.stocks.index') }}" class="menu-link" data-id="stocks"><i class="fa-solid fa-cubes"></i> <span>Tồn Kho</span></a>
                 <a href="{{ route('admin.inventory.warehouses.index') }}" class="menu-link" data-id="warehouses"><i class="fa-solid fa-warehouse"></i> <span>Danh Sách Kho</span></a>
                 <a href="{{ route('admin.inventory.import-orders.index') }}" class="menu-link" data-id="po"><i class="fa-solid fa-file-import"></i> <span>Nhập (PO)</span></a>
                 <a href="{{ route('admin.inventory.transactions.index') }}" class="menu-link" data-id="transactions"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch Sử Kho</span></a>
             </div>
         </div>
-        {{-- === NHÓM 6: TÀI CHÍNH === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 6: TÀI CHÍNH --}}
+        <div class="menu-group-box" data-group-id="finance">
             <div class="group-title text-primary">TÀI CHÍNH</div>
-            <div class="menu-items-container" data-group-id="finance">
+            <div class="menu-items-container" data-sort-group="finance">
                 <a href="{{ route('admin.finance.profit-distribution-groups.index') }}" class="menu-link" data-id="profits"><i class="fa-solid fa-percent"></i> <span>Lợi Nhuận</span></a>
                 <a href="{{ route('admin.finance.reward-wallets.index') }}" class="menu-link" data-id="wallets"><i class="fa-solid fa-wallet"></i> <span>Ví Tiền</span></a>
                 <a href="{{ route('admin.finance.commissions.index') }}" class="menu-link" data-id="commissions"><i class="fa-solid fa-money-bill-transfer"></i> <span>Hoa Hồng</span></a>
             </div>
         </div>
-        {{-- === NHÓM 7: KÝ GỬI === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 7: KÝ GỬI --}}
+        <div class="menu-group-box" data-group-id="consignment">
             <div class="group-title text-secondary">KÝ GỬI</div>
-            <div class="menu-items-container" data-group-id="consignment">
+            <div class="menu-items-container" data-sort-group="consignment">
                 <a href="{{ route('admin.consignment.consignments.index') }}" class="menu-link" data-id="consignment_orders"><i class="fa-solid fa-clipboard-list"></i> <span>Đơn Ký Gửi</span></a>
                 <a href="{{ route('admin.consignment.customers.index') }}" class="menu-link" data-id="consignment_customers"><i class="fa-solid fa-users-rectangle"></i> <span>Khách Ký Gửi</span></a>
             </div>
         </div>
-        {{-- === NHÓM 8: MARKETING === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 8: MARKETING --}}
+        <div class="menu-group-box" data-group-id="marketing">
             <div class="group-title text-info">MARKETING</div>
-            <div class="menu-items-container" data-group-id="marketing">
+            <div class="menu-items-container" data-sort-group="marketing">
                 <a href="{{ route('admin.marketing.promotions.index') }}" class="menu-link" data-id="promotions"><i class="fa-solid fa-bullhorn"></i> <span>Chiến Dịch</span></a>
                 <a href="{{ route('admin.marketing.promotion-coupons.index') }}" class="menu-link" data-id="coupons"><i class="fa-solid fa-ticket"></i> <span>Voucher</span></a>
                 <a href="{{ route('admin.marketing.flash-sales.index') }}" class="menu-link" data-id="flash"><i class="fa-solid fa-bolt"></i> <span>Flash Sale</span></a>
                 <a href="{{ route('admin.marketing.affiliate-links.index') }}" class="menu-link" data-id="affiliates"><i class="fa-solid fa-network-wired"></i> <span>AffiliateLink</span></a>
             </div>
         </div>
-        {{-- === NHÓM 9: NỘI DUNG === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 9: NỘI DUNG --}}
+        <div class="menu-group-box" data-group-id="content">
             <div class="group-title text-secondary">NỘI DUNG</div>
-            <div class="menu-items-container" data-group-id="content">
+            <div class="menu-items-container" data-sort-group="content">
                 <a href="{{ route('admin.content.posts.index') }}" class="menu-link" data-id="posts"><i class="fa-solid fa-newspaper"></i> <span>Tin Tức</span></a>
                 <a href="{{ route('admin.content.banners.index') }}" class="menu-link" data-id="banners"><i class="fa-solid fa-image"></i> <span>Banner</span></a>
                 <a href="{{ route('admin.content.menus.index') }}" class="menu-link" data-id="menus"><i class="fa-solid fa-bars"></i> <span>Menu Web</span></a>
@@ -187,10 +294,11 @@
                 <a href="{{ route('admin.content.game-subjects.index') }}" class="menu-link" data-id="games"><i class="fa-solid fa-gamepad"></i> <span>Game/Học</span></a>
             </div>
         </div>
-        {{-- === NHÓM 10: KHÁCH HÀNG (CRM) === --}}
-        <div class="menu-group-box">
+
+        {{-- NHÓM 10: KHÁCH HÀNG (CRM) --}}
+        <div class="menu-group-box" data-group-id="crm">
             <div class="group-title text-warning">KHÁCH HÀNG (CRM)</div>
-            <div class="menu-items-container" data-group-id="crm">
+            <div class="menu-items-container" data-sort-group="crm">
                 <a href="{{ route('admin.crm.customers.index') }}" class="menu-link" data-id="customers"><i class="fa-solid fa-user-group"></i> <span>Khách Hàng</span></a>
                 <a href="{{ route('admin.crm.chat-conversations.index') }}" class="menu-link" data-id="chats"><i class="fa-solid fa-comments"></i> <span>Hội Thoại</span></a>
                 <a href="{{ route('admin.crm.requests.index') }}" class="menu-link" data-id="requests"><i class="fa-solid fa-envelope-open-text"></i> <span>Yêu Cầu</span></a>
@@ -201,10 +309,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. VIEW MODE DROPDOWN LOGIC (ADMIN) ---
         const menuWrapper = document.getElementById('admin-menu-container');
 
-        // Logic check trạng thái đã lưu
+        // Logic hiển thị theo cấu hình đã lưu
         const savedView = localStorage.getItem('admin_menu_view') || 'list';
         applyMenuView(savedView);
 
@@ -218,10 +325,10 @@
             }
         }
 
-        // --- 2. SORTABLE JS LOGIC ---
+        // Kích hoạt Sortable
         const groups = document.querySelectorAll('.menu-items-container');
         groups.forEach(group => {
-            const groupId = group.getAttribute('data-group-id');
+            const groupId = group.getAttribute('data-sort-group');
             new Sortable(group, {
                 group: { name: groupId, pull: false, put: false },
                 animation: 150,
@@ -229,11 +336,11 @@
                 dragClass: 'sortable-drag',
                 delay: 100, delayOnTouchOnly: true,
                 store: {
-                    get: function (sortable) {
+                    get: (sortable) => {
                         const order = localStorage.getItem('admin_menu_order_' + groupId);
                         return order ? order.split('|') : [];
                     },
-                    set: function (sortable) {
+                    set: (sortable) => {
                         const order = sortable.toArray();
                         localStorage.setItem('admin_menu_order_' + groupId, order.join('|'));
                     }
@@ -241,7 +348,6 @@
             });
         });
 
-        // --- 3. EXPORT RENDER FUNCTION ---
         window.renderMenuContent = function() {
             const menuInterface = document.getElementById('menu-interface');
             const chatInterface = document.getElementById('chat-interface');
