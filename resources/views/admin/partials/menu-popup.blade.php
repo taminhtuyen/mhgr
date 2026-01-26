@@ -41,27 +41,20 @@
             white-space: nowrap;
         }
 
-        /* --- 3. XỬ LÝ HOVER TỐI ƯU --- */
+        /* --- 3. XỬ LÝ HOVER TỐI ƯU (ĐỒNG BỘ LIST VÀ GRID) --- */
 
-        /* Mặc định cho List Mode hoặc Dark Mode */
+        /* Mặc định cho Dark Mode (cả List và Grid giống nhau) */
         .menu-link:hover span,
         .menu-link:hover i {
             color: #ffffff !important;
             text-shadow: 0 0 0.3125rem var(--neon-glow);
         }
 
-        /* [LIGHT MODE] - CHẾ ĐỘ LƯỚI (GRID): Chỉ đổi màu chữ theo nhóm, KHÔNG ĐỔ BÓNG/NHOÈ CHỮ */
-        body:not(.dark-mode) .view-mode-grid .menu-link:hover span,
-        body:not(.dark-mode) .view-mode-grid .menu-link:hover i {
+        /* [LIGHT MODE] - ÁP DỤNG CHO CẢ GRID VÀ LIST: Đổi màu chữ theo nhóm, KHÔNG ĐỔ BÓNG CHỮ */
+        body:not(.dark-mode) .menu-link:hover span,
+        body:not(.dark-mode) .menu-link:hover i {
             color: var(--neon-glow) !important;
-            text-shadow: none !important; /* Loại bỏ đổ bóng làm nhòe chữ */
-        }
-
-        /* [LIGHT MODE] - CHẾ ĐỘ DANH SÁCH (LIST): Giữ màu text mặc định, bóng nhẹ để tách nền */
-        body:not(.dark-mode) .view-mode-list .menu-link:hover span,
-        body:not(.dark-mode) .view-mode-list .menu-link:hover i {
-            color: var(--text-color) !important;
-            text-shadow: 0 0 0.25rem rgba(0,0,0,0.1);
+            text-shadow: none !important; /* Loại bỏ đổ bóng làm nhòe chữ ở nền sáng */
         }
 
         /* --- 4. CHẾ ĐỘ DANH SÁCH (LIST VIEW) --- */
@@ -77,8 +70,22 @@
             gap: 0.3125rem;
         }
 
-        .view-mode-list .menu-link { padding: 0.5625rem 0.875rem; }
-        .view-mode-list .menu-link:hover { background-color: var(--link-hover-bg); }
+        .view-mode-list .menu-link {
+            padding: 0.5625rem 0.875rem;
+            /* Thêm border trong suốt để tránh nhảy layout khi hover (vì hiệu ứng hover có border) */
+            border: 0.0625rem solid transparent;
+        }
+
+        /* HIỆU ỨNG HOVER CỦA LIST (Y HỆT GRID) */
+        .view-mode-list .menu-link:hover {
+            background-color: transparent !important;
+            border-color: #ffffff !important;
+            box-shadow:
+                inset 0 0 0.3125rem var(--neon-glow),
+                0 0 0.3125rem var(--neon-glow),
+                0 0 0.9375rem var(--neon-glow);
+            transform: none !important;
+        }
 
         .view-mode-list .menu-link i {
             width: 1.5rem;
@@ -87,6 +94,7 @@
             color: var(--text-muted);
             font-size: 1rem;
         }
+        /* Khi hover ở List view thì icon cũng đổi màu theo neon (đã xử lý ở mục 3) */
 
         @media (max-width: 998px) { .view-mode-list { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 576px) { .view-mode-list { grid-template-columns: 1fr; } }

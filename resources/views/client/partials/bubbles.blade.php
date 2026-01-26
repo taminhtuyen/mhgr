@@ -91,6 +91,11 @@
         transition: all var(--neon-duration) ease-out;
     }
 
+    /* [UPDATE] Tăng độ ưu tiên để hover hoạt động khi expanded (Fix lỗi không zoom) */
+    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        transform: scale(1.1);
+    }
+
     /* Sub-bubble đang chọn giữ scale 1.15 để nổi bật */
     .sub-bubble.active {
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
@@ -114,13 +119,11 @@
        3. TRẠNG THÁI TẮT ĐÈN (NEON-OFF) - ĐÃ FIX LỖI TẮT BỤP
        ================================================================= */
 
-    /* [CƠ CHẾ ĐỒNG BỘ MỚI]
-       Gộp tất cả vào khối 2s duy nhất, KHÔNG ĐƯỢC dùng transition: none khi hover.
-    */
+    /* [CƠ CHẾ ĐỒNG BỘ MỚI] */
     body.neon-off #nav-bubble,
     body.neon-off #nav-bubble:hover,
     body.neon-off .sub-bubble,
-    body.neon-off .sub-bubble:hover,
+        /* body.neon-off .sub-bubble:hover, -> XÓA DÒNG NÀY ĐỂ TRÁNH CONFLICT TRANSITION KHI HOVER */
     body.neon-off .main-bubble-badge,
     body.neon-off #bubble-icon,
     body.neon-off .sub-bubble i {
@@ -130,8 +133,14 @@
             border-color 2s ease-out,
             background-color 2s ease-out,
             color 2s ease-out,
+            transform 2s ease-out, /* Đồng bộ scale */
             filter 2s ease-out !important;
         transition-delay: 0s !important;
+    }
+
+    /* Riêng trạng thái hover trong neon-off vẫn cần transition mượt nhưng force 2s */
+    body.neon-off .sub-bubble:hover {
+        transition: all 2s ease-out !important;
     }
 
     /* 3.1. LOẠI BỎ VIỀN cho các bóng CHƯA được chọn */
@@ -139,7 +148,12 @@
     body.neon-off .sub-bubble:not(.active) {
         border-color: transparent !important;
         box-shadow: 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0), 0 0 0 0 rgba(0,0,0,0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-        transform: scale(1) !important; /* Đảm bảo không phóng to */
+        transform: scale(1); /* [UPDATE] Bỏ !important để cho phép hover override */
+    }
+
+    /* [UPDATE] Hover khi tắt đèn vẫn zoom (nếu muốn) hoặc ít nhất không bị lỗi */
+    body.neon-off #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        transform: scale(1.1);
     }
 
     /* 3.2. GIỮ VIỀN VÀ NỀN cho bong bóng con ĐANG CHỌN (ACTIVE) */

@@ -62,14 +62,12 @@
         font-size: 1.5rem; cursor: pointer; position: relative; z-index: 10;
         border: 0.0625rem solid transparent;
         box-shadow: 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0), 0 0 0 0 rgba(0,0,0,0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-
-        /* [CẬP NHẬT] Loại bỏ hoàn toàn phóng to */
         transform: scale(1);
         transition: all var(--neon-duration) ease-out;
     }
 
     #nav-bubble:not(.no-hover-glow):hover {
-        transform: scale(1); /* Không zoom */
+        transform: scale(1);
         border-color: #fff;
         box-shadow: 0 0 0.1rem rgb(var(--neon-primary)) inset, 0 0 0.5rem rgb(var(--neon-primary)) inset, 0 0 1rem rgb(var(--neon-primary)), 0 0 2.5rem rgb(var(--neon-primary)), 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
     }
@@ -77,7 +75,7 @@
     #nav-bubble.red-mode {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
         border-color: #fff !important;
-        transform: scale(1); /* Không zoom */
+        transform: scale(1);
         box-shadow: 0 0 0.1rem rgb(var(--neon-danger)) inset, 0 0 0.5rem rgb(var(--neon-danger)) inset, 0 0 1.5rem rgb(var(--neon-danger)), 0 0 3.5rem rgb(var(--neon-danger)), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
     }
 
@@ -88,11 +86,13 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 1.25rem; cursor: pointer; opacity: 0; transform: scale(0); position: relative;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-
-        /* [CẬP NHẬT] Không zoom khi hover */
         transition: all var(--neon-duration) ease-out;
     }
-    .sub-bubble:hover { transform: scale(1); }
+
+    /* [FIX QUAN TRỌNG] Tăng độ ưu tiên Selector để đè lên trạng thái expanded */
+    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        transform: scale(1.1);
+    }
 
     /* Duy nhất bong bóng con đang chọn là giữ scale 1.15 */
     .sub-bubble.active {
@@ -115,18 +115,24 @@
     body.neon-off #nav-bubble,
     body.neon-off #nav-bubble:hover,
     body.neon-off .sub-bubble,
-    body.neon-off .sub-bubble:hover,
+        /* body.neon-off .sub-bubble:hover, -> XÓA DÒNG NÀY ĐỂ TRÁNH CONFLICT TRANSITION KHI HOVER */
     body.neon-off .main-bubble-badge,
     body.neon-off #bubble-icon,
     body.neon-off .sub-bubble i {
-        /* Bắt buộc giữ 2s cho shadow và color để không bị "tắt bụp" khi hover */
+        /* Transition chậm 2s */
         transition:
             box-shadow 2s ease-out,
             border-color 2s ease-out,
             background-color 2s ease-out,
             color 2s ease-out,
+            transform 2s ease-out, /* Đồng bộ scale */
             filter 2s ease-out !important;
         transition-delay: 0s !important;
+    }
+
+    /* Riêng trạng thái hover trong neon-off vẫn cần transition mượt nhưng không được ghi đè bởi rule trên */
+    body.neon-off .sub-bubble:hover {
+        transition: all 2s ease-out !important;
     }
 
     /* 3.2. LOẠI BỎ VIỀN cho các bóng CHƯA được chọn */
@@ -134,7 +140,16 @@
     body.neon-off .sub-bubble:not(.active) {
         border-color: transparent !important;
         box-shadow: 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0), 0 0 0 0 rgba(0,0,0,0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-        transform: scale(1) !important;
+        /* Lưu ý: Không force transform: scale(1) ở đây nữa để cho phép hover hoạt động nếu muốn,
+           hoặc nếu muốn tắt đèn là không zoom thì giữ nguyên.
+           Hiện tại logic JS 'mouseenter' sẽ đánh thức neon nên hover sẽ luôn sáng.
+           Dòng dưới chỉ áp dụng khi người dùng KHÔNG chạm vào (vừa hết time out) */
+        transform: scale(1);
+    }
+
+    /* Khi tắt đèn mà hover vào (trường hợp hiếm nếu JS chưa kịp wake up) thì vẫn cho zoom nhẹ */
+    body.neon-off #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        transform: scale(1.1);
     }
 
     /* 3.3. GIỮ VIỀN VÀ NỀN cho bong bóng con ĐANG CHỌN (ACTIVE) */
@@ -142,7 +157,6 @@
         border-color: #ffffff !important;
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
         transform: scale(1.15) !important;
-        /* Triệt tiêu Glow */
         box-shadow: 0 0 0 0 rgba(var(--neon-primary), 0) inset, 0 0 0 0 rgba(var(--neon-primary), 0) inset, 0 0 0 0 rgba(var(--neon-primary), 0), 0 0 0 0 rgba(var(--neon-primary), 0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
     }
 
@@ -184,6 +198,7 @@
         opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px);
     }
     #nav-backdrop.active { opacity: 1; visibility: visible; }
+    /* Quan trọng: Trạng thái expanded set scale(1) nhưng độ ưu tiên thấp hơn hover phía trên */
     #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
 </style>
 
