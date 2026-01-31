@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-catalog.-attribute-table />
+    <livewire:admin.catalog.attribute-table />
 
 @endsection

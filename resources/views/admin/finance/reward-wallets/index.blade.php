@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-finance.-reward-wallet-table />
+    <livewire:admin.finance.reward-wallet-table />
 
 @endsection

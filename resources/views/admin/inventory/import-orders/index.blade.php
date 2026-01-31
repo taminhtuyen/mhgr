@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-inventory.-import-order-table />
+    <livewire:admin.inventory.import-order-table />
 
 @endsection

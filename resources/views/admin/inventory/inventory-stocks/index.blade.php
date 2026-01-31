@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-inventory.-stock-table />
+    <livewire:admin.inventory.stock-table />
 
 @endsection

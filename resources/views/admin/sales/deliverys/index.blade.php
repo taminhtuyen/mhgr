@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-sales.-shipping-shipment-table />
+    <livewire:admin.sales.shipping-shipment-table />
 
 @endsection

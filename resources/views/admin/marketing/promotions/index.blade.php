@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-marketing.-promotion-table />
+    <livewire:admin.marketing.promotion-table />
 
 @endsection

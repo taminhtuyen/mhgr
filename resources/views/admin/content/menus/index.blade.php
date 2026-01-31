@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-content.-menu-table />
+    <livewire:admin.content.menu-table />
 
 @endsection

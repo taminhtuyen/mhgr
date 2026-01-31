@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-finance.-profit-distribution-group-table />
+    <livewire:admin.finance.profit-distribution-group-table />
 
 @endsection

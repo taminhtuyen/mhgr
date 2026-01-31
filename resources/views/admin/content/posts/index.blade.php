@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-content.-post-table />
+    <livewire:admin.content.post-table />
 
 @endsection

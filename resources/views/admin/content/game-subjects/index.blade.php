@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-content.-game-subject-table />
+    <livewire:admin.content.game-subject-table />
 
 @endsection

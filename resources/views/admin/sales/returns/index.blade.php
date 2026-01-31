@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-sales.-order-return-table />
+    <livewire:admin.sales.order-return-table />
 
 @endsection

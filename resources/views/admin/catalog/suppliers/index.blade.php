@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-catalog.-supplier-table />
+    <livewire:admin.catalog.supplier-table />
 
 @endsection

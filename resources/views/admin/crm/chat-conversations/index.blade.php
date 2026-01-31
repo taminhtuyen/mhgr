@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-c-r-m.-chat-conversation-table />
+    <livewire:admin.c-r-m.chat-conversation-table />
 
 @endsection

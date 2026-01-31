@@ -10,6 +10,6 @@
         và viết code giao diện Livewire/Table vào đây.
     --}}
 
-    <livewire:admin.-system.-system-log-table />
+    <livewire:admin.system.system-log-table />
 
 @endsection
