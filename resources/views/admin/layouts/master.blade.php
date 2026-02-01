@@ -72,7 +72,15 @@
         /* Global Modal Styles */
         #global-confirm-modal { position: fixed; inset: 0; z-index: 20000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.2s; }
         #global-confirm-modal.active { opacity: 1; visibility: visible; }
-        .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); transition: 0.3s; z-index: 1; pointer-events: auto; }
+
+        /* [ĐÃ CẬP NHẬT] Thêm backdrop-filter: blur(5px) để làm mờ mọi thứ bên dưới */
+        .modal-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            transition: 0.3s; z-index: 1; pointer-events: auto;
+        }
+
         .modal-box { position: relative; width: 300px; background: var(--modal-bg); backdrop-filter: blur(20px); border-radius: 14px; text-align: center; overflow: hidden; transform: scale(0.95); transition: 0.2s; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 0.5px solid var(--modal-border); z-index: 2; }
         #global-confirm-modal.active .modal-box { transform: scale(1); }
         .modal-content-box { padding: 20px 16px 20px; }
@@ -182,7 +190,7 @@
             if(this.timer) clearTimeout(this.timer);
             this.timer = setTimeout(() => {
                 this.sleep();
-            }, 5000);
+            }, 5000); // 5000ms = 5s (GIỮ NGUYÊN THEO FILE GỐC)
         },
 
         sleep: function(force = false) {
@@ -250,6 +258,27 @@
     };
 
     window.NeonManager = NeonManager;
+</script>
+
+{{-- === PHẦN BỔ SUNG: KÍCH HOẠT NHẬN THÔNG BÁO TỪ SERVER === --}}
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+<script>
+    var pusher = new Pusher('bbd581278169e135dc72', { cluster: 'ap1' });
+    var channel = pusher.subscribe('notifications');
+
+    channel.bind('system.message', function(data) {
+        const noti = data.notification;
+        if (!noti) return;
+
+        // Tự động thêm icon dựa trên loại thông báo
+        let iconHtml = '<i class="fa-solid fa-bell text-warning"></i>';
+        if (noti.type === 'success') iconHtml = '<i class="fa-solid fa-circle-check text-success"></i>';
+        else if (noti.type === 'error') iconHtml = '<i class="fa-solid fa-circle-exclamation text-danger"></i>';
+        else if (noti.type === 'warning') iconHtml = '<i class="fa-solid fa-triangle-exclamation text-warning"></i>';
+
+        const fullTitle = `${iconHtml} ${noti.title}`;
+        showDynamicModal(fullTitle, noti.content, noti.buttons);
+    });
 </script>
 
 @livewireScripts

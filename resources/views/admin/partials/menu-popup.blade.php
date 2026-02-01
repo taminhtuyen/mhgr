@@ -12,12 +12,12 @@
             --popup-border-highlight: rgba(255, 255, 255, 0.1);
             --link-hover-bg: rgba(255, 255, 255, 0.05);
         }
-        /* Colors per group - Đã bổ sung màu cho nhóm Technical */
+        /* Colors per group */
         .menu-group-box[data-group-id="overview"]    { --neon-glow: #0d6efd; }
         .menu-group-box[data-group-id="sales"]       { --neon-glow: #198754; }
         .menu-group-box[data-group-id="logistics"]   { --neon-glow: #20c997; }
         .menu-group-box[data-group-id="system"]      { --neon-glow: #6c757d; }
-        .menu-group-box[data-group-id="technical"]   { --neon-glow: #00d2d3; } /* MỚI: Cyan cho Kỹ thuật */
+        .menu-group-box[data-group-id="technical"]   { --neon-glow: #00d2d3; }
         .menu-group-box[data-group-id="products"]    { --neon-glow: #ffc107; }
         .menu-group-box[data-group-id="inventory"]   { --neon-glow: #dc3545; }
         .menu-group-box[data-group-id="finance"]     { --neon-glow: #6610f2; }
@@ -29,13 +29,8 @@
         .menu-link {
             display: flex; align-items: center; text-decoration: none !important; color: var(--text-color);
             border-radius: 0.625rem; font-weight: 500; font-size: 0.92rem; white-space: nowrap;
-            /* Transition giống Client: Tắt chậm 2s */
-            transition:
-                background-color 0.25s ease,
-                color 2s ease-out,
-                text-shadow 2s ease-out,
-                border-color 2s ease-out,
-                box-shadow 2s ease-out;
+            /* [ĐÃ SỬA] Đồng bộ tốc độ với Client (0.25s) thay vì 2s */
+            transition: all 0.25s ease;
             position: relative;
         }
 
@@ -44,7 +39,7 @@
         body.neon-active .menu-link:hover i {
             color: #ffffff !important;
             text-shadow: 0 0 0.3125rem var(--neon-glow);
-            transition: color 0.5s ease-out, text-shadow 0.5s ease-out;
+            /* Bỏ transition riêng lẻ để dùng chung transition 0.25s ở trên */
         }
 
         /* Chế độ sáng */
@@ -52,7 +47,6 @@
         body:not(.dark-mode).neon-active .menu-link:hover i {
             color: var(--neon-glow) !important;
             text-shadow: none !important;
-            transition: color 0.5s ease-out;
         }
 
         /* Khi Neon TẮT */
