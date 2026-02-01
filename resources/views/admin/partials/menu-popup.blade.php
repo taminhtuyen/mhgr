@@ -12,11 +12,12 @@
             --popup-border-highlight: rgba(255, 255, 255, 0.1);
             --link-hover-bg: rgba(255, 255, 255, 0.05);
         }
-        /* Colors per group - Giữ nguyên màu gốc của Admin */
+        /* Colors per group - Đã bổ sung màu cho nhóm Technical */
         .menu-group-box[data-group-id="overview"]    { --neon-glow: #0d6efd; }
         .menu-group-box[data-group-id="sales"]       { --neon-glow: #198754; }
         .menu-group-box[data-group-id="logistics"]   { --neon-glow: #20c997; }
         .menu-group-box[data-group-id="system"]      { --neon-glow: #6c757d; }
+        .menu-group-box[data-group-id="technical"]   { --neon-glow: #00d2d3; } /* MỚI: Cyan cho Kỹ thuật */
         .menu-group-box[data-group-id="products"]    { --neon-glow: #ffc107; }
         .menu-group-box[data-group-id="inventory"]   { --neon-glow: #dc3545; }
         .menu-group-box[data-group-id="finance"]     { --neon-glow: #6610f2; }
@@ -28,7 +29,7 @@
         .menu-link {
             display: flex; align-items: center; text-decoration: none !important; color: var(--text-color);
             border-radius: 0.625rem; font-weight: 500; font-size: 0.92rem; white-space: nowrap;
-            /* Cập nhật transition giống Client: Tắt chậm 2s */
+            /* Transition giống Client: Tắt chậm 2s */
             transition:
                 background-color 0.25s ease,
                 color 2s ease-out,
@@ -38,7 +39,7 @@
             position: relative;
         }
 
-        /* NEON HOVER LOGIC (ĐỒNG BỘ CLIENT - BẬT NHANH 0.5s) */
+        /* NEON HOVER LOGIC */
         body.neon-active .menu-link:hover span,
         body.neon-active .menu-link:hover i {
             color: #ffffff !important;
@@ -46,7 +47,7 @@
             transition: color 0.5s ease-out, text-shadow 0.5s ease-out;
         }
 
-        /* Chế độ sáng thì text màu glow, không cần shadow trắng */
+        /* Chế độ sáng */
         body:not(.dark-mode).neon-active .menu-link:hover span,
         body:not(.dark-mode).neon-active .menu-link:hover i {
             color: var(--neon-glow) !important;
@@ -54,7 +55,7 @@
             transition: color 0.5s ease-out;
         }
 
-        /* Khi Neon TẮT: Hover bình thường */
+        /* Khi Neon TẮT */
         body:not(.neon-active) .menu-link:hover {
             background-color: var(--link-hover-bg);
         }
@@ -68,7 +69,6 @@
             background-color: transparent !important; border-color: #ffffff !important;
             box-shadow: inset 0 0 0.3125rem var(--neon-glow), 0 0 0.3125rem var(--neon-glow), 0 0 0.9375rem var(--neon-glow);
             transform: none !important;
-            transition: box-shadow 0.5s ease-out, border-color 0.5s ease-out;
         }
 
         .view-mode-list .menu-link i { width: 1.5rem; margin-right: 0.625rem; text-align: center; color: var(--text-muted); font-size: 1rem; }
@@ -84,7 +84,6 @@
             background-color: transparent !important; border-color: #ffffff !important;
             box-shadow: inset 0 0 0.3125rem var(--neon-glow), 0 0 0.3125rem var(--neon-glow), 0 0 0.9375rem var(--neon-glow);
             transform: none !important;
-            transition: box-shadow 0.5s ease-out, border-color 0.5s ease-out;
         }
 
         .view-mode-grid .menu-link i { font-size: 1.75rem; margin-bottom: 0.625rem; color: var(--neon-glow); }
@@ -133,7 +132,7 @@
             </div>
         </div>
 
-        {{-- NHÓM 3: LOGISTICS (VẬN TẢI - MỚI) --}}
+        {{-- NHÓM 3: LOGISTICS (VẬN TẢI - ĐÃ CẬP NHẬT) --}}
         <div class="menu-group-box" data-group-id="logistics">
             <div class="group-title text-info" style="color: #20c997 !important;">VẬN TẢI</div>
             <div class="menu-items-container" data-sort-group="logistics">
@@ -141,25 +140,41 @@
                 <a href="{{ route('admin.logistics.drivers.index') }}" class="menu-link neon-trigger" data-id="logistics_drivers"><i class="fa-solid fa-id-card"></i> <span>Tài Xế</span></a>
                 <a href="{{ route('admin.logistics.rates.index') }}" class="menu-link neon-trigger" data-id="logistics_rates"><i class="fa-solid fa-scale-balanced"></i> <span>Biểu Phí</span></a>
                 <a href="{{ route('admin.logistics.trips.index') }}" class="menu-link neon-trigger" data-id="logistics_trips"><i class="fa-solid fa-route"></i> <span>Chuyến Giao</span></a>
+                {{-- MỚI: SỰ CỐ GIAO HÀNG --}}
+                <a href="{{ route('admin.logistics.delivery-failures.index') }}" class="menu-link neon-trigger" data-id="logistics_failures"><i class="fa-solid fa-triangle-exclamation"></i> <span>Sự Cố Giao</span></a>
             </div>
         </div>
 
-        {{-- NHÓM 4: HỆ THỐNG --}}
+        {{-- NHÓM 4: HỆ THỐNG (ĐÃ CẬP NHẬT) --}}
         <div class="menu-group-box" data-group-id="system">
             <div class="group-title text-secondary">HỆ THỐNG</div>
             <div class="menu-items-container" data-sort-group="system">
                 <a href="{{ route('admin.system.settings.index') }}" class="menu-link neon-trigger" data-id="settings"><i class="fa-solid fa-gear"></i> <span>Cài Đặt</span></a>
                 <a href="{{ route('admin.system.tax-classes.index') }}" class="menu-link neon-trigger" data-id="taxes"><i class="fa-solid fa-percent"></i> <span>Thuế & Phí</span></a>
+                {{-- MỚI: LỊCH TRÌNH THUẾ --}}
+                <a href="{{ route('admin.system.tax-schedules.index') }}" class="menu-link neon-trigger" data-id="tax_schedules"><i class="fa-solid fa-calendar-check"></i> <span>Lịch Thuế</span></a>
                 <a href="{{ route('admin.system.booking-status.index') }}" class="menu-link neon-trigger" data-id="booking_status"><i class="fa-solid fa-list-check"></i> <span>Quy Trình Đơn</span></a>
 
                 <a href="{{ route('admin.system.users.index') }}" class="menu-link neon-trigger" data-id="users"><i class="fa-solid fa-user-shield"></i> <span>Quản Trị</span></a>
+                {{-- MỚI: LỊCH NGHỈ PHÉP --}}
+                <a href="{{ route('admin.system.leave-schedules.index') }}" class="menu-link neon-trigger" data-id="leave_schedules"><i class="fa-solid fa-calendar-xmark"></i> <span>Lịch Nghỉ</span></a>
                 <a href="{{ route('admin.system.roles.index') }}" class="menu-link neon-trigger" data-id="roles"><i class="fa-solid fa-user-lock"></i> <span>Phân Quyền</span></a>
                 <a href="{{ route('admin.system.locations.index') }}" class="menu-link neon-trigger" data-id="locations"><i class="fa-solid fa-map-location-dot"></i> <span>Vị Trí</span></a>
                 <a href="{{ route('admin.system.logs.index') }}" class="menu-link neon-trigger" data-id="logs"><i class="fa-solid fa-terminal"></i> <span>Logs</span></a>
             </div>
         </div>
 
-        {{-- NHÓM 5: SẢN PHẨM --}}
+        {{-- NHÓM 5: QUẢN TRỊ KỸ THUẬT (MỚI HOÀN TOÀN) --}}
+        <div class="menu-group-box" data-group-id="technical">
+            <div class="group-title" style="color: #00d2d3;">KỸ THUẬT (DEV)</div>
+            <div class="menu-items-container" data-sort-group="technical">
+                <a href="{{ route('admin.technical.queues.index') }}" class="menu-link neon-trigger" data-id="tech_queues"><i class="fa-solid fa-server"></i> <span>Hàng Chờ</span></a>
+                <a href="{{ route('admin.technical.sessions.index') }}" class="menu-link neon-trigger" data-id="tech_sessions"><i class="fa-solid fa-user-clock"></i> <span>Phiên Đăng Nhập</span></a>
+                <a href="{{ route('admin.technical.pulse.index') }}" class="menu-link neon-trigger" data-id="tech_pulse"><i class="fa-solid fa-heart-pulse"></i> <span>Hiệu Năng</span></a>
+            </div>
+        </div>
+
+        {{-- NHÓM 6: SẢN PHẨM --}}
         <div class="menu-group-box" data-group-id="products">
             <div class="group-title text-warning">SẢN PHẨM</div>
             <div class="menu-items-container" data-sort-group="products">
@@ -172,29 +187,35 @@
             </div>
         </div>
 
-        {{-- NHÓM 6: KHO HÀNG --}}
+        {{-- NHÓM 7: KHO HÀNG (ĐÃ CẬP NHẬT) --}}
         <div class="menu-group-box" data-group-id="inventory">
             <div class="group-title text-danger">KHO HÀNG</div>
             <div class="menu-items-container" data-sort-group="inventory">
                 <a href="{{ route('admin.inventory.stocks.index') }}" class="menu-link neon-trigger" data-id="stocks"><i class="fa-solid fa-cubes"></i> <span>Tồn Kho</span></a>
                 <a href="{{ route('admin.inventory.snapshots.index') }}" class="menu-link neon-trigger" data-id="snapshots"><i class="fa-solid fa-clipboard-check"></i> <span>Kiểm Kê</span></a>
+                {{-- MỚI: ĐÓNG GÓI --}}
+                <a href="{{ route('admin.inventory.packing.index') }}" class="menu-link neon-trigger" data-id="packing"><i class="fa-solid fa-box-taped"></i> <span>Đóng Gói</span></a>
                 <a href="{{ route('admin.inventory.warehouses.index') }}" class="menu-link neon-trigger" data-id="warehouses"><i class="fa-solid fa-warehouse"></i> <span>Danh Sách Kho</span></a>
                 <a href="{{ route('admin.inventory.import-orders.index') }}" class="menu-link neon-trigger" data-id="po"><i class="fa-solid fa-file-import"></i> <span>Nhập (PO)</span></a>
                 <a href="{{ route('admin.inventory.transactions.index') }}" class="menu-link neon-trigger" data-id="transactions"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch Sử Kho</span></a>
             </div>
         </div>
 
-        {{-- NHÓM 7: TÀI CHÍNH --}}
+        {{-- NHÓM 8: TÀI CHÍNH (ĐÃ CẬP NHẬT) --}}
         <div class="menu-group-box" data-group-id="finance">
             <div class="group-title text-primary">TÀI CHÍNH</div>
             <div class="menu-items-container" data-sort-group="finance">
                 <a href="{{ route('admin.finance.profit-distribution-groups.index') }}" class="menu-link neon-trigger" data-id="profits"><i class="fa-solid fa-chart-pie"></i> <span>Lợi Nhuận</span></a>
+                {{-- MỚI: QUY TẮC THƯỞNG PHẠT --}}
+                <a href="{{ route('admin.finance.reward-rules.index') }}" class="menu-link neon-trigger" data-id="reward_rules"><i class="fa-solid fa-gavel"></i> <span>Luật Thưởng</span></a>
                 <a href="{{ route('admin.finance.reward-wallets.index') }}" class="menu-link neon-trigger" data-id="wallets"><i class="fa-solid fa-wallet"></i> <span>Ví Tiền</span></a>
+                {{-- MỚI: BIẾN ĐỘNG SỐ DƯ --}}
+                <a href="{{ route('admin.finance.reward-history.index') }}" class="menu-link neon-trigger" data-id="wallet_history"><i class="fa-solid fa-file-invoice-dollar"></i> <span>Lịch Sử Ví</span></a>
                 <a href="{{ route('admin.finance.commissions.index') }}" class="menu-link neon-trigger" data-id="commissions"><i class="fa-solid fa-money-bill-transfer"></i> <span>Hoa Hồng</span></a>
             </div>
         </div>
 
-        {{-- NHÓM 8: KÝ GỬI --}}
+        {{-- NHÓM 9: KÝ GỬI --}}
         <div class="menu-group-box" data-group-id="consignment">
             <div class="group-title text-secondary">KÝ GỬI</div>
             <div class="menu-items-container" data-sort-group="consignment">
@@ -203,11 +224,15 @@
             </div>
         </div>
 
-        {{-- NHÓM 9: MARKETING --}}
+        {{-- NHÓM 10: MARKETING (ĐÃ CẬP NHẬT) --}}
         <div class="menu-group-box" data-group-id="marketing">
             <div class="group-title text-info">MARKETING</div>
             <div class="menu-items-container" data-sort-group="marketing">
+                {{-- MỚI: XU HƯỚNG TÌM KIẾM --}}
+                <a href="{{ route('admin.marketing.search-history.index') }}" class="menu-link neon-trigger" data-id="search_history"><i class="fa-solid fa-magnifying-glass-chart"></i> <span>Xu Hướng</span></a>
                 <a href="{{ route('admin.marketing.promotions.index') }}" class="menu-link neon-trigger" data-id="promotions"><i class="fa-solid fa-bullhorn"></i> <span>Chiến Dịch</span></a>
+                {{-- MỚI: TỪ ĐIỂN LOGIC --}}
+                <a href="{{ route('admin.marketing.logic-dictionary.index') }}" class="menu-link neon-trigger" data-id="logic_dictionary"><i class="fa-solid fa-code-branch"></i> <span>Logic KM</span></a>
                 <a href="{{ route('admin.marketing.promotion-coupons.index') }}" class="menu-link neon-trigger" data-id="coupons"><i class="fa-solid fa-ticket"></i> <span>Voucher</span></a>
                 <a href="{{ route('admin.marketing.flash-sales.index') }}" class="menu-link neon-trigger" data-id="flash"><i class="fa-solid fa-bolt"></i> <span>Flash Sale</span></a>
                 <a href="{{ route('admin.marketing.affiliate-links.index') }}" class="menu-link neon-trigger" data-id="affiliates"><i class="fa-solid fa-network-wired"></i> <span>AffiliateLink</span></a>
@@ -215,7 +240,7 @@
             </div>
         </div>
 
-        {{-- NHÓM 10: NỘI DUNG --}}
+        {{-- NHÓM 11: NỘI DUNG (ĐÃ CẬP NHẬT) --}}
         <div class="menu-group-box" data-group-id="content">
             <div class="group-title text-secondary">NỘI DUNG</div>
             <div class="menu-items-container" data-sort-group="content">
@@ -224,14 +249,18 @@
                 <a href="{{ route('admin.content.menus.index') }}" class="menu-link neon-trigger" data-id="menus"><i class="fa-solid fa-bars"></i> <span>Menu Web</span></a>
                 <a href="{{ route('admin.content.images.index') }}" class="menu-link neon-trigger" data-id="images"><i class="fa-solid fa-images"></i> <span>Thư Viện</span></a>
                 <a href="{{ route('admin.content.game-subjects.index') }}" class="menu-link neon-trigger" data-id="games"><i class="fa-solid fa-gamepad"></i> <span>Game/Học</span></a>
+                {{-- MỚI: NGÔN NGỮ & GIỌNG ĐỌC --}}
+                <a href="{{ route('admin.content.game-languages.index') }}" class="menu-link neon-trigger" data-id="game_languages"><i class="fa-solid fa-language"></i> <span>Ngôn Ngữ/Voice</span></a>
             </div>
         </div>
 
-        {{-- NHÓM 11: KHÁCH HÀNG (CRM) --}}
+        {{-- NHÓM 12: KHÁCH HÀNG (CRM) - ĐÃ CẬP NHẬT --}}
         <div class="menu-group-box" data-group-id="crm">
             <div class="group-title text-warning">KHÁCH HÀNG (CRM)</div>
             <div class="menu-items-container" data-sort-group="crm">
                 <a href="{{ route('admin.crm.customers.index') }}" class="menu-link neon-trigger" data-id="customers"><i class="fa-solid fa-user-group"></i> <span>Khách Hàng</span></a>
+                {{-- MỚI: HẠNG THÀNH VIÊN --}}
+                <a href="{{ route('admin.crm.membership-tiers.index') }}" class="menu-link neon-trigger" data-id="membership_tiers"><i class="fa-solid fa-crown"></i> <span>Hạng TV</span></a>
                 <a href="{{ route('admin.crm.chat-conversations.index') }}" class="menu-link neon-trigger" data-id="chats"><i class="fa-solid fa-comments"></i> <span>Hội Thoại</span></a>
                 <a href="{{ route('admin.crm.requests.index') }}" class="menu-link neon-trigger" data-id="requests"><i class="fa-solid fa-envelope-open-text"></i> <span>Yêu Cầu</span></a>
             </div>

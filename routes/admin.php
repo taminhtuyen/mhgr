@@ -21,25 +21,29 @@ use App\Http\Controllers\Admin\Catalog\CategoryController;
 use App\Http\Controllers\Admin\Catalog\AttributeController;
 use App\Http\Controllers\Admin\Catalog\SupplierController;
 use App\Http\Controllers\Admin\Catalog\ProductReviewController;
-use App\Http\Controllers\Admin\Catalog\PriceGroupController; // [MỚI]
+use App\Http\Controllers\Admin\Catalog\PriceGroupController;
 
 // 3. Inventory (Kho Hàng)
 use App\Http\Controllers\Admin\Inventory\InventoryStockController;
 use App\Http\Controllers\Admin\Inventory\WarehouseController;
 use App\Http\Controllers\Admin\Inventory\ImportOrderController;
 use App\Http\Controllers\Admin\Inventory\InventoryTransactionController;
-use App\Http\Controllers\Admin\Inventory\InventorySnapshotController; // [MỚI]
+use App\Http\Controllers\Admin\Inventory\InventorySnapshotController;
+use App\Http\Controllers\Admin\Inventory\PackingController; // [MỚI: Đóng gói]
 
-// 4. Logistics (Vận Tải - [MỚI])
+// 4. Logistics (Vận Tải)
 use App\Http\Controllers\Admin\Logistics\ShippingPartnerController;
 use App\Http\Controllers\Admin\Logistics\ShippingDriverController;
 use App\Http\Controllers\Admin\Logistics\ShippingRateController;
 use App\Http\Controllers\Admin\Logistics\DeliveryTripController;
+use App\Http\Controllers\Admin\Logistics\DeliveryFailureController; // [MỚI: Sự cố giao hàng]
 
 // 5. Finance (Tài Chính)
 use App\Http\Controllers\Admin\Finance\ProfitDistributionGroupController;
 use App\Http\Controllers\Admin\Finance\RewardWalletController;
 use App\Http\Controllers\Admin\Finance\CommissionController;
+use App\Http\Controllers\Admin\Finance\ReviewRatingRuleController; // [MỚI: Luật thưởng]
+use App\Http\Controllers\Admin\Finance\RewardHistoryController; // [MỚI: Lịch sử ví]
 
 // 6. Consignment (Ký Gửi)
 use App\Http\Controllers\Admin\Consignment\ConsignmentController;
@@ -50,7 +54,9 @@ use App\Http\Controllers\Admin\Marketing\PromotionController;
 use App\Http\Controllers\Admin\Marketing\PromotionCouponController;
 use App\Http\Controllers\Admin\Marketing\FlashSaleController;
 use App\Http\Controllers\Admin\Marketing\AffiliateLinkController;
-use App\Http\Controllers\Admin\Marketing\WishlistController; // [MỚI]
+use App\Http\Controllers\Admin\Marketing\WishlistController;
+use App\Http\Controllers\Admin\Marketing\SearchHistoryController; // [MỚI: Xu hướng tìm kiếm]
+use App\Http\Controllers\Admin\Marketing\PromotionLogicDictionaryController; // [MỚI: Từ điển Logic]
 
 // 8. Content (Nội Dung)
 use App\Http\Controllers\Admin\Content\PostController;
@@ -58,11 +64,13 @@ use App\Http\Controllers\Admin\Content\BannerController;
 use App\Http\Controllers\Admin\Content\MenuController;
 use App\Http\Controllers\Admin\Content\ImageController;
 use App\Http\Controllers\Admin\Content\GameSubjectController;
+use App\Http\Controllers\Admin\Content\GameLanguageController; // [MỚI: Ngôn ngữ/Voice]
 
 // 9. CRM (Khách Hàng)
 use App\Http\Controllers\Admin\CRM\CustomerController;
 use App\Http\Controllers\Admin\CRM\ChatConversationController;
 use App\Http\Controllers\Admin\CRM\CustomerRequestController;
+use App\Http\Controllers\Admin\CRM\MembershipTierController; // [MỚI: Hạng thành viên]
 
 // 10. System (Hệ Thống)
 use App\Http\Controllers\Admin\System\SettingController;
@@ -70,8 +78,16 @@ use App\Http\Controllers\Admin\System\UserController;
 use App\Http\Controllers\Admin\System\RoleController;
 use App\Http\Controllers\Admin\System\LocationController;
 use App\Http\Controllers\Admin\System\SystemLogController;
-use App\Http\Controllers\Admin\System\TaxClassController; // [MỚI]
-use App\Http\Controllers\Admin\System\BookingStatusController; // [MỚI]
+use App\Http\Controllers\Admin\System\TaxClassController;
+use App\Http\Controllers\Admin\System\BookingStatusController;
+use App\Http\Controllers\Admin\System\LeaveScheduleController; // [MỚI: Lịch nghỉ]
+use App\Http\Controllers\Admin\System\TaxScheduleController; // [MỚI: Lịch thuế]
+
+// 11. Technical (Kỹ Thuật - [MỚI GROUP])
+use App\Http\Controllers\Admin\Technical\QueueJobController;
+use App\Http\Controllers\Admin\Technical\SessionController;
+use App\Http\Controllers\Admin\Technical\PulseController;
+
 
 // --- ROUTES ---
 
@@ -97,7 +113,7 @@ Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::resource('attributes', AttributeController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('product-reviews', ProductReviewController::class);
-    Route::resource('price-groups', PriceGroupController::class); // [MỚI]
+    Route::resource('price-groups', PriceGroupController::class);
 });
 
 // 3. NHÓM INVENTORY (Kho Hàng)
@@ -106,15 +122,17 @@ Route::prefix('inventory')->name('inventory.')->group(function () {
     Route::resource('warehouses', WarehouseController::class);
     Route::resource('import-orders', ImportOrderController::class);
     Route::resource('transactions', InventoryTransactionController::class);
-    Route::resource('snapshots', InventorySnapshotController::class); // [MỚI]
+    Route::resource('snapshots', InventorySnapshotController::class);
+    Route::resource('packing', PackingController::class); // [MỚI]
 });
 
-// 4. NHÓM LOGISTICS (Vận Tải - [MỚI])
+// 4. NHÓM LOGISTICS (Vận Tải)
 Route::prefix('logistics')->name('logistics.')->group(function () {
     Route::resource('shipping-partners', ShippingPartnerController::class);
     Route::resource('drivers', ShippingDriverController::class);
     Route::resource('rates', ShippingRateController::class);
     Route::resource('trips', DeliveryTripController::class);
+    Route::resource('delivery-failures', DeliveryFailureController::class); // [MỚI]
 });
 
 // 5. NHÓM FINANCE (Tài Chính)
@@ -122,6 +140,8 @@ Route::prefix('finance')->name('finance.')->group(function () {
     Route::resource('profit-distribution-groups', ProfitDistributionGroupController::class);
     Route::resource('reward-wallets', RewardWalletController::class);
     Route::resource('commissions', CommissionController::class);
+    Route::resource('reward-rules', ReviewRatingRuleController::class); // [MỚI]
+    Route::resource('reward-history', RewardHistoryController::class); // [MỚI]
 });
 
 // 6. NHÓM CONSIGNMENT (Ký Gửi)
@@ -136,7 +156,9 @@ Route::prefix('marketing')->name('marketing.')->group(function () {
     Route::resource('promotion-coupons', PromotionCouponController::class);
     Route::resource('flash-sales', FlashSaleController::class);
     Route::resource('affiliate-links', AffiliateLinkController::class);
-    Route::resource('wishlists', WishlistController::class); // [MỚI]
+    Route::resource('wishlists', WishlistController::class);
+    Route::resource('search-history', SearchHistoryController::class); // [MỚI]
+    Route::resource('logic-dictionary', PromotionLogicDictionaryController::class); // [MỚI]
 });
 
 // 8. NHÓM CONTENT (Nội Dung)
@@ -146,6 +168,7 @@ Route::prefix('content')->name('content.')->group(function () {
     Route::resource('menus', MenuController::class);
     Route::resource('images', ImageController::class);
     Route::resource('game-subjects', GameSubjectController::class);
+    Route::resource('game-languages', GameLanguageController::class); // [MỚI]
 });
 
 // 9. NHÓM CRM (Khách Hàng)
@@ -153,6 +176,7 @@ Route::prefix('crm')->name('crm.')->group(function () {
     Route::resource('customers', CustomerController::class);
     Route::resource('chat-conversations', ChatConversationController::class);
     Route::resource('requests', CustomerRequestController::class);
+    Route::resource('membership-tiers', MembershipTierController::class); // [MỚI]
 });
 
 // 10. NHÓM SYSTEM (Hệ Thống)
@@ -162,8 +186,17 @@ Route::prefix('system')->name('system.')->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('locations', LocationController::class);
     Route::resource('logs', SystemLogController::class);
-    Route::resource('tax-classes', TaxClassController::class); // [MỚI]
-    Route::resource('booking-status', BookingStatusController::class); // [MỚI]
+    Route::resource('tax-classes', TaxClassController::class);
+    Route::resource('booking-status', BookingStatusController::class);
+    Route::resource('leave-schedules', LeaveScheduleController::class); // [MỚI]
+    Route::resource('tax-schedules', TaxScheduleController::class); // [MỚI]
+});
+
+// 11. NHÓM TECHNICAL (Kỹ Thuật - [MỚI HOÀN TOÀN])
+Route::prefix('technical')->name('technical.')->group(function () {
+    Route::resource('queues', QueueJobController::class);
+    Route::resource('sessions', SessionController::class);
+    Route::resource('pulse', PulseController::class);
 });
 
 // --- TOOLS & UTILITIES (TESTING) ---
