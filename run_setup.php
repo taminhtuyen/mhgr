@@ -5,14 +5,14 @@ require_once 'generator_core.php';
 
 // DANH SÁCH MENU MỚI
 $newMenus = [
-    'Inventory' => ['Packing'],
-    'Logistics' => ['DeliveryFailure'],
-    'Finance'   => ['ReviewRatingRule', 'RewardHistory'],
-    'Marketing' => ['SearchHistory', 'PromotionLogicDictionary'],
-    'Content'   => ['GameLanguage'],
-    'CRM'       => ['MembershipTier'],
-    'System'    => ['LeaveSchedule', 'TaxSchedule'],
-    'Technical' => ['QueueJob', 'Session', 'Pulse']
+    // Module 'Catalog' -> Entity 'CategoryCollection' (Nhóm hàng)
+    'Catalog' => ['CategoryCollection'],
+
+    // Module 'Finance' -> Entity 'PaymentTransaction' (Giao dịch cổng)
+    'Finance' => ['PaymentTransaction'],
+
+    // Module 'Content' -> Entity 'News' (Bản tin) và 'Content' (Khối tĩnh)
+    'Content' => ['News', 'Content'],
 ];
 
 echo "=============================================\n";
