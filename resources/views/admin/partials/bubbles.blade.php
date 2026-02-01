@@ -52,22 +52,29 @@
         transition:
             transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
             background-color 0.3s ease,
-            box-shadow 2.0s ease-out, /* Tắt chậm */
+            box-shadow 2.0s ease-out,
             border-color 2.0s ease-out;
     }
 
-    #nav-bubble.hover-glow,
-    #nav-bubble.red-mode,
-    body.neon-mode-2 #nav-bubble {
+    /* Blue Glow (Loại trừ Red Mode) */
+    #nav-bubble:not(.red-mode).hover-glow,
+    body.neon-mode-2 #nav-bubble:not(.red-mode) {
         box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
         border-color: #fff;
         transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
     }
 
+    /* Red Mode (Vật lý) */
     #nav-bubble.red-mode {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
         border-color: #fff !important;
+    }
+
+    /* Red Glow (Ánh sáng - Chỉ khi Neon Active) */
+    body.neon-active #nav-bubble.red-mode,
+    #nav-bubble.red-mode.hover-glow {
         box-shadow: 0 0 0.1rem rgba(var(--c-red), 1) inset, 0 0 0.5rem rgba(var(--c-red), 1) inset, 0 0 1.5rem rgba(var(--c-red), 1), 0 0 3.5rem rgba(var(--c-red), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
+        transition: box-shadow 0.2s ease-out;
     }
 
     /* --- BONG BÓNG CON --- */
@@ -79,7 +86,6 @@
         font-size: 1.25rem; cursor: pointer; opacity: 0; transform: scale(0); position: relative;
         box-shadow: none;
 
-        /* Transition tách biệt */
         transition:
             transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
             background-color 0.3s ease,
@@ -88,44 +94,52 @@
             border-color 2.0s ease-out;
     }
 
-    /* 1. TRẠNG THÁI ACTIVE (VẬT LÝ - LUÔN GIỮ NỀN VÀ SCALE) */
-    /* Scope Global để không bị mất khi Neon tắt */
+    /* 1. TRẠNG THÁI ACTIVE VÀ HOVER (VẬT LÝ - LUÔN GIỮ NỀN VÀ SCALE) */
+    .sub-bubble.active,
+    #bubble-wrapper.expanded .sub-bubble:hover {
+        transform: scale(1.15) !important;
+    }
+
     .sub-bubble.active {
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
         border: 0.0625rem solid #fff !important;
         color: #fff !important;
-        transform: scale(1.15) !important;
         z-index: 10;
         opacity: 1 !important;
     }
 
-    /* 2. TRẠNG THÁI ACTIVE (ÁNH SÁNG) */
-    /* Scope Neon để chỉ sáng khi có đèn */
-    body.neon-active .sub-bubble.active {
-        box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0,0,0,0.2) !important;
-        transition: box-shadow 0.2s ease-out;
+    /* Hover Vật Lý (Không đổi nền, Không Glow) */
+    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        background-color: var(--sub-bg) !important;
+        color: var(--sub-text) !important;
+        border-color: var(--sub-border) !important;
+        z-index: 100;
+        opacity: 1 !important;
+        transform: scale(1.1) !important; /* Chỉ phóng to 1.1 */
     }
 
-    /* 3. Hover (Chưa active) */
-    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
-        transform: scale(1.1) !important;
-        background-color: var(--sub-bg) !important; color: var(--sub-text) !important; border-color: var(--sub-border) !important; z-index: 100;
-        opacity: 1 !important;
+    /* 2. TRẠNG THÁI ÁNH SÁNG (Chỉ cho Active, KHÔNG cho Hover) */
+    body.neon-active .sub-bubble.active {
+        box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0,0,0,0.2) !important;
+        transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
     }
 
     /* ICON */
     #bubble-icon, .sub-bubble i { transition: filter 0.5s ease-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); filter: none; transform: rotate(0deg); }
     #nav-bubble.red-mode #bubble-icon { transform: rotate(90deg); }
 
-    #nav-bubble.hover-glow #bubble-icon, body.neon-mode-2 #nav-bubble #bubble-icon,
+    #nav-bubble:not(.red-mode).hover-glow #bubble-icon,
+    body.neon-mode-2 #nav-bubble:not(.red-mode) #bubble-icon,
     body.neon-active .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgba(var(--c-blue), 1)); }
-    #nav-bubble.red-mode #bubble-icon { filter: drop-shadow(0 0 0.5rem rgba(var(--c-red), 1)); }
+
+    body.neon-active #nav-bubble.red-mode #bubble-icon,
+    #nav-bubble.red-mode.hover-glow #bubble-icon { filter: drop-shadow(0 0 0.5rem rgba(var(--c-red), 1)); }
 
     .sub-bubbles-container { position: absolute; left: 0; width: 3.75rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; pointer-events: none; z-index: 1; }
     .main-bubble-badge { position: absolute; top: 0; right: 0; width: 1rem; height: 1rem; background-color: #ef4444; border: 0.0625rem solid #fff; border-radius: 50%; z-index: 11; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; transition: box-shadow 2s ease-out; }
     #nav-bubble.hover-glow .main-bubble-badge { box-shadow: 0 0 5px #ef4444; }
 
-    #nav-popup { position: fixed; z-index: 9999; background: var(--popup-bg); backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border); box-shadow: var(--popup-shadow); border-radius: 1.25rem !important; overflow: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; opacity: 0; visibility: hidden; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; width: fit-content; max-width: 95vw; display: flex; flex-direction: column; scrollbar-width: thin; }
+    #nav-popup { position: fixed; z-index: 9999; background: var(--popup-bg); backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border); box-shadow: var(--popup-shadow); border-radius: 1.25rem !important; overflow: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; opacity: 0; visibility: hidden; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; width: fit-content; max-width: 95vw; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
     #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
     #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
     #nav-backdrop.active { opacity: 1; visibility: visible; }
@@ -146,7 +160,7 @@
             settings: document.getElementById('btn-open-settings')
         };
 
-        // --- BONG BÓNG CHÍNH ---
+        // --- SỰ KIỆN RIÊNG CHO BONG BÓNG CHÍNH ---
         mainBubble.addEventListener('mouseenter', () => {
             mainBubble.classList.add('hover-glow');
             if(window.NeonManager) window.NeonManager.wakeUp();

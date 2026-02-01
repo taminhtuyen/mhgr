@@ -25,6 +25,7 @@
 </div>
 
 <style>
+    /* --- 1. ĐỊNH NGHĨA BIẾN --- */
     :root {
         --c-blue: 0, 191, 255;
         --c-red: 255, 49, 49;
@@ -33,8 +34,14 @@
         --sub-text: #374151;
         --neon-duration: 0.5s;
     }
-    body.dark-mode { --sub-bg: #1e293b; --sub-border: #334155; --sub-text: #f8fafc; }
 
+    body.dark-mode {
+        --sub-bg: #1e293b;
+        --sub-border: #334155;
+        --sub-text: #f8fafc;
+    }
+
+    /* WRAPPER */
     #bubble-wrapper {
         position: fixed; z-index: 10000;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
@@ -43,7 +50,9 @@
     }
     #bubble-wrapper.scroll-hidden { transform: scale(0.9); opacity: 0; visibility: hidden; pointer-events: none; }
 
-    /* --- BONG BÓNG CHÍNH --- */
+    /* =================================================================
+       LOGIC BONG BÓNG CHÍNH (MAIN BUBBLE)
+       ================================================================= */
     #nav-bubble {
         width: 3.75rem; height: 3.75rem;
         background: linear-gradient(135deg, #0ea5e9, #0284c7);
@@ -57,27 +66,33 @@
         transition:
             transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
             background-color 0.3s ease,
-            box-shadow 2.0s ease-out, /* Tắt đèn chậm 2s */
+            box-shadow 2.0s ease-out,
             border-color 2.0s ease-out;
     }
 
-    /* Glow Bong bóng chính */
-    #nav-bubble.hover-glow,
-    body.neon-mode-2 #nav-bubble {
+    /* Blue Glow (Tránh chồng lấn Red Mode) */
+    #nav-bubble:not(.red-mode).hover-glow,
+    body.neon-mode-2 #nav-bubble:not(.red-mode) {
         box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
         border-color: #fff;
         transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
     }
 
-    /* Red Mode (Khi mở menu) */
+    /* Red Mode (Vật lý - Màu nền) */
     #nav-bubble.red-mode {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
         border-color: #fff !important;
+    }
+
+    /* Red Glow (Ánh sáng - Chỉ khi Neon Active) */
+    body.neon-active #nav-bubble.red-mode,
+    #nav-bubble.red-mode.hover-glow {
         box-shadow: 0 0 0.1rem rgba(var(--c-red), 1) inset, 0 0 0.5rem rgba(var(--c-red), 1) inset, 0 0 1.5rem rgba(var(--c-red), 1), 0 0 3.5rem rgba(var(--c-red), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
+        transition: box-shadow 0.2s ease-out;
     }
 
     /* =================================================================
-       LOGIC BONG BÓNG CON - TÁCH BIỆT VẬT LÝ VÀ ÁNH SÁNG
+       LOGIC BONG BÓNG CON (SUB BUBBLES)
        ================================================================= */
     .sub-bubble {
         width: 3.125rem; height: 3.125rem;
@@ -87,22 +102,21 @@
         font-size: 1.25rem; cursor: pointer; opacity: 0; transform: scale(0); position: relative;
         box-shadow: none;
 
-        /* Transition tách biệt */
         transition:
-            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), /* Vật lý nhanh */
-            background-color 0.3s ease,                   /* Màu nền nhanh */
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            background-color 0.3s ease,
+            opacity 0.3s ease,
             color 0.3s ease,
-            box-shadow 2.0s ease-out,                     /* Ánh sáng tắt chậm */
+            box-shadow 2.0s ease-out,
             border-color 2.0s ease-out;
     }
 
     /* 1. TRẠNG THÁI ACTIVE (VẬT LÝ - LUÔN GIỮ NỀN VÀ SCALE) */
-    /* Nằm ngoài scope body.neon-active để không bị mất khi tắt đèn */
     .sub-bubble.active {
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
         border: 0.0625rem solid #fff !important;
         color: #fff !important;
-        transform: scale(1.15) !important; /* Active scale to 1.15 */
+        transform: scale(1.15) !important;
         z-index: 10;
         opacity: 1 !important;
     }
@@ -114,7 +128,7 @@
         transition: box-shadow 0.2s ease-out;
     }
 
-    /* 3. TRẠNG THÁI HOVER CHƯA ACTIVE (Scale 1.1, giữ nền gốc) */
+    /* 3. TRẠNG THÁI HOVER CHƯA ACTIVE (CHỈ PHÓNG TO, KHÔNG GLOW) */
     #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
         transform: scale(1.1) !important;
         background-color: var(--sub-bg) !important;
@@ -122,16 +136,25 @@
         border-color: var(--sub-border) !important;
         z-index: 5;
         opacity: 1 !important;
+        /* Box-shadow mặc định là none, không thêm gì ở đây */
     }
 
     /* ICON */
     #bubble-icon, .sub-bubble i { transition: filter 0.5s ease-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); filter: none; transform: rotate(0deg); }
     #nav-bubble.red-mode #bubble-icon { transform: rotate(90deg); }
 
-    /* Glow Icon */
-    #nav-bubble.hover-glow #bubble-icon, body.neon-mode-2 #nav-bubble #bubble-icon,
-    body.neon-active .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgba(var(--c-blue), 1)); }
-    #nav-bubble.red-mode #bubble-icon { filter: drop-shadow(0 0 0.5rem rgba(var(--c-red), 1)); }
+    /* Icon Glow - CHỈ DÀNH CHO BONG BÓNG CHÍNH HOẶC BONG BÓNG CON ĐANG ACTIVE */
+    /* Đã loại bỏ selector hover cho sub-bubble */
+    #nav-bubble:not(.red-mode).hover-glow #bubble-icon,
+    body.neon-mode-2 #nav-bubble:not(.red-mode) #bubble-icon,
+    body.neon-active .sub-bubble.active i {
+        filter: drop-shadow(0 0 0.3rem rgba(var(--c-blue), 1));
+    }
+
+    body.neon-active #nav-bubble.red-mode #bubble-icon,
+    #nav-bubble.red-mode.hover-glow #bubble-icon {
+        filter: drop-shadow(0 0 0.5rem rgba(var(--c-red), 1));
+    }
 
     /* Layout & Badge */
     .main-bubble-badge { position: absolute; top: 0; right: 0; width: 1rem; height: 1rem; background-color: #ef4444; border: 0.0625rem solid #fff; border-radius: 50%; z-index: 11; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; transition: all 0.5s ease-out; }

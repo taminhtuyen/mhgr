@@ -135,7 +135,7 @@
 
         {{-- NHÓM 3: LOGISTICS (VẬN TẢI - MỚI) --}}
         <div class="menu-group-box" data-group-id="logistics">
-            <div class="group-title text-info" style="color: #20c997 !important;">VẬN TẢI (LOGISTICS)</div>
+            <div class="group-title text-info" style="color: #20c997 !important;">VẬN TẢI</div>
             <div class="menu-items-container" data-sort-group="logistics">
                 <a href="{{ route('admin.logistics.shipping-partners.index') }}" class="menu-link neon-trigger" data-id="logistics_partners"><i class="fa-solid fa-handshake-simple"></i> <span>Đối Tác VC</span></a>
                 <a href="{{ route('admin.logistics.drivers.index') }}" class="menu-link neon-trigger" data-id="logistics_drivers"><i class="fa-solid fa-id-card"></i> <span>Tài Xế</span></a>
@@ -146,7 +146,7 @@
 
         {{-- NHÓM 4: HỆ THỐNG --}}
         <div class="menu-group-box" data-group-id="system">
-            <div class="group-title text-dark">HỆ THỐNG</div>
+            <div class="group-title text-secondary">HỆ THỐNG</div>
             <div class="menu-items-container" data-sort-group="system">
                 <a href="{{ route('admin.system.settings.index') }}" class="menu-link neon-trigger" data-id="settings"><i class="fa-solid fa-gear"></i> <span>Cài Đặt</span></a>
                 <a href="{{ route('admin.system.tax-classes.index') }}" class="menu-link neon-trigger" data-id="taxes"><i class="fa-solid fa-percent"></i> <span>Thuế & Phí</span></a>
