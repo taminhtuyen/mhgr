@@ -27,10 +27,8 @@
             --primary: #0ea5e9;
             --scrollbar-thumb: #cbd5e1;
 
-            /* Switch Colors */
-            --switch-gray: #9ca3af;
-            --switch-green: #10b981;
-            --switch-knob: #ffffff;
+            /* NEON CORE CONFIG (CLIENT STYLE) */
+            --neon-duration: 0.5s;
 
             /* Modal Colors */
             --modal-bg: rgba(255, 255, 255, 0.9);
@@ -49,7 +47,6 @@
             --link-hover-bg: rgba(255, 255, 255, 0.08);
             --primary: #38bdf8;
             --scrollbar-thumb: #334155;
-            --switch-gray: #4b5563;
             --modal-bg: rgba(30, 30, 30, 0.9);
             --modal-text: #fff;
             --modal-border: rgba(84, 84, 88, 0.65);
@@ -71,29 +68,6 @@
         /* Utility */
         .glass-effect { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .cursor-pointer { cursor: pointer !important; }
-
-        /* Dark Mode Overrides */
-        body.dark-mode .text-dark { color: #f1f5f9 !important; }
-        body.dark-mode .text-primary { color: #38bdf8 !important; }
-        body.dark-mode .text-secondary { color: #cbd5e1 !important; }
-        body.dark-mode .form-control { background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #fff; }
-        body.dark-mode .form-control:focus { background-color: rgba(255,255,255,0.08); border-color: var(--primary); color: #fff; box-shadow: none; }
-
-        /* Component Tri-State Switch */
-        .tri-state-toggle { position: relative; display: inline-flex; align-items: center; cursor: pointer; width: 3rem; height: 3rem; user-select: none; }
-        .tri-state-toggle .toggle-bg { width: 3rem; height: 1.6rem; border-radius: 9999px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: absolute; top: 50%; transform: translateY(-50%); left: 0; right: 0; background-color: var(--switch-gray); }
-        .tri-state-toggle .toggle-knob { width: 2.2rem; height: 2.2rem; background-color: var(--switch-knob); border-radius: 9999px; position: absolute; top: 50%; left: 0; transform: translateY(-50%) rotate(-180deg); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 800; color: var(--switch-gray); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2; }
-        .tri-state-toggle[data-state="0"] .toggle-bg { background-color: var(--switch-gray); opacity: 0.5; }
-        .tri-state-toggle[data-state="0"] .toggle-knob { left: 0; transform: translateY(-50%) rotate(-180deg); color: #9ca3af; }
-        .tri-state-toggle[data-state="0"] .toggle-knob::after { content: ''; width: 8px; height: 8px; background: #d1d5db; border-radius: 50%; }
-        .tri-state-toggle[data-state="1"] .toggle-bg { background-color: var(--switch-green); opacity: 1; }
-        .tri-state-toggle[data-state="1"] .toggle-knob { left: 0.8rem; transform: translateY(-50%) rotate(0deg); color: var(--switch-green); }
-        .tri-state-toggle[data-state="1"] .toggle-knob::after { content: '5s'; }
-        .tri-state-toggle[data-state="2"] .toggle-bg { background-color: var(--switch-green); opacity: 1; }
-        .tri-state-toggle[data-state="2"] .toggle-knob { left: 0.8rem; transform: translateY(-50%) rotate(0deg); color: var(--switch-green); }
-        .tri-state-toggle[data-state="2"] .toggle-knob::after { content: '✔'; font-size: 1rem; }
-        .tri-state-toggle:hover .toggle-knob { transform: translateY(-50%) rotate(0deg) scale(0.85) !important; }
-        .tri-state-toggle[data-state="0"]:hover .toggle-knob { transform: translateY(-50%) rotate(-180deg) scale(0.85) !important; }
 
         /* Global Modal Styles */
         #global-confirm-modal { position: fixed; inset: 0; z-index: 20000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.2s; }
@@ -144,52 +118,75 @@
 </div>
 
 <script>
-    // --- 1. NEON MANAGER SYSTEM ---
+    // --- 1. NEON MANAGER SYSTEM (CLIENT LOGIC) ---
+    // Mode 0: Off, Mode 1: Auto (5s), Mode 2: Always On
     const NeonManager = {
+        currentMode: 1,
         timer: null,
-        mode: 0, // 0: Off, 1: 5s, 2: Always On
 
-        init() {
-            this.mode = parseInt(localStorage.getItem('admin_neon_mode') || '2');
-            this.applyMode();
+        init: function() {
+            // Lấy setting từ LocalStorage (Mặc định là 1 - Auto)
+            const savedMode = localStorage.getItem('admin_neon_mode');
+            this.currentMode = savedMode !== null ? parseInt(savedMode) : 1;
+
+            // Apply Class ban đầu
+            this.applyModeClass();
+
+            // Nếu là Mode 2 (Always On), kích hoạt ngay
+            if(this.currentMode === 2) {
+                document.body.classList.add('neon-active');
+            } else {
+                // Mode 0 hoặc 1: Mặc định tắt khi load trang
+                document.body.classList.remove('neon-active');
+            }
+            // KHÔNG GẮN GLOBAL EVENT LISTENER (Chuẩn Client/Admin mới)
         },
 
-        setMode(newMode) {
-            this.mode = newMode;
-            localStorage.setItem('admin_neon_mode', newMode);
-            this.applyMode();
-        },
+        setMode: function(mode) {
+            this.currentMode = parseInt(mode);
+            localStorage.setItem('admin_neon_mode', this.currentMode);
+            this.applyModeClass();
 
-        applyMode() {
-            const body = document.body;
-            if (this.timer) clearTimeout(this.timer);
-
-            if (this.mode === 0) {
-                body.classList.remove('neon-active');
-            } else if (this.mode === 2) {
-                body.classList.add('neon-active');
+            if (this.currentMode === 2) {
+                this.wakeUp(true); // Force Active
+            } else if (this.currentMode === 0) {
+                this.sleep(true); // Force Sleep
+            } else {
+                // Mode 1: Reset về tắt, chờ tương tác cụ thể
+                this.sleep(true);
             }
         },
 
-        // [QUAN TRỌNG] Bật đèn (khi hover/click)
-        wakeUp() {
-            if (this.mode !== 1) return; // Chỉ áp dụng mode 5s
+        applyModeClass: function() {
+            document.body.classList.remove('neon-mode-0', 'neon-mode-1', 'neon-mode-2');
+            document.body.classList.add(`neon-mode-${this.currentMode}`);
+        },
 
-            document.body.classList.add('neon-active');
-            if (this.timer) clearTimeout(this.timer);
-
-            // Auto tắt sau 5s nếu không có tương tác gì thêm
-            this.timer = setTimeout(() => {
+        wakeUp: function(force = false) {
+            if (this.currentMode === 0) {
                 document.body.classList.remove('neon-active');
+                return;
+            }
+
+            // Nếu mode 2 (Always On), luôn giữ active
+            if (this.currentMode === 2 || force) {
+                document.body.classList.add('neon-active');
+                if(this.timer) clearTimeout(this.timer);
+                return;
+            }
+
+            // Mode 1: Auto Logic (Chỉ chạy khi được gọi bởi Bubbles/Menu)
+            document.body.classList.add('neon-active');
+
+            // Reset timer tắt đèn (5s giống Client)
+            if(this.timer) clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                this.sleep();
             }, 5000);
         },
 
-        // [QUAN TRỌNG] Tắt đèn (khi rời chuột)
-        sleep() {
-            if (this.mode !== 1) return;
-
-            // Xóa ngay class active để CSS transition (2s) hoạt động
-            if (this.timer) clearTimeout(this.timer);
+        sleep: function(force = false) {
+            if (this.currentMode === 2 && !force) return;
             document.body.classList.remove('neon-active');
         }
     };
@@ -198,15 +195,17 @@
     (function() {
         const savedTheme = localStorage.getItem('admin_theme_preference');
         if (savedTheme === 'dark') document.body.classList.add('dark-mode');
-        NeonManager.init();
     })();
 
-    // --- 3. SCROLL & MODAL ---
+    // --- 3. CORE EVENTS ---
     document.addEventListener('DOMContentLoaded', () => {
+        NeonManager.init();
+
         const mainWrapper = document.getElementById('main-wrapper');
         const bubbleWrapper = document.getElementById('bubble-wrapper');
         if(mainWrapper && bubbleWrapper) {
             let lastScrollTop = 0;
+            // Scroll logic giống Client: Chỉ ẩn hiện bubble, không kích hoạt đèn
             mainWrapper.addEventListener('scroll', () => {
                 if (window.isSystemOpen || document.body.classList.contains('no-select')) return;
                 const currentScroll = mainWrapper.scrollTop;
@@ -251,18 +250,6 @@
     };
 
     window.NeonManager = NeonManager;
-</script>
-
-{{-- PUSHER --- --}}
-<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
-<script>
-    var pusher = new Pusher('bbd581278169e135dc72', { cluster: 'ap1' });
-    var channel = pusher.subscribe('notifications');
-    channel.bind('system.message', function(data) {
-        const noti = data.notification; if (!noti) return;
-        const iconMap = { success: 'circle-check text-success', error: 'circle-exclamation text-danger', warning: 'triangle-exclamation text-warning' };
-        showDynamicModal(`<i class="fa-solid fa-${iconMap[noti.type] || 'bell text-warning'}"></i> ${noti.title}`, noti.content, noti.buttons);
-    });
 </script>
 
 @livewireScripts

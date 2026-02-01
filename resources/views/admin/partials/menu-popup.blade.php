@@ -12,7 +12,7 @@
             --popup-border-highlight: rgba(255, 255, 255, 0.1);
             --link-hover-bg: rgba(255, 255, 255, 0.05);
         }
-        /* Colors per group */
+        /* Colors per group - Giữ nguyên màu gốc của Admin */
         .menu-group-box[data-group-id="overview"]    { --neon-glow: #0d6efd; }
         .menu-group-box[data-group-id="sales"]       { --neon-glow: #198754; }
         .menu-group-box[data-group-id="logistics"]   { --neon-glow: #20c997; }
@@ -28,16 +28,17 @@
         .menu-link {
             display: flex; align-items: center; text-decoration: none !important; color: var(--text-color);
             border-radius: 0.625rem; font-weight: 500; font-size: 0.92rem; white-space: nowrap;
-            /* TẮT CHẬM 2s */
+            /* Cập nhật transition giống Client: Tắt chậm 2s */
             transition:
                 background-color 0.25s ease,
                 color 2s ease-out,
                 text-shadow 2s ease-out,
                 border-color 2s ease-out,
                 box-shadow 2s ease-out;
+            position: relative;
         }
 
-        /* NEON ACTIVE ON (0.5s) */
+        /* NEON HOVER LOGIC (ĐỒNG BỘ CLIENT - BẬT NHANH 0.5s) */
         body.neon-active .menu-link:hover span,
         body.neon-active .menu-link:hover i {
             color: #ffffff !important;
@@ -45,6 +46,7 @@
             transition: color 0.5s ease-out, text-shadow 0.5s ease-out;
         }
 
+        /* Chế độ sáng thì text màu glow, không cần shadow trắng */
         body:not(.dark-mode).neon-active .menu-link:hover span,
         body:not(.dark-mode).neon-active .menu-link:hover i {
             color: var(--neon-glow) !important;
@@ -52,8 +54,10 @@
             transition: color 0.5s ease-out;
         }
 
-        /* Khi đèn tắt */
-        body:not(.neon-active) .menu-link:hover { background-color: var(--link-hover-bg); }
+        /* Khi Neon TẮT: Hover bình thường */
+        body:not(.neon-active) .menu-link:hover {
+            background-color: var(--link-hover-bg);
+        }
 
         /* LIST VIEW */
         .view-mode-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5625rem; }
@@ -246,14 +250,18 @@
             else { menuWrapper.classList.remove('view-mode-grid'); menuWrapper.classList.add('view-mode-list'); }
         }
 
-        // BỔ SUNG SỰ KIỆN NEON TRIGGER CHO MENU ITEMS
+        // --- NEON TRIGGER: Hover/Touch vào Menu Item sẽ gọi WakeUp (Giống Client) ---
         const triggers = document.querySelectorAll('.neon-trigger');
         triggers.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 if(window.NeonManager) window.NeonManager.wakeUp();
             });
+            el.addEventListener('touchstart', () => {
+                if(window.NeonManager) window.NeonManager.wakeUp();
+            }, {passive: true});
         });
 
+        // --- SORTABLE ---
         const groups = document.querySelectorAll('.menu-items-container');
         groups.forEach(group => {
             const groupId = group.getAttribute('data-sort-group');

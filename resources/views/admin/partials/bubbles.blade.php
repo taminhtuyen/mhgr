@@ -21,22 +21,16 @@
 </div>
 
 <style>
-    /* --- BIẾN MÀU --- */
     :root {
-        --neon-primary: 0, 191, 255; /* Xanh da trời */
-        --neon-danger: 255, 49, 49;  /* Đỏ */
+        --c-blue: 0, 191, 255;
+        --c-red: 255, 49, 49;
         --sub-bg: #ffffff;
         --sub-border: #d1d5db;
         --sub-text: #374151;
+        --neon-duration: 0.5s;
     }
+    body.dark-mode { --sub-bg: #1e293b; --sub-border: #334155; --sub-text: #f8fafc; }
 
-    body.dark-mode {
-        --sub-bg: #1e293b;
-        --sub-border: #334155;
-        --sub-text: #f8fafc;
-    }
-
-    /* WRAPPER */
     #bubble-wrapper {
         position: fixed; z-index: 10000;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
@@ -44,33 +38,7 @@
     }
     #bubble-wrapper.scroll-hidden { transform: scale(0.9); opacity: 0; visibility: hidden; pointer-events: none; }
 
-    /* =================================================================
-       1. TRẠNG THÁI OFF (TẮT DẦN 2 GIÂY)
-       Kỹ thuật: Khai báo sẵn các lớp shadow trong suốt để browser tính toán được transition
-       ================================================================= */
-
-    #nav-bubble, .sub-bubble {
-        /* Transition mặc định (khi tắt) là 2s */
-        transition:
-            transform 0.3s ease,
-            background-color 0.3s ease,
-            opacity 0.3s ease,
-            box-shadow 2s ease-out,  /* Tắt chậm 2s */
-            border-color 2s ease-out; /* Tắt chậm 2s */
-
-        /* Bắt buộc: Khai báo shadow rỗng nhưng đúng cấu trúc (5 lớp) để không bị giật */
-        box-shadow:
-            0 0 0 0 rgba(0,0,0,0) inset,
-            0 0 0 0 rgba(0,0,0,0) inset,
-            0 0 0 0 rgba(0,0,0,0),
-            0 0 0 0 rgba(0,0,0,0),
-            0 0 0 0 rgba(0,0,0,0);
-
-        border-color: transparent;
-        will-change: box-shadow, border-color; /* Tối ưu GPU */
-    }
-
-    /* Cấu hình riêng cho bong bóng chính */
+    /* --- BONG BÓNG CHÍNH --- */
     #nav-bubble {
         width: 3.75rem; height: 3.75rem;
         background: linear-gradient(135deg, #0ea5e9, #0284c7);
@@ -79,101 +47,84 @@
         font-size: 1.5rem; cursor: pointer; position: relative; z-index: 10;
         border: 0.0625rem solid transparent;
         transform: scale(1);
+        box-shadow: none;
+
+        transition:
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            background-color 0.3s ease,
+            box-shadow 2.0s ease-out, /* Tắt chậm */
+            border-color 2.0s ease-out;
     }
 
-    /* Cấu hình riêng cho bong bóng con */
+    #nav-bubble.hover-glow,
+    #nav-bubble.red-mode,
+    body.neon-mode-2 #nav-bubble {
+        box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
+        border-color: #fff;
+        transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+    }
+
+    #nav-bubble.red-mode {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        border-color: #fff !important;
+        box-shadow: 0 0 0.1rem rgba(var(--c-red), 1) inset, 0 0 0.5rem rgba(var(--c-red), 1) inset, 0 0 1.5rem rgba(var(--c-red), 1), 0 0 3.5rem rgba(var(--c-red), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* --- BONG BÓNG CON --- */
     .sub-bubble {
         width: 3.125rem; height: 3.125rem;
         background-color: var(--sub-bg); border: 0.0625rem solid var(--sub-border); color: var(--sub-text);
         backdrop-filter: blur(0.6rem); border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-size: 1.25rem; cursor: pointer; opacity: 0; transform: scale(0); position: relative;
-    }
+        box-shadow: none;
 
-    /* Icon bên trong */
-    #bubble-icon, .sub-bubble i {
-        filter: drop-shadow(0 0 0 rgba(0,0,0,0)); /* Shadow rỗng */
-        transition: filter 2s ease-out, transform 0.4s ease; /* Tắt chậm 2s */
-    }
-
-    /* =================================================================
-       2. TRẠNG THÁI ON (BẬT NHANH 0.5 GIÂY)
-       Khi body có class .neon-active, các giá trị này sẽ đè lên
-       ================================================================= */
-
-    body.neon-active #nav-bubble,
-    body.neon-active .sub-bubble.active {
-        border-color: #fff;
-
-        /* Shadow phát sáng (5 lớp tương ứng với 5 lớp rỗng ở trên) */
-        box-shadow:
-            0 0 0.1rem rgb(var(--neon-primary)) inset,
-            0 0 0.5rem rgb(var(--neon-primary)) inset,
-            0 0 1rem rgb(var(--neon-primary)),
-            0 0 2.5rem rgb(var(--neon-primary)),
-            0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-
-        /* Ghi đè thời gian transition thành 0.5s để bật nhanh */
+        /* Transition tách biệt */
         transition:
-            transform 0.3s ease,
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
             background-color 0.3s ease,
-            opacity 0.3s ease,
-            box-shadow 0.5s ease-out, /* Bật nhanh 0.5s */
-            border-color 0.5s ease-out;
+            color 0.3s ease,
+            box-shadow 2.0s ease-out,
+            border-color 2.0s ease-out;
     }
 
-    /* Màu đỏ khi mở menu */
-    body.neon-active #nav-bubble.red-mode {
-        box-shadow:
-            0 0 0.1rem rgb(var(--neon-danger)) inset,
-            0 0 0.5rem rgb(var(--neon-danger)) inset,
-            0 0 1.5rem rgb(var(--neon-danger)),
-            0 0 3.5rem rgb(var(--neon-danger)),
-            0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-    }
-
-    /* Icon phát sáng */
-    body.neon-active #nav-bubble:hover #bubble-icon,
-    body.neon-active .sub-bubble.active i {
-        filter: drop-shadow(0 0 0.3rem rgb(var(--neon-primary)));
-        transition: filter 0.5s ease-out; /* Bật nhanh 0.5s */
-    }
-
-    body.neon-active #nav-bubble.red-mode #bubble-icon {
-        filter: drop-shadow(0 0 0.5rem rgb(var(--neon-danger)));
-    }
-
-    /* =================================================================
-       3. CÁC TRẠNG THÁI KHÁC
-       ================================================================= */
-
-    /* Active vật lý (khi mở menu) */
+    /* 1. TRẠNG THÁI ACTIVE (VẬT LÝ - LUÔN GIỮ NỀN VÀ SCALE) */
+    /* Scope Global để không bị mất khi Neon tắt */
     .sub-bubble.active {
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
         border: 0.0625rem solid #fff !important;
         color: #fff !important;
         transform: scale(1.15) !important;
+        z-index: 10;
         opacity: 1 !important;
     }
 
-    #nav-bubble.red-mode {
-        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        border-color: #fff !important;
+    /* 2. TRẠNG THÁI ACTIVE (ÁNH SÁNG) */
+    /* Scope Neon để chỉ sáng khi có đèn */
+    body.neon-active .sub-bubble.active {
+        box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0,0,0,0.2) !important;
+        transition: box-shadow 0.2s ease-out;
     }
+
+    /* 3. Hover (Chưa active) */
+    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        transform: scale(1.1) !important;
+        background-color: var(--sub-bg) !important; color: var(--sub-text) !important; border-color: var(--sub-border) !important; z-index: 100;
+        opacity: 1 !important;
+    }
+
+    /* ICON */
+    #bubble-icon, .sub-bubble i { transition: filter 0.5s ease-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); filter: none; transform: rotate(0deg); }
     #nav-bubble.red-mode #bubble-icon { transform: rotate(90deg); }
 
-    /* Hover nhẹ khi chưa active */
-    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
-        transform: scale(1.1);
-        transition: transform 0.2s;
-    }
+    #nav-bubble.hover-glow #bubble-icon, body.neon-mode-2 #nav-bubble #bubble-icon,
+    body.neon-active .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgba(var(--c-blue), 1)); }
+    #nav-bubble.red-mode #bubble-icon { filter: drop-shadow(0 0 0.5rem rgba(var(--c-red), 1)); }
 
-    /* Layout utils */
     .sub-bubbles-container { position: absolute; left: 0; width: 3.75rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; pointer-events: none; z-index: 1; }
     .main-bubble-badge { position: absolute; top: 0; right: 0; width: 1rem; height: 1rem; background-color: #ef4444; border: 0.0625rem solid #fff; border-radius: 50%; z-index: 11; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; transition: box-shadow 2s ease-out; }
-    body.neon-active .main-bubble-badge { box-shadow: 0 0 5px #ef4444; transition: box-shadow 0.5s ease-out; }
+    #nav-bubble.hover-glow .main-bubble-badge { box-shadow: 0 0 5px #ef4444; }
 
-    /* Popup & Backdrop */
     #nav-popup { position: fixed; z-index: 9999; background: var(--popup-bg); backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border); box-shadow: var(--popup-shadow); border-radius: 1.25rem !important; overflow: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; opacity: 0; visibility: hidden; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; width: fit-content; max-width: 95vw; display: flex; flex-direction: column; scrollbar-width: thin; }
     #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
     #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
@@ -195,15 +146,21 @@
             settings: document.getElementById('btn-open-settings')
         };
 
-        // --- GÁN SỰ KIỆN NEON (Hover In / Hover Out) ---
-        const neonTargets = document.querySelectorAll('.neon-target');
-        neonTargets.forEach(el => {
-            el.addEventListener('mouseenter', () => { if(window.NeonManager) window.NeonManager.wakeUp(); });
-            el.addEventListener('mouseleave', () => { if(window.NeonManager) window.NeonManager.sleep(); });
-            el.addEventListener('click', () => { if(window.NeonManager) window.NeonManager.wakeUp(); });
+        // --- BONG BÓNG CHÍNH ---
+        mainBubble.addEventListener('mouseenter', () => {
+            mainBubble.classList.add('hover-glow');
+            if(window.NeonManager) window.NeonManager.wakeUp();
+        });
+        mainBubble.addEventListener('mouseleave', () => {
+            mainBubble.classList.remove('hover-glow');
         });
 
-        // --- DRAG LOGIC ---
+        const otherTargets = document.querySelectorAll('.neon-target:not(#nav-bubble)');
+        otherTargets.forEach(el => {
+            el.addEventListener('mouseenter', () => { if(window.NeonManager) window.NeonManager.wakeUp(); });
+            el.addEventListener('touchstart', () => { if(window.NeonManager) window.NeonManager.wakeUp(); }, {passive: true});
+        });
+
         let isDragging = false, startX, startY, initialLeft, initialTop;
         const storageKeyPos = 'admin_bubblePos';
         const restorePosition = () => {
@@ -211,20 +168,33 @@
             if (savedPos) {
                 try {
                     const pos = JSON.parse(savedPos);
-                    let left = Math.min(Math.max(0, pos.left), window.innerWidth - 60);
-                    let top = Math.min(Math.max(0, pos.top), window.innerHeight - 60);
-                    wrapper.style.left = left + 'px'; wrapper.style.top = top + 'px';
-                    wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
-                } catch (e) {}
+                    let left = parseFloat(pos.left), top = parseFloat(pos.top);
+                    const winW = window.innerWidth, winH = window.innerHeight, bubbleSize = 60;
+                    if (!isNaN(left) && !isNaN(top)) {
+                        left = Math.min(Math.max(0, left), winW - bubbleSize);
+                        top = Math.min(Math.max(0, top), winH - bubbleSize);
+                        wrapper.style.left = left + 'px'; wrapper.style.top = top + 'px';
+                        wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
+                    }
+                } catch (e) { localStorage.removeItem(storageKeyPos); }
             }
         };
         restorePosition();
 
-        window.addEventListener('resize', () => { if(window.isSystemOpen) window.positionPopup(window.currentPopupMode); });
+        window.addEventListener('resize', () => {
+            if(!isDragging && wrapper.style.left) {
+                const r = wrapper.getBoundingClientRect();
+                const winW = window.innerWidth, winH = window.innerHeight;
+                let newLeft = Math.min(Math.max(0, r.left), winW - r.width);
+                let newTop = Math.min(Math.max(0, r.top), winH - r.height);
+                wrapper.style.left = newLeft + 'px'; wrapper.style.top = newTop + 'px';
+            }
+            if (window.isSystemOpen) window.positionPopup(window.currentPopupMode);
+        });
 
         const getPos = (e) => e.touches ? e.touches[0] : e;
         const onDragStart = (e) => {
-            if(window.NeonManager) window.NeonManager.wakeUp();
+            mainBubble.classList.add('hover-glow');
             isDragging = false; const p = getPos(e); startX = p.clientX; startY = p.clientY;
             const r = wrapper.getBoundingClientRect(); initialLeft = r.left; initialTop = r.top;
             Object.assign(wrapper.style, { left: r.left + 'px', top: r.top + 'px', bottom: 'auto', right: 'auto', transition: 'none' });
@@ -246,12 +216,16 @@
             document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd);
             document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', onDragEnd);
             document.body.classList.remove('no-select'); wrapper.style.transition = '';
-            if (isDragging) { localStorage.setItem(storageKeyPos, JSON.stringify({ left: parseFloat(wrapper.style.left), top: parseFloat(wrapper.style.top) })); setTimeout(() => isDragging = false, 50); }
+            if (isDragging) { localStorage.setItem(storageKeyPos, JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top })); setTimeout(() => isDragging = false, 50); }
         };
 
         mainBubble.addEventListener('mousedown', onDragStart);
         mainBubble.addEventListener('touchstart', onDragStart, { passive: false });
-        mainBubble.onclick = () => { if (!isDragging) window.isSystemOpen ? closeAll() : openAll('menu'); };
+        mainBubble.onclick = () => {
+            mainBubble.classList.add('hover-glow');
+            if(window.NeonManager) window.NeonManager.wakeUp();
+            if (!isDragging) window.isSystemOpen ? closeAll() : openAll('menu');
+        };
 
         window.openAll = (mode) => {
             if(window.NeonManager) window.NeonManager.wakeUp();

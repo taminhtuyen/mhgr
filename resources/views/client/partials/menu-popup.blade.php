@@ -22,7 +22,7 @@
         .menu-group-box[data-group="shopping"] { --neon-glow: #ffc107; } /* Warning */
         .menu-group-box[data-group="support"]  { --neon-glow: #0dcaf0; } /* Info */
 
-        /* --- 2. ĐỊNH DẠNG CHUNG (CLEAN TEXT) --- */
+        /* --- 2. ĐỊNH DẠNG CHUNG --- */
         .menu-link {
             display: flex;
             align-items: center;
@@ -32,157 +32,71 @@
             border-radius: 0.625rem;
             font-weight: 500;
             font-size: 0.92rem;
-            position: relative; /* Để định vị badge */
+            position: relative;
             white-space: nowrap;
         }
 
-        /* Badge giỏ hàng (Client Only) */
         .cart-badge {
-            position: absolute;
-            top: 0.375rem;
-            right: 0.375rem;
-            font-size: 0.625rem;
-            padding: 0.25rem 0.4rem;
-            min-width: 1.125rem;
-            z-index: 5;
-            line-height: 1;
+            position: absolute; top: 0.375rem; right: 0.375rem; font-size: 0.625rem;
+            padding: 0.25rem 0.4rem; min-width: 1.125rem; z-index: 5; line-height: 1;
             box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.2);
         }
 
-        /* --- 3. XỬ LÝ HOVER (COPY Y HỆT ADMIN - KHẮC PHỤC LỖI NHOÈ) --- */
-
-        /* [DARK MODE] - Chữ trắng + Đổ bóng Neon (Nổi bật trên nền tối) */
+        /* --- 3. XỬ LÝ HOVER --- */
         .menu-link:hover span,
         .menu-link:hover i {
             color: #ffffff !important;
             text-shadow: 0 0 0.3125rem var(--neon-glow);
         }
 
-        /* [LIGHT MODE] - Chữ đổi màu theo nhóm + KHÔNG ĐỔ BÓNG (Giúp chữ sắc nét, không bị nhoè) */
         body:not(.dark-mode) .menu-link:hover span,
         body:not(.dark-mode) .menu-link:hover i {
             color: var(--neon-glow) !important;
             text-shadow: none !important;
         }
 
-        /* --- 4. CHẾ ĐỘ DANH SÁCH (LIST VIEW) --- */
-        .view-mode-list {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5625rem;
-        }
+        /* --- 4. VIEW MODES --- */
+        .view-mode-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5625rem; }
+        .view-mode-list .menu-items-container { display: flex; flex-direction: column; gap: 0.3125rem; }
+        .view-mode-list .menu-link { padding: 0.5625rem 0.875rem; border: 0.0625rem solid transparent; }
 
-        .view-mode-list .menu-items-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3125rem;
-        }
-
-        .view-mode-list .menu-link {
-            padding: 0.5625rem 0.875rem;
-            /* Border trong suốt để tránh giật layout khi hover */
-            border: 0.0625rem solid transparent;
-        }
-
-        /* HIỆU ỨNG KHUNG HOVER (NEON BOX) - GIỐNG ADMIN */
         .view-mode-list .menu-link:hover {
-            background-color: transparent !important;
-            border-color: #ffffff !important;
-            box-shadow:
-                inset 0 0 0.3125rem var(--neon-glow),
-                0 0 0.3125rem var(--neon-glow),
-                0 0 0.9375rem var(--neon-glow);
+            background-color: transparent !important; border-color: #ffffff !important;
+            box-shadow: inset 0 0 0.3125rem var(--neon-glow), 0 0 0.3125rem var(--neon-glow), 0 0 0.9375rem var(--neon-glow);
             transform: none !important;
         }
 
-        .view-mode-list .menu-link i {
-            width: 1.5rem;
-            margin-right: 0.625rem;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-        /* Icon đổi màu đã xử lý ở mục 3 */
+        .view-mode-list .menu-link i { width: 1.5rem; margin-right: 0.625rem; text-align: center; color: var(--text-muted); font-size: 1rem; }
 
         @media (max-width: 998px) { .view-mode-list { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 576px) { .view-mode-list { grid-template-columns: 1fr; } }
 
-        /* --- 5. CHẾ ĐỘ LƯỚI (GRID VIEW) --- */
-        .view-mode-grid .menu-items-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.9375rem;
-        }
-
+        .view-mode-grid .menu-items-container { display: flex; flex-wrap: wrap; gap: 0.9375rem; }
         .view-mode-grid .menu-link {
-            flex-direction: column;
-            justify-content: center;
-            width: 5.75rem;
-            height: 5.75rem;
-            background: transparent;
-            border: 0.0625rem solid var(--popup-border-highlight);
-            border-radius: 0.75rem;
-            padding: 0.75rem 0.3125rem;
+            flex-direction: column; justify-content: center; width: 5.75rem; height: 5.75rem;
+            background: transparent; border: 0.0625rem solid var(--popup-border-highlight);
+            border-radius: 0.75rem; padding: 0.75rem 0.3125rem;
         }
-
-        /* Hiệu ứng khung Neon cho Grid */
         .view-mode-grid .menu-link:hover {
-            background-color: transparent !important;
-            border-color: #ffffff !important;
-            box-shadow:
-                inset 0 0 0.3125rem var(--neon-glow),
-                0 0 0.3125rem var(--neon-glow),
-                0 0 0.9375rem var(--neon-glow);
+            background-color: transparent !important; border-color: #ffffff !important;
+            box-shadow: inset 0 0 0.3125rem var(--neon-glow), 0 0 0.3125rem var(--neon-glow), 0 0 0.9375rem var(--neon-glow);
             transform: none !important;
         }
+        .view-mode-grid .menu-link i { font-size: 1.75rem; margin-bottom: 0.625rem; color: var(--neon-glow); }
+        .view-mode-grid .menu-link span { font-size: 0.75rem; font-weight: 700; line-height: 1.2; text-align: center; }
 
-        .view-mode-grid .menu-link i {
-            font-size: 1.75rem;
-            margin-bottom: 0.625rem;
-            color: var(--neon-glow);
-        }
-
-        .view-mode-grid .menu-link span {
-            font-size: 0.75rem;
-            font-weight: 700;
-            line-height: 1.2;
-            text-align: center;
-        }
-
-        /* --- 6. GIAO DIỆN HEADER & SCROLL --- */
-        #menu-interface {
-            width: 100%;
-            overflow-y: auto;
-            max-height: 80vh;
-            scrollbar-width: thin;
-            overscroll-behavior: contain;
-        }
-
+        /* --- 5. HEADER --- */
+        #menu-interface { width: 100%; overflow-y: auto; max-height: 80vh; scrollbar-width: thin; overscroll-behavior: contain; }
         #menu-interface::-webkit-scrollbar { width: 0.375rem; }
         #menu-interface::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 0.625rem; }
-
         .popup-header {
-            padding: 1.125rem 1.5625rem;
-            border-bottom: 0.0625rem solid var(--popup-border);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background-color: var(--popup-bg); /* Dùng biến chung */
-            backdrop-filter: blur(0.625rem);
-            -webkit-backdrop-filter: blur(0.625rem);
-            margin-top: -0.0625rem;
+            padding: 1.125rem 1.5625rem; border-bottom: 0.0625rem solid var(--popup-border); position: sticky; top: 0; z-index: 50;
+            background-color: var(--popup-bg); backdrop-filter: blur(0.625rem); -webkit-backdrop-filter: blur(0.625rem); margin-top: -0.0625rem;
         }
-
         .menu-main-wrapper { padding: 1.5625rem; }
-
         .group-title {
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 0.625rem;
-            letter-spacing: 0.05rem;
-            padding-bottom: 0.3125rem;
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted);
+            margin-bottom: 0.625rem; letter-spacing: 0.05rem; padding-bottom: 0.3125rem;
             border-bottom: 0.125rem solid rgba(0,0,0,0.03);
         }
         body.dark-mode .group-title { border-bottom-color: rgba(255,255,255,0.05); }
@@ -204,10 +118,10 @@
         <div class="menu-group-box" data-group="explore">
             <div class="group-title text-primary">KHÁM PHÁ</div>
             <div class="menu-items-container" data-group-id="explore">
-                <a href="/" class="menu-link" data-id="home"><i class="fa-solid fa-house"></i> <span>Trang Chủ</span></a>
-                <a href="#" class="menu-link" data-id="store"><i class="fa-solid fa-store"></i> <span>Cửa Hàng</span></a>
-                <a href="#" class="menu-link" data-id="hot"><i class="fa-solid fa-fire"></i> <span>Khuyến Mãi Hot</span></a>
-                <a href="#" class="menu-link" data-id="news"><i class="fa-solid fa-newspaper"></i> <span>Tin Tức</span></a>
+                <a href="/" class="menu-link neon-trigger" data-id="home"><i class="fa-solid fa-house"></i> <span>Trang Chủ</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="store"><i class="fa-solid fa-store"></i> <span>Cửa Hàng</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="hot"><i class="fa-solid fa-fire"></i> <span>Khuyến Mãi Hot</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="news"><i class="fa-solid fa-newspaper"></i> <span>Tin Tức</span></a>
             </div>
         </div>
 
@@ -215,8 +129,8 @@
         <div class="menu-group-box" data-group="personal">
             <div class="group-title text-success">CÁ NHÂN</div>
             <div class="menu-items-container" data-group-id="personal">
-                <a href="#" class="menu-link" data-id="account"><i class="fa-solid fa-user-gear"></i> <span>Tài Khoản</span></a>
-                <a href="#" class="menu-link" data-id="wishlist"><i class="fa-solid fa-heart"></i> <span>Yêu Thích</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="account"><i class="fa-solid fa-user-gear"></i> <span>Tài Khoản</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="wishlist"><i class="fa-solid fa-heart"></i> <span>Yêu Thích</span></a>
             </div>
         </div>
 
@@ -224,12 +138,12 @@
         <div class="menu-group-box" data-group="shopping">
             <div class="group-title text-warning">MUA SẮM</div>
             <div class="menu-items-container" data-group-id="shopping">
-                <a href="#" class="menu-link" data-id="cart">
+                <a href="#" class="menu-link neon-trigger" data-id="cart">
                     <i class="fa-solid fa-cart-shopping"></i> <span>Giỏ Hàng</span>
                     <span class="badge bg-danger rounded-pill cart-badge">3</span>
                 </a>
-                <a href="#" class="menu-link" data-id="orders"><i class="fa-solid fa-truck-fast"></i> <span>Đơn Mua</span></a>
-                <a href="#" class="menu-link" data-id="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch Sử</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="orders"><i class="fa-solid fa-truck-fast"></i> <span>Đơn Mua</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lịch Sử</span></a>
             </div>
         </div>
 
@@ -237,8 +151,8 @@
         <div class="menu-group-box" data-group="support">
             <div class="group-title text-info">HỖ TRỢ</div>
             <div class="menu-items-container" data-group-id="support">
-                <a href="#" class="menu-link" data-id="help"><i class="fa-solid fa-circle-question"></i> <span>Trợ Giúp</span></a>
-                <a href="#" class="menu-link" data-id="security"><i class="fa-solid fa-shield-halved"></i> <span>Bảo Mật</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="help"><i class="fa-solid fa-circle-question"></i> <span>Trợ Giúp</span></a>
+                <a href="#" class="menu-link neon-trigger" data-id="security"><i class="fa-solid fa-shield-halved"></i> <span>Bảo Mật</span></a>
             </div>
         </div>
     </div>
@@ -247,7 +161,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const menuWrapper = document.getElementById('menu-container');
-        // Logic hiển thị theo cấu hình đã lưu
         const savedView = localStorage.getItem('client_menu_view') || 'list';
         applyMenuView(savedView);
 
@@ -261,7 +174,6 @@
             }
         }
 
-        // Kích hoạt Sortable cho Client
         const groups = document.querySelectorAll('.menu-items-container');
         groups.forEach(group => {
             const groupId = group.getAttribute('data-group-id');
@@ -282,6 +194,17 @@
                     }
                 }
             });
+        });
+
+        // --- LOGIC KÍCH HOẠT ĐÈN NEON KHI DI CHUỘT VÀO MENU (ĐỒNG BỘ ADMIN) ---
+        const links = document.querySelectorAll('.neon-trigger');
+        links.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                if (typeof NeonManager !== 'undefined') NeonManager.wakeUp();
+            });
+            link.addEventListener('touchstart', () => {
+                if (typeof NeonManager !== 'undefined') NeonManager.wakeUp();
+            }, { passive: true });
         });
 
         window.renderMenuContent = function() {

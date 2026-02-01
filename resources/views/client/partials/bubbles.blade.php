@@ -1,21 +1,21 @@
 <div id="bubble-wrapper" style="position: fixed; bottom: 1.875rem; right: 1.875rem; z-index: 10000;">
     {{-- 3 BONG BÓNG CON --}}
     <div class="sub-bubbles-container">
-        <div class="sub-bubble" id="btn-open-menu" title="Menu chức năng">
+        <div class="sub-bubble neon-target" id="btn-open-menu" title="Menu chức năng">
             <i class="fa-solid fa-table-cells"></i>
         </div>
-        <div class="sub-bubble" id="btn-open-chat" title="Tin nhắn">
+        <div class="sub-bubble neon-target" id="btn-open-chat" title="Tin nhắn">
             <i class="fa-solid fa-comments"></i>
             {{-- Badge đếm số lượng --}}
             <span class="badge-counter">1</span>
         </div>
-        <div class="sub-bubble" id="btn-open-settings" title="Cài đặt">
+        <div class="sub-bubble neon-target" id="btn-open-settings" title="Cài đặt">
             <i class="fa-solid fa-gear"></i>
         </div>
     </div>
 
     {{-- BONG BÓNG CHÍNH --}}
-    <div id="nav-bubble" title="Mở rộng">
+    <div id="nav-bubble" class="neon-target" title="Mở rộng">
         {{-- Icon sẽ xoay riêng biệt --}}
         <i class="fa-solid fa-bars" id="bubble-icon"></i>
 
@@ -25,7 +25,6 @@
 </div>
 
 <style>
-    /* --- 1. ĐỊNH NGHĨA BIẾN --- */
     :root {
         --c-blue: 0, 191, 255;
         --c-red: 255, 49, 49;
@@ -34,14 +33,8 @@
         --sub-text: #374151;
         --neon-duration: 0.5s;
     }
+    body.dark-mode { --sub-bg: #1e293b; --sub-border: #334155; --sub-text: #f8fafc; }
 
-    body.dark-mode {
-        --sub-bg: #1e293b;
-        --sub-border: #334155;
-        --sub-text: #f8fafc;
-    }
-
-    /* WRAPPER */
     #bubble-wrapper {
         position: fixed; z-index: 10000;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
@@ -50,10 +43,7 @@
     }
     #bubble-wrapper.scroll-hidden { transform: scale(0.9); opacity: 0; visibility: hidden; pointer-events: none; }
 
-    /* =================================================================
-       2. TRẠNG THÁI BÌNH THƯỜNG (KHI ĐÈN ĐANG SÁNG)
-       ================================================================= */
-
+    /* --- BONG BÓNG CHÍNH --- */
     #nav-bubble {
         width: 3.75rem; height: 3.75rem;
         background: linear-gradient(135deg, #0ea5e9, #0284c7);
@@ -61,143 +51,101 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 1.5rem; cursor: pointer; position: relative; z-index: 10;
         border: 0.0625rem solid transparent;
-        box-shadow: 0 0 0 0 rgba(var(--c-blue), 0) inset, 0 0 0 0 rgba(var(--c-blue), 0) inset, 0 0 0 0 rgba(var(--c-blue), 0), 0 0 0 0 rgba(var(--c-blue), 0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-
-        /* Loại bỏ hoàn toàn phóng to cho bong bóng to */
         transform: scale(1);
-        transition: all var(--neon-duration) ease-out;
+        box-shadow: none;
+
+        transition:
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            background-color 0.3s ease,
+            box-shadow 2.0s ease-out, /* Tắt đèn chậm 2s */
+            border-color 2.0s ease-out;
     }
 
-    /* Hover chỉ sáng đèn, không zoom */
-    #nav-bubble:not(.no-hover-glow):hover {
+    /* Glow Bong bóng chính */
+    #nav-bubble.hover-glow,
+    body.neon-mode-2 #nav-bubble {
+        box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
         border-color: #fff;
-        box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
     }
 
+    /* Red Mode (Khi mở menu) */
     #nav-bubble.red-mode {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
         border-color: #fff !important;
-        transform: scale(1);
         box-shadow: 0 0 0.1rem rgba(var(--c-red), 1) inset, 0 0 0.5rem rgba(var(--c-red), 1) inset, 0 0 1.5rem rgba(var(--c-red), 1), 0 0 3.5rem rgba(var(--c-red), 1), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
     }
 
+    /* =================================================================
+       LOGIC BONG BÓNG CON - TÁCH BIỆT VẬT LÝ VÀ ÁNH SÁNG
+       ================================================================= */
     .sub-bubble {
         width: 3.125rem; height: 3.125rem;
         background-color: var(--sub-bg); border: 0.0625rem solid var(--sub-border); color: var(--sub-text);
         backdrop-filter: blur(0.6rem); border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-size: 1.25rem; cursor: pointer; opacity: 0; transform: scale(0); position: relative;
-        box-shadow: 0 0 0 0 rgba(0,0,0,0);
-        transition: all var(--neon-duration) ease-out;
+        box-shadow: none;
+
+        /* Transition tách biệt */
+        transition:
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), /* Vật lý nhanh */
+            background-color 0.3s ease,                   /* Màu nền nhanh */
+            color 0.3s ease,
+            box-shadow 2.0s ease-out,                     /* Ánh sáng tắt chậm */
+            border-color 2.0s ease-out;
     }
 
-    /* [UPDATE] Tăng độ ưu tiên để hover hoạt động khi expanded (Fix lỗi không zoom) */
-    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
-        transform: scale(1.1);
-    }
-
-    /* Sub-bubble đang chọn giữ scale 1.15 để nổi bật */
+    /* 1. TRẠNG THÁI ACTIVE (VẬT LÝ - LUÔN GIỮ NỀN VÀ SCALE) */
+    /* Nằm ngoài scope body.neon-active để không bị mất khi tắt đèn */
     .sub-bubble.active {
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
-        border: 0.0625rem solid #fff !important; color: #fff !important; transform: scale(1.15) !important;
+        border: 0.0625rem solid #fff !important;
+        color: #fff !important;
+        transform: scale(1.15) !important; /* Active scale to 1.15 */
+        z-index: 10;
+        opacity: 1 !important;
+    }
+
+    /* 2. TRẠNG THÁI ACTIVE (ÁNH SÁNG - CHỈ KHI CÓ ĐÈN) */
+    body.neon-active .sub-bubble.active {
         box-shadow: 0 0 0.1rem rgba(var(--c-blue), 1) inset, 0 0 0.5rem rgba(var(--c-blue), 1) inset, 0 0 1rem rgba(var(--c-blue), 1), 0 0 2.5rem rgba(var(--c-blue), 1), 0 0.5rem 1rem rgba(0,0,0,0.2) !important;
+        /* Khi đèn bật lại, shadow hiện nhanh 0.2s */
+        transition: box-shadow 0.2s ease-out;
     }
 
-    #bubble-icon, .sub-bubble i { transition: filter var(--neon-duration) ease-out, transform 0.4s ease; }
-    #nav-bubble:hover #bubble-icon, .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgba(var(--c-blue), 1)); }
-    #nav-bubble.red-mode #bubble-icon { filter: drop-shadow(0 0 0.5rem rgba(var(--c-red), 1)); transform: rotate(90deg); }
-
-    .main-bubble-badge {
-        position: absolute; top: 0; right: 0; width: 1rem; height: 1rem;
-        background-color: #ef4444; border: 0.0625rem solid #fff; border-radius: 50%; z-index: 11;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none;
-        transition: all var(--neon-duration) ease-out;
+    /* 3. TRẠNG THÁI HOVER CHƯA ACTIVE (Scale 1.1, giữ nền gốc) */
+    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        transform: scale(1.1) !important;
+        background-color: var(--sub-bg) !important;
+        color: var(--sub-text) !important;
+        border-color: var(--sub-border) !important;
+        z-index: 5;
+        opacity: 1 !important;
     }
+
+    /* ICON */
+    #bubble-icon, .sub-bubble i { transition: filter 0.5s ease-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); filter: none; transform: rotate(0deg); }
+    #nav-bubble.red-mode #bubble-icon { transform: rotate(90deg); }
+
+    /* Glow Icon */
+    #nav-bubble.hover-glow #bubble-icon, body.neon-mode-2 #nav-bubble #bubble-icon,
+    body.neon-active .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgba(var(--c-blue), 1)); }
+    #nav-bubble.red-mode #bubble-icon { filter: drop-shadow(0 0 0.5rem rgba(var(--c-red), 1)); }
+
+    /* Layout & Badge */
+    .main-bubble-badge { position: absolute; top: 0; right: 0; width: 1rem; height: 1rem; background-color: #ef4444; border: 0.0625rem solid #fff; border-radius: 50%; z-index: 11; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; transition: all 0.5s ease-out; }
+    #nav-bubble.hover-glow .main-bubble-badge { box-shadow: 0 0 5px #ef4444; }
     .sub-bubbles-container { position: absolute; left: 0; width: 3.75rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; pointer-events: none; z-index: 1; }
+    #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
 
-    /* =================================================================
-       3. TRẠNG THÁI TẮT ĐÈN (NEON-OFF) - ĐÃ FIX LỖI TẮT BỤP
-       ================================================================= */
-
-    /* [CƠ CHẾ ĐỒNG BỘ MỚI] */
-    body.neon-off #nav-bubble,
-    body.neon-off #nav-bubble:hover,
-    body.neon-off .sub-bubble,
-        /* body.neon-off .sub-bubble:hover, -> XÓA DÒNG NÀY ĐỂ TRÁNH CONFLICT TRANSITION KHI HOVER */
-    body.neon-off .main-bubble-badge,
-    body.neon-off #bubble-icon,
-    body.neon-off .sub-bubble i {
-        /* Bắt buộc giữ 2s cho mọi thay đổi liên quan đến ánh sáng và màu sắc */
-        transition:
-            box-shadow 2s ease-out,
-            border-color 2s ease-out,
-            background-color 2s ease-out,
-            color 2s ease-out,
-            transform 2s ease-out, /* Đồng bộ scale */
-            filter 2s ease-out !important;
-        transition-delay: 0s !important;
-    }
-
-    /* Riêng trạng thái hover trong neon-off vẫn cần transition mượt nhưng force 2s */
-    body.neon-off .sub-bubble:hover {
-        transition: all 2s ease-out !important;
-    }
-
-    /* 3.1. LOẠI BỎ VIỀN cho các bóng CHƯA được chọn */
-    body.neon-off #nav-bubble:not(.red-mode),
-    body.neon-off .sub-bubble:not(.active) {
-        border-color: transparent !important;
-        box-shadow: 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0), 0 0 0 0 rgba(0,0,0,0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-        transform: scale(1); /* [UPDATE] Bỏ !important để cho phép hover override */
-    }
-
-    /* [UPDATE] Hover khi tắt đèn vẫn zoom (nếu muốn) hoặc ít nhất không bị lỗi */
-    body.neon-off #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
-        transform: scale(1.1);
-    }
-
-    /* 3.2. GIỮ VIỀN VÀ NỀN cho bong bóng con ĐANG CHỌN (ACTIVE) */
-    body.neon-off .sub-bubble.active {
-        border-color: #ffffff !important;
-        background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
-        transform: scale(1.15) !important;
-        box-shadow: 0 0 0 0 rgba(var(--c-blue), 0) inset, 0 0 0 0 rgba(var(--c-blue), 0) inset, 0 0 0 0 rgba(var(--c-blue), 0), 0 0 0 0 rgba(var(--c-blue), 0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-    }
-
-    /* 3.3. GIỮ VIỀN VÀ NỀN cho bong bóng Menu chính đang mở (RED MODE) */
-    body.neon-off #nav-bubble.red-mode {
-        border-color: #ffffff !important;
-        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        transform: scale(1) !important; /* Không zoom */
-        box-shadow: 0 0 0 0 rgba(var(--c-red), 0) inset, 0 0 0 0 rgba(var(--c-red), 0) inset, 0 0 0 0 rgba(var(--c-red), 0), 0 0 0 0 rgba(var(--c-red), 0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-    }
-
-    /* 3.4. Tắt Filter và Badge */
-    body.neon-off #bubble-icon,
-    body.neon-off .sub-bubble i { filter: none !important; }
-    body.neon-off .main-bubble-badge {
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important; border-color: #fff !important;
-    }
-
-    /* --- POPUP & BACKDROP --- */
-    #nav-popup {
-        position: fixed; z-index: 9999; background: var(--popup-bg);
-        backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border);
-        box-shadow: var(--popup-shadow); border-radius: 1.25rem !important; overflow: hidden !important;
-        overflow-y: auto !important; -webkit-overflow-scrolling: touch;
-        opacity: 0; visibility: hidden; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s;
-        width: fit-content; max-width: 95vw; display: flex; flex-direction: column;
-        scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent;
-    }
+    /* Popup & Backdrop */
+    #nav-popup { position: fixed; z-index: 9999; background: var(--popup-bg); backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border); box-shadow: var(--popup-shadow); border-radius: 1.25rem !important; overflow: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; opacity: 0; visibility: hidden; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; width: fit-content; max-width: 95vw; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
     #nav-popup::-webkit-scrollbar { width: 4px; }
     #nav-popup::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
     #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
-    #nav-backdrop {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998;
-        opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px);
-    }
+    #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
     #nav-backdrop.active { opacity: 1; visibility: visible; }
-    #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
 </style>
 
 <script>
@@ -213,63 +161,38 @@
             chat: document.getElementById('btn-open-chat'),
             settings: document.getElementById('btn-open-settings')
         };
-        const allBubbles = [mainBubble, btns.menu, btns.chat, btns.settings];
 
-        window.isSystemOpen = false;
-        window.currentPopupMode = 'menu';
-
-        // --- LOGIC NEON AUTO OFF ---
-        let neonTimeout;
-
-        const startNeonCountdown = () => {
-            if(localStorage.getItem('client_neon_auto_off') === 'true') {
-                clearTimeout(neonTimeout);
-                neonTimeout = setTimeout(() => {
-                    document.body.classList.add('neon-off');
-                }, 5000);
-            }
-        };
-
-        const wakeUpNeon = () => {
-            document.body.classList.remove('neon-off');
-            startNeonCountdown();
-        };
-
-        window.initNeonEffect = function() {
-            const isAutoOff = localStorage.getItem('client_neon_auto_off') === 'true';
-            clearTimeout(neonTimeout);
-            if (!isAutoOff) {
-                document.body.classList.remove('neon-off');
-            } else {
-                startNeonCountdown();
-            }
-        };
-
-        allBubbles.forEach(bubble => {
-            if(bubble) {
-                bubble.addEventListener('click', wakeUpNeon);
-                bubble.addEventListener('touchstart', wakeUpNeon, { passive: true });
-                bubble.addEventListener('mouseenter', wakeUpNeon);
-            }
+        // --- BONG BÓNG CHÍNH ---
+        mainBubble.addEventListener('mouseenter', () => {
+            mainBubble.classList.add('hover-glow');
+            if(window.NeonManager) window.NeonManager.wakeUp();
+        });
+        mainBubble.addEventListener('mouseleave', () => {
+            mainBubble.classList.remove('hover-glow');
         });
 
-        window.initNeonEffect();
+        const otherTargets = document.querySelectorAll('.neon-target:not(#nav-bubble)');
+        otherTargets.forEach(el => {
+            el.addEventListener('mouseenter', () => { if(window.NeonManager) window.NeonManager.wakeUp(); });
+            el.addEventListener('touchstart', () => { if(window.NeonManager) window.NeonManager.wakeUp(); }, {passive: true});
+        });
 
-        // --- POSITION RESTORE ---
         let isDragging = false, startX, startY, initialLeft, initialTop;
+        const storageKeyPos = 'client_bubblePos';
         const restorePosition = () => {
-            const savedPos = localStorage.getItem('client_bubblePos');
+            const savedPos = localStorage.getItem(storageKeyPos);
             if (savedPos) {
                 try {
                     const pos = JSON.parse(savedPos);
                     let left = parseFloat(pos.left), top = parseFloat(pos.top);
                     const winW = window.innerWidth, winH = window.innerHeight, bubbleSize = 60;
-                    if (isNaN(left) || isNaN(top)) return;
-                    left = Math.min(Math.max(0, left), winW - bubbleSize);
-                    top = Math.min(Math.max(0, top), winH - bubbleSize);
-                    wrapper.style.left = left + 'px'; wrapper.style.top = top + 'px';
-                    wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
-                } catch (e) { localStorage.removeItem('client_bubblePos'); }
+                    if (!isNaN(left) && !isNaN(top)) {
+                        left = Math.min(Math.max(0, left), winW - bubbleSize);
+                        top = Math.min(Math.max(0, top), winH - bubbleSize);
+                        wrapper.style.left = left + 'px'; wrapper.style.top = top + 'px';
+                        wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
+                    }
+                } catch (e) { localStorage.removeItem(storageKeyPos); }
             }
         };
         restorePosition();
@@ -278,17 +201,16 @@
             if(!isDragging && wrapper.style.left) {
                 const r = wrapper.getBoundingClientRect();
                 const winW = window.innerWidth, winH = window.innerHeight;
-                let newLeft = r.left, newTop = r.top;
-                if (newLeft + r.width > winW) newLeft = winW - r.width - 10;
-                if (newTop + r.height > winH) newTop = winH - r.height - 10;
-                wrapper.style.left = Math.max(0, newLeft) + 'px'; wrapper.style.top = Math.max(0, newTop) + 'px';
+                let newLeft = Math.min(Math.max(0, r.left), winW - r.width);
+                let newTop = Math.min(Math.max(0, r.top), winH - r.height);
+                wrapper.style.left = newLeft + 'px'; wrapper.style.top = newTop + 'px';
             }
             if (window.isSystemOpen) window.positionPopup(window.currentPopupMode);
         });
 
         const getPos = (e) => e.touches ? e.touches[0] : e;
         const onDragStart = (e) => {
-            wakeUpNeon();
+            mainBubble.classList.add('hover-glow');
             isDragging = false; const p = getPos(e); startX = p.clientX; startY = p.clientY;
             const r = wrapper.getBoundingClientRect(); initialLeft = r.left; initialTop = r.top;
             Object.assign(wrapper.style, { left: r.left + 'px', top: r.top + 'px', bottom: 'auto', right: 'auto', transition: 'none' });
@@ -300,9 +222,8 @@
             const p = getPos(e);
             if (Math.abs(p.clientX - startX) > 5 || Math.abs(p.clientY - startY) > 5) {
                 isDragging = true; e.preventDefault();
-                let nL = initialLeft + (p.clientX - startX); let nT = initialTop + (p.clientY - startY);
-                nL = Math.min(Math.max(0, nL), window.innerWidth - wrapper.offsetWidth);
-                nT = Math.min(Math.max(0, nT), window.innerHeight - wrapper.offsetHeight);
+                let nL = Math.min(Math.max(0, initialLeft + (p.clientX - startX)), window.innerWidth - wrapper.offsetWidth);
+                let nT = Math.min(Math.max(0, initialTop + (p.clientY - startY)), window.innerHeight - wrapper.offsetHeight);
                 wrapper.style.left = `${nL}px`; wrapper.style.top = `${nT}px`;
                 if (window.isSystemOpen) { expandBubblesVisual(); window.positionPopup(window.currentPopupMode); }
             }
@@ -311,15 +232,19 @@
             document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd);
             document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', onDragEnd);
             document.body.classList.remove('no-select'); wrapper.style.transition = '';
-            if (isDragging) { localStorage.setItem('client_bubblePos', JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top })); setTimeout(() => isDragging = false, 50); }
+            if (isDragging) { localStorage.setItem(storageKeyPos, JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top })); setTimeout(() => isDragging = false, 50); }
         };
+
         mainBubble.addEventListener('mousedown', onDragStart);
         mainBubble.addEventListener('touchstart', onDragStart, { passive: false });
-
-        mainBubble.onclick = () => { if (!isDragging) window.isSystemOpen ? closeAll() : openAll('menu'); };
+        mainBubble.onclick = () => {
+            mainBubble.classList.add('hover-glow');
+            if(window.NeonManager) window.NeonManager.wakeUp();
+            if (!isDragging) window.isSystemOpen ? closeAll() : openAll('menu');
+        };
 
         window.openAll = (mode) => {
-            wakeUpNeon();
+            if(window.NeonManager) window.NeonManager.wakeUp();
             window.isSystemOpen = true; window.currentPopupMode = mode;
             expandBubblesVisual();
             if(mode === 'menu' && typeof window.renderMenuContent === 'function') window.renderMenuContent();
@@ -335,7 +260,7 @@
         };
 
         window.closeAll = () => {
-            wakeUpNeon();
+            if(window.NeonManager) window.NeonManager.wakeUp();
             window.isSystemOpen = false; wrapper.classList.remove('expanded'); popup.classList.remove('active');
             icon.classList.replace('fa-xmark', 'fa-bars'); backdrop.classList.remove('active');
             mainBubble.classList.remove('red-mode'); highlight(null);
