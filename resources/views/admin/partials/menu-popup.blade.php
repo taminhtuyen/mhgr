@@ -233,13 +233,10 @@
         <div class="menu-group-box" data-group-id="content">
             <div class="group-title text-secondary">NỘI DUNG</div>
             <div class="menu-items-container" data-sort-group="content">
-                {{-- MỚI: BẢN TIN (NEWS) --}}
                 <a href="{{ route('admin.content.news.index') }}" class="menu-link neon-trigger" data-id="news"><i class="fa-solid fa-bullhorn"></i> <span>Bản Tin</span></a>
-                {{-- CẬP NHẬT: POSTS -> KIẾN THỨC SP --}}
                 <a href="{{ route('admin.content.posts.index') }}" class="menu-link neon-trigger" data-id="posts"><i class="fa-solid fa-book-open"></i> <span>Kiến Thức SP</span></a>
                 <a href="{{ route('admin.content.banners.index') }}" class="menu-link neon-trigger" data-id="banners"><i class="fa-solid fa-image"></i> <span>Banner</span></a>
                 <a href="{{ route('admin.content.menus.index') }}" class="menu-link neon-trigger" data-id="menus"><i class="fa-solid fa-bars"></i> <span>Menu Web</span></a>
-                {{-- MỚI: KHỐI TĨNH (CONTENTS) --}}
                 <a href="{{ route('admin.content.contents.index') }}" class="menu-link neon-trigger" data-id="static_contents"><i class="fa-solid fa-puzzle-piece"></i> <span>Khối Tĩnh</span></a>
                 <a href="{{ route('admin.content.images.index') }}" class="menu-link neon-trigger" data-id="images"><i class="fa-solid fa-images"></i> <span>Thư Viện</span></a>
                 <a href="{{ route('admin.content.game-subjects.index') }}" class="menu-link neon-trigger" data-id="games"><i class="fa-solid fa-gamepad"></i> <span>Game/Học</span></a>

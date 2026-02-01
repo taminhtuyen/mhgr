@@ -3,6 +3,8 @@
 @section('title', $title ?? 'Quản lý ShippingPartner')
 
 @section('content')
+    @include('admin.partials.schema-view')
+
     {{--
         GEMINI NOTE:
         Đây là giao diện "Hồ sơ thiết kế" (Placeholder).
