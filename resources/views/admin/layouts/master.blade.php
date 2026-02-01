@@ -11,7 +11,6 @@
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
     @livewireStyles
-
     @stack('styles')
 
     <style>
@@ -25,13 +24,15 @@
             --popup-border: rgba(0, 0, 0, 0.08);
             --popup-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
             --link-hover-bg: #f1f5f9;
-            --link-hover-text: #0ea5e9;
             --primary: #0ea5e9;
             --scrollbar-thumb: #cbd5e1;
-            --input-darker: #f1f5f9;
-            --transDur: 0.3s;
 
-            /* Modal Colors Light */
+            /* Switch Colors */
+            --switch-gray: #9ca3af;
+            --switch-green: #10b981;
+            --switch-knob: #ffffff;
+
+            /* Modal Colors */
             --modal-bg: rgba(255, 255, 255, 0.9);
             --modal-text: #000;
             --modal-border: rgba(60, 60, 67, 0.29);
@@ -46,12 +47,9 @@
             --popup-border: rgba(255, 255, 255, 0.1);
             --popup-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             --link-hover-bg: rgba(255, 255, 255, 0.08);
-            --link-hover-text: #38bdf8;
             --primary: #38bdf8;
             --scrollbar-thumb: #334155;
-            --input-darker: #0b1120;
-
-            /* Modal Colors Dark */
+            --switch-gray: #4b5563;
             --modal-bg: rgba(30, 30, 30, 0.9);
             --modal-text: #fff;
             --modal-border: rgba(84, 84, 88, 0.65);
@@ -78,77 +76,44 @@
         body.dark-mode .text-dark { color: #f1f5f9 !important; }
         body.dark-mode .text-primary { color: #38bdf8 !important; }
         body.dark-mode .text-secondary { color: #cbd5e1 !important; }
-        body.dark-mode .border-bottom { border-color: var(--popup-border) !important; }
         body.dark-mode .form-control { background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #fff; }
         body.dark-mode .form-control:focus { background-color: rgba(255,255,255,0.08); border-color: var(--primary); color: #fff; box-shadow: none; }
 
-        /* ====== GLOBAL CONFIRM MODAL (iOS STYLE - DYNAMIC) ====== */
+        /* Component Tri-State Switch */
+        .tri-state-toggle { position: relative; display: inline-flex; align-items: center; cursor: pointer; width: 3rem; height: 3rem; user-select: none; }
+        .tri-state-toggle .toggle-bg { width: 3rem; height: 1.6rem; border-radius: 9999px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: absolute; top: 50%; transform: translateY(-50%); left: 0; right: 0; background-color: var(--switch-gray); }
+        .tri-state-toggle .toggle-knob { width: 2.2rem; height: 2.2rem; background-color: var(--switch-knob); border-radius: 9999px; position: absolute; top: 50%; left: 0; transform: translateY(-50%) rotate(-180deg); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 800; color: var(--switch-gray); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2; }
+        .tri-state-toggle[data-state="0"] .toggle-bg { background-color: var(--switch-gray); opacity: 0.5; }
+        .tri-state-toggle[data-state="0"] .toggle-knob { left: 0; transform: translateY(-50%) rotate(-180deg); color: #9ca3af; }
+        .tri-state-toggle[data-state="0"] .toggle-knob::after { content: ''; width: 8px; height: 8px; background: #d1d5db; border-radius: 50%; }
+        .tri-state-toggle[data-state="1"] .toggle-bg { background-color: var(--switch-green); opacity: 1; }
+        .tri-state-toggle[data-state="1"] .toggle-knob { left: 0.8rem; transform: translateY(-50%) rotate(0deg); color: var(--switch-green); }
+        .tri-state-toggle[data-state="1"] .toggle-knob::after { content: '5s'; }
+        .tri-state-toggle[data-state="2"] .toggle-bg { background-color: var(--switch-green); opacity: 1; }
+        .tri-state-toggle[data-state="2"] .toggle-knob { left: 0.8rem; transform: translateY(-50%) rotate(0deg); color: var(--switch-green); }
+        .tri-state-toggle[data-state="2"] .toggle-knob::after { content: '✔'; font-size: 1rem; }
+        .tri-state-toggle:hover .toggle-knob { transform: translateY(-50%) rotate(0deg) scale(0.85) !important; }
+        .tri-state-toggle[data-state="0"]:hover .toggle-knob { transform: translateY(-50%) rotate(-180deg) scale(0.85) !important; }
+
+        /* Global Modal Styles */
         #global-confirm-modal { position: fixed; inset: 0; z-index: 20000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.2s; }
         #global-confirm-modal.active { opacity: 1; visibility: visible; }
-
-        .modal-backdrop {
-            position: absolute; inset: 0;
-            background: rgba(0,0,0,0.4);
-            transition: 0.3s;
-            z-index: 1;
-            pointer-events: auto;
-        }
-
-        .modal-box {
-            position: relative; width: 300px;
-            background: var(--modal-bg);
-            backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 14px; text-align: center; overflow: hidden;
-            transform: scale(0.95); transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            border: 0.5px solid var(--modal-border);
-            z-index: 2;
-        }
-
+        .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); transition: 0.3s; z-index: 1; pointer-events: auto; }
+        .modal-box { position: relative; width: 300px; background: var(--modal-bg); backdrop-filter: blur(20px); border-radius: 14px; text-align: center; overflow: hidden; transform: scale(0.95); transition: 0.2s; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 0.5px solid var(--modal-border); z-index: 2; }
         #global-confirm-modal.active .modal-box { transform: scale(1); }
-
         .modal-content-box { padding: 20px 16px 20px; }
-
-        /* Chỉnh lại Title để hiển thị Icon đẹp hơn */
-        .modal-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 6px;
-            color: var(--modal-text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px; /* Khoảng cách giữa Icon và Text */
-        }
-
+        .modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; color: var(--modal-text); display: flex; align-items: center; justify-content: center; gap: 8px; }
         .modal-desc { font-size: 0.85rem; line-height: 1.4; color: var(--modal-text); opacity: 0.8; word-wrap: break-word; }
-        .modal-desc img { max-width: 100%; border-radius: 6px; margin-top: 8px; }
-
-        /* --- DYNAMIC ACTIONS AREA --- */
         .modal-actions { display: flex; border-top: 0.5px solid var(--modal-border); }
-
-        .btn-modal {
-            flex: 1; border: none; background: transparent; padding: 12px;
-            font-size: 1.05rem; cursor: pointer; transition: 0.2s;
-            border-right: 0.5px solid var(--modal-border);
-            color: #007aff;
-            font-weight: 400;
-        }
+        .btn-modal { flex: 1; border: none; background: transparent; padding: 12px; font-size: 1.05rem; cursor: pointer; transition: 0.2s; border-right: 0.5px solid var(--modal-border); color: #007aff; font-weight: 400; }
         .btn-modal:last-child { border-right: none; }
         .btn-modal:active { background: rgba(127,127,127,0.15); }
-
-        /* --- COLOR VARIANTS --- */
-        .modal-text-primary { color: #007aff !important; font-weight: 400; }
+        .modal-text-primary { color: #007aff !important; }
         .modal-text-danger { color: #ff3b30 !important; font-weight: 600; }
         .modal-text-success { color: #34c759 !important; font-weight: 600; }
-        .modal-text-secondary { color: #6c757d !important; font-weight: 400; }
-        .modal-text-bold { font-weight: 600 !important; }
-
-        /* Dark Mode Adaptation */
+        .modal-text-secondary { color: #6c757d !important; }
         body.dark-mode .modal-text-primary { color: #0a84ff !important; }
         body.dark-mode .modal-text-danger { color: #ff453a !important; }
-        body.dark-mode .modal-text-success { color: #30d158 !important; }
-        body.dark-mode .modal-text-secondary { color: #98989d !important; }
     </style>
 </head>
 <body>
@@ -159,18 +124,14 @@
     </div>
 </div>
 
-{{-- SYSTEM POPUP & BUBBLES --}}
 <div id="nav-backdrop"></div>
-
 @include('admin.partials.bubbles')
-
 <div id="nav-popup">
     @include('admin.partials.menu-popup')
     @include('admin.partials.chat-popup')
     @include('admin.partials.settings-popup')
 </div>
 
-{{-- GLOBAL MODAL DYNAMIC (Giữ đúng cấu trúc bạn thích) --}}
 <div id="global-confirm-modal">
     <div class="modal-backdrop"></div>
     <div class="modal-box">
@@ -182,168 +143,125 @@
     </div>
 </div>
 
-{{-- --- SCRIPT XỬ LÝ (UPDATED) --- --}}
 <script>
-    // --- 1. THEME SETUP ---
+    // --- 1. NEON MANAGER SYSTEM ---
+    const NeonManager = {
+        timer: null,
+        mode: 0, // 0: Off, 1: 5s, 2: Always On
+
+        init() {
+            this.mode = parseInt(localStorage.getItem('admin_neon_mode') || '2');
+            this.applyMode();
+        },
+
+        setMode(newMode) {
+            this.mode = newMode;
+            localStorage.setItem('admin_neon_mode', newMode);
+            this.applyMode();
+        },
+
+        applyMode() {
+            const body = document.body;
+            if (this.timer) clearTimeout(this.timer);
+
+            if (this.mode === 0) {
+                body.classList.remove('neon-active');
+            } else if (this.mode === 2) {
+                body.classList.add('neon-active');
+            }
+        },
+
+        // [QUAN TRỌNG] Bật đèn (khi hover/click)
+        wakeUp() {
+            if (this.mode !== 1) return; // Chỉ áp dụng mode 5s
+
+            document.body.classList.add('neon-active');
+            if (this.timer) clearTimeout(this.timer);
+
+            // Auto tắt sau 5s nếu không có tương tác gì thêm
+            this.timer = setTimeout(() => {
+                document.body.classList.remove('neon-active');
+            }, 5000);
+        },
+
+        // [QUAN TRỌNG] Tắt đèn (khi rời chuột)
+        sleep() {
+            if (this.mode !== 1) return;
+
+            // Xóa ngay class active để CSS transition (2s) hoạt động
+            if (this.timer) clearTimeout(this.timer);
+            document.body.classList.remove('neon-active');
+        }
+    };
+
+    // --- 2. THEME SETUP ---
     (function() {
         const savedTheme = localStorage.getItem('admin_theme_preference');
         if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+        NeonManager.init();
     })();
 
-    // --- 2. SCROLL LOGIC ---
+    // --- 3. SCROLL & MODAL ---
     document.addEventListener('DOMContentLoaded', () => {
         const mainWrapper = document.getElementById('main-wrapper');
         const bubbleWrapper = document.getElementById('bubble-wrapper');
         if(mainWrapper && bubbleWrapper) {
             let lastScrollTop = 0;
-            const scrollThreshold = 50;
             mainWrapper.addEventListener('scroll', () => {
                 if (window.isSystemOpen || document.body.classList.contains('no-select')) return;
                 const currentScroll = mainWrapper.scrollTop;
-                if (currentScroll <= scrollThreshold) {
-                    bubbleWrapper.classList.remove('scroll-hidden');
-                } else {
-                    if (currentScroll > lastScrollTop) bubbleWrapper.classList.add('scroll-hidden');
-                    else bubbleWrapper.classList.remove('scroll-hidden');
-                }
-                lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+                bubbleWrapper.classList.toggle('scroll-hidden', currentScroll > 50 && currentScroll > lastScrollTop);
+                lastScrollTop = Math.max(0, currentScroll);
             });
         }
     });
 
-    // --- 3. HỆ THỐNG MODAL THÔNG MINH ---
+    const closeGlobalModal = () => document.getElementById('global-confirm-modal').classList.remove('active');
 
-    const closeGlobalModal = () => {
-        document.getElementById('global-confirm-modal').classList.remove('active');
-    };
-
-    /**
-     * Hàm hiển thị Modal
-     * titleHtml: Cho phép truyền cả HTML icon vào tiêu đề
-     */
     function showDynamicModal(titleHtml, contentHtml, buttons = []) {
         const modal = document.getElementById('global-confirm-modal');
-        const elTitle = document.getElementById('global-modal-title');
-        const elDesc = document.getElementById('global-modal-desc');
+        document.getElementById('global-modal-title').innerHTML = titleHtml || '<i class="fa-solid fa-bell text-warning"></i> THÔNG BÁO';
+        document.getElementById('global-modal-desc').innerHTML = contentHtml || '';
         const elActions = document.getElementById('global-modal-actions');
-
-        // Mặc định giao diện chuẩn nếu không có tiêu đề
-        if (!titleHtml) {
-            titleHtml = '<i class="fa-solid fa-bell text-warning"></i> THÔNG BÁO MỚI';
-        }
-
-        elTitle.innerHTML = titleHtml; // HTML cho phép icon ở title
-        elDesc.innerHTML = contentHtml || '';
-
-        // Render Buttons
         elActions.innerHTML = '';
-        if (!buttons || buttons.length === 0) {
-            buttons = [{ text: 'Đóng', color: 'primary', action: { type: 'dismiss' } }];
-        }
+
+        if (!buttons.length) buttons = [{ text: 'Đóng', color: 'primary', action: { type: 'dismiss' } }];
 
         buttons.forEach(btnConfig => {
-            const button = document.createElement('button');
-
-            // Map màu sắc
-            let colorClass = 'modal-text-primary';
-            if (btnConfig.color === 'danger') colorClass = 'modal-text-danger';
-            if (btnConfig.color === 'success') colorClass = 'modal-text-success';
-            if (btnConfig.color === 'secondary') colorClass = 'modal-text-secondary';
-
-            button.className = `btn-modal ${colorClass}`;
-            if (btnConfig.isBold) button.style.fontWeight = "600";
-
-            button.innerHTML = btnConfig.text;
-
-            // Xử lý sự kiện click
-            button.onclick = () => {
-                const action = btnConfig.action || {};
-
-                if (action.type === 'url' && action.value) {
-                    window.location.href = action.value;
-                }
-                else if (action.type === 'livewire' && action.value) {
-                    if (typeof Livewire !== 'undefined') {
-                        Livewire.dispatch(action.value, action.params || {});
-                    }
-                    closeGlobalModal();
-                }
-                else if (action.type === 'callback' && typeof action.value === 'function') {
-                    action.value();
-                    if (!action.preventClose) closeGlobalModal();
-                }
-                else {
-                    closeGlobalModal();
-                }
+            const btn = document.createElement('button');
+            const colorMap = { danger: 'modal-text-danger', success: 'modal-text-success', secondary: 'modal-text-secondary' };
+            btn.className = `btn-modal ${colorMap[btnConfig.color] || 'modal-text-primary'}`;
+            if (btnConfig.isBold) btn.style.fontWeight = "600";
+            btn.innerHTML = btnConfig.text;
+            btn.onclick = () => {
+                if (btnConfig.action?.type === 'url') window.location.href = btnConfig.action.value;
+                else if (btnConfig.action?.type === 'livewire') { Livewire.dispatch(btnConfig.action.value, btnConfig.action.params || {}); closeGlobalModal(); }
+                else if (btnConfig.action?.type === 'callback') { btnConfig.action.value(); if (!btnConfig.action.preventClose) closeGlobalModal(); }
+                else closeGlobalModal();
             };
-            elActions.appendChild(button);
+            elActions.appendChild(btn);
         });
-
         modal.classList.add('active');
     }
 
-    // --- 4. HELPER CŨ (Để không lỗi code cũ) ---
-    window.showAlert = function(title, desc, btnText = 'Đóng', btnColor = 'primary', callback = null) {
-        // Tự động thêm icon vào title cũ để đồng bộ giao diện mới
-        const icon = '<i class="fa-solid fa-bell text-warning"></i>';
-        showDynamicModal(`${icon} ${title}`, desc, [{
-            text: btnText,
-            color: btnColor,
-            isBold: btnColor !== 'primary',
-            action: { type: 'callback', value: callback }
-        }]);
+    window.showAlert = (title, desc, btnText = 'Đóng', btnColor = 'primary', callback = null) => showDynamicModal(`<i class="fa-solid fa-bell text-warning"></i> ${title}`, desc, [{ text: btnText, color: btnColor, isBold: btnColor !== 'primary', action: { type: 'callback', value: callback } }]);
+    window.showConfirm = (title, desc, cancelText, confirmText, onConfirm) => {
+        if (typeof cancelText === 'function') { onConfirm = cancelText; cancelText = 'Hủy'; confirmText = 'Đồng ý'; }
+        showDynamicModal(`<i class="fa-solid fa-circle-question text-danger"></i> ${title}`, desc, [{ text: cancelText || 'Hủy', color: 'secondary', action: { type: 'dismiss' } }, { text: confirmText || 'Đồng ý', color: 'danger', isBold: true, action: { type: 'callback', value: onConfirm } }]);
     };
 
-    window.showConfirm = function(title, desc, cancelText, confirmText, onConfirm) {
-        let _onConfirm = onConfirm;
-        let _cancelText = cancelText || 'Hủy';
-        let _confirmText = confirmText || 'Đồng ý';
-
-        if (typeof cancelText === 'function') { _onConfirm = cancelText; _cancelText = 'Hủy'; _confirmText = 'Đồng ý'; }
-
-        // Icon dấu hỏi cho confirm
-        const icon = '<i class="fa-solid fa-circle-question text-danger"></i>';
-
-        showDynamicModal(`${icon} ${title}`, desc, [
-            { text: _cancelText, color: 'secondary', action: { type: 'dismiss' } },
-            { text: _confirmText, color: 'danger', isBold: true, action: { type: 'callback', value: _onConfirm } }
-        ]);
-    };
+    window.NeonManager = NeonManager;
 </script>
 
-{{-- --- 5. REAL-TIME LISTENER (PUSHER) --- --}}
+{{-- PUSHER --- --}}
 <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script>
-    var pusher = new Pusher('bbd581278169e135dc72', {
-        cluster: 'ap1'
-    });
+    var pusher = new Pusher('bbd581278169e135dc72', { cluster: 'ap1' });
     var channel = pusher.subscribe('notifications');
-
     channel.bind('system.message', function(data) {
-        const noti = data.notification;
-
-        if (!noti) return;
-
-        // Xử lý Icon hiển thị cạnh tiêu đề
-        let iconHtml = '<i class="fa-solid fa-bell text-warning"></i>'; // Mặc định
-
-        if (noti.type === 'success') {
-            iconHtml = '<i class="fa-solid fa-circle-check text-success"></i>';
-        } else if (noti.type === 'error') {
-            iconHtml = '<i class="fa-solid fa-circle-exclamation text-danger"></i>';
-        } else if (noti.type === 'warning') {
-            iconHtml = '<i class="fa-solid fa-triangle-exclamation text-warning"></i>';
-        }
-
-        // Ghép Icon vào Title
-        const fullTitle = `${iconHtml} ${noti.title}`;
-
-        // Gọi hàm hiển thị
-        showDynamicModal(
-            fullTitle,
-            noti.content,
-            noti.buttons
-        );
+        const noti = data.notification; if (!noti) return;
+        const iconMap = { success: 'circle-check text-success', error: 'circle-exclamation text-danger', warning: 'triangle-exclamation text-warning' };
+        showDynamicModal(`<i class="fa-solid fa-${iconMap[noti.type] || 'bell text-warning'}"></i> ${noti.title}`, noti.content, noti.buttons);
     });
 </script>
 

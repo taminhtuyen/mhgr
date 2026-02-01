@@ -203,16 +203,16 @@
             </label>
         </div>
 
-        {{-- 1.1.5 Tự tắt Neon (NEW FOR ADMIN) --}}
+        {{-- 1.1.5 Hiệu ứng Neon (NEW - 3 Chế độ) --}}
         <div class="setting-item">
             <div class="setting-info">
-                <div class="setting-label"><i class="fa-solid fa-lightbulb text-muted"></i> Tự tắt Neon</div>
-                <div class="setting-subtext" id="desc-neon">Tắt hiệu ứng sau 5s</div>
+                <div class="setting-label"><i class="fa-solid fa-lightbulb text-muted"></i> Hiệu ứng Neon</div>
+                <div class="setting-subtext" id="desc-neon">Luôn bật</div>
             </div>
 
-            <div class="toggle-switch-lite">
-                <input class="toggle-input-lite" id="settings-neon-toggle" type="checkbox" />
-                <label class="toggle-label-lite" for="settings-neon-toggle"></label>
+            <div class="tri-state-toggle" id="settings-neon-toggle" data-state="2" title="Chạm để đổi chế độ">
+                <div class="toggle-bg"></div>
+                <div class="toggle-knob"></div>
             </div>
         </div>
 
@@ -309,27 +309,38 @@
             });
         }
 
-        // --- 2.5 AUTO OFF NEON LOGIC (ADMIN NEW) ---
-        const neonToggle = document.getElementById('settings-neon-toggle');
+        // --- 2.5 NEON MODE LOGIC (NEW 3-STATE) ---
+        const neonBtn = document.getElementById('settings-neon-toggle');
         const descNeon = document.getElementById('desc-neon');
 
-        const updateNeonText = (isOn) => {
-            if(descNeon) descNeon.innerText = isOn ? 'Đang BẬT: Tắt sau 5s không thao tác' : 'Đang TẮT: Hiệu ứng luôn bật';
+        const updateNeonUI = (mode) => {
+            if (!neonBtn) return;
+            neonBtn.setAttribute('data-state', mode);
+
+            let text = 'Đã tắt hiệu ứng';
+            if (mode === 1) text = 'Bật 5s khi thao tác';
+            if (mode === 2) text = 'Luôn luôn bật';
+
+            if (descNeon) descNeon.innerText = text;
         };
 
-        const savedNeon = localStorage.getItem('admin_neon_auto_off') === 'true';
-        if(neonToggle) {
-            neonToggle.checked = savedNeon;
-            updateNeonText(savedNeon);
+        // Lấy state hiện tại từ Global Manager
+        if (window.NeonManager) {
+            updateNeonUI(window.NeonManager.mode);
         }
 
-        if(neonToggle) {
-            neonToggle.addEventListener('change', (e) => {
-                const isEnabled = e.target.checked;
-                localStorage.setItem('admin_neon_auto_off', isEnabled);
-                updateNeonText(isEnabled);
-                // Trigger global update in bubbles.blade.php
-                if(window.initNeonEffect) window.initNeonEffect();
+        if (neonBtn) {
+            neonBtn.addEventListener('click', () => {
+                let current = parseInt(neonBtn.getAttribute('data-state'));
+                // Cycle: 0 -> 1 -> 2 -> 0
+                let next = (current + 1) > 2 ? 0 : (current + 1);
+
+                updateNeonUI(next);
+
+                // Cập nhật vào Global Manager
+                if (window.NeonManager) {
+                    window.NeonManager.setMode(next);
+                }
             });
         }
 

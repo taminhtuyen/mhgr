@@ -1,38 +1,33 @@
 <div id="bubble-wrapper" style="position: fixed; bottom: 2.5rem; right: 2.5rem; z-index: 10000;">
     {{-- 3 BONG BÓNG CON --}}
     <div class="sub-bubbles-container">
-        <div class="sub-bubble" id="btn-open-menu" title="Menu chức năng">
+        <div class="sub-bubble neon-target" id="btn-open-menu" title="Menu chức năng">
             <i class="fa-solid fa-table-cells"></i>
         </div>
-        <div class="sub-bubble" id="btn-open-chat" title="Tin nhắn">
+        <div class="sub-bubble neon-target" id="btn-open-chat" title="Tin nhắn">
             <i class="fa-solid fa-comments"></i>
-            {{-- Badge đếm số lượng --}}
             <span class="badge-counter">3</span>
         </div>
-        <div class="sub-bubble" id="btn-open-settings" title="Cài đặt">
+        <div class="sub-bubble neon-target" id="btn-open-settings" title="Cài đặt">
             <i class="fa-solid fa-gear"></i>
         </div>
     </div>
 
     {{-- BONG BÓNG CHÍNH --}}
-    <div id="nav-bubble" title="Mở rộng">
-        {{-- Icon sẽ xoay riêng biệt --}}
+    <div id="nav-bubble" class="neon-target" title="Mở rộng">
         <i class="fa-solid fa-bars" id="bubble-icon"></i>
-
-        {{-- Chấm đỏ thông báo --}}
         <span class="main-bubble-badge"></span>
     </div>
 </div>
 
 <style>
-    /* --- 1. BIẾN MÀU & CẤU HÌNH --- */
+    /* --- BIẾN MÀU --- */
     :root {
-        --neon-primary: 0, 191, 255;
-        --neon-danger: 255, 49, 49;
+        --neon-primary: 0, 191, 255; /* Xanh da trời */
+        --neon-danger: 255, 49, 49;  /* Đỏ */
         --sub-bg: #ffffff;
         --sub-border: #d1d5db;
         --sub-text: #374151;
-        --neon-duration: 0.5s; /* Tốc độ khi bật đèn */
     }
 
     body.dark-mode {
@@ -45,15 +40,37 @@
     #bubble-wrapper {
         position: fixed; z-index: 10000;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-        opacity: 1; visibility: visible; transform: scale(1);
-        transform: translateZ(0); will-change: transform;
+        opacity: 1; visibility: visible; transform: scale(1); will-change: transform;
     }
     #bubble-wrapper.scroll-hidden { transform: scale(0.9); opacity: 0; visibility: hidden; pointer-events: none; }
 
     /* =================================================================
-       2. TRẠNG THÁI ĐANG BẬT ĐÈN (NORMAL MODE)
+       1. TRẠNG THÁI OFF (TẮT DẦN 2 GIÂY)
+       Kỹ thuật: Khai báo sẵn các lớp shadow trong suốt để browser tính toán được transition
        ================================================================= */
 
+    #nav-bubble, .sub-bubble {
+        /* Transition mặc định (khi tắt) là 2s */
+        transition:
+            transform 0.3s ease,
+            background-color 0.3s ease,
+            opacity 0.3s ease,
+            box-shadow 2s ease-out,  /* Tắt chậm 2s */
+            border-color 2s ease-out; /* Tắt chậm 2s */
+
+        /* Bắt buộc: Khai báo shadow rỗng nhưng đúng cấu trúc (5 lớp) để không bị giật */
+        box-shadow:
+            0 0 0 0 rgba(0,0,0,0) inset,
+            0 0 0 0 rgba(0,0,0,0) inset,
+            0 0 0 0 rgba(0,0,0,0),
+            0 0 0 0 rgba(0,0,0,0),
+            0 0 0 0 rgba(0,0,0,0);
+
+        border-color: transparent;
+        will-change: box-shadow, border-color; /* Tối ưu GPU */
+    }
+
+    /* Cấu hình riêng cho bong bóng chính */
     #nav-bubble {
         width: 3.75rem; height: 3.75rem;
         background: linear-gradient(135deg, #0ea5e9, #0284c7);
@@ -61,144 +78,106 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 1.5rem; cursor: pointer; position: relative; z-index: 10;
         border: 0.0625rem solid transparent;
-        box-shadow: 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0), 0 0 0 0 rgba(0,0,0,0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
         transform: scale(1);
-        transition: all var(--neon-duration) ease-out;
     }
 
-    #nav-bubble:not(.no-hover-glow):hover {
-        transform: scale(1);
-        border-color: #fff;
-        box-shadow: 0 0 0.1rem rgb(var(--neon-primary)) inset, 0 0 0.5rem rgb(var(--neon-primary)) inset, 0 0 1rem rgb(var(--neon-primary)), 0 0 2.5rem rgb(var(--neon-primary)), 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-    }
-
-    #nav-bubble.red-mode {
-        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        border-color: #fff !important;
-        transform: scale(1);
-        box-shadow: 0 0 0.1rem rgb(var(--neon-danger)) inset, 0 0 0.5rem rgb(var(--neon-danger)) inset, 0 0 1.5rem rgb(var(--neon-danger)), 0 0 3.5rem rgb(var(--neon-danger)), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-    }
-
+    /* Cấu hình riêng cho bong bóng con */
     .sub-bubble {
         width: 3.125rem; height: 3.125rem;
         background-color: var(--sub-bg); border: 0.0625rem solid var(--sub-border); color: var(--sub-text);
         backdrop-filter: blur(0.6rem); border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-size: 1.25rem; cursor: pointer; opacity: 0; transform: scale(0); position: relative;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        transition: all var(--neon-duration) ease-out;
     }
 
-    /* [FIX QUAN TRỌNG] Tăng độ ưu tiên Selector để đè lên trạng thái expanded */
-    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
-        transform: scale(1.1);
+    /* Icon bên trong */
+    #bubble-icon, .sub-bubble i {
+        filter: drop-shadow(0 0 0 rgba(0,0,0,0)); /* Shadow rỗng */
+        transition: filter 2s ease-out, transform 0.4s ease; /* Tắt chậm 2s */
     }
-
-    /* Duy nhất bong bóng con đang chọn là giữ scale 1.15 */
-    .sub-bubble.active {
-        background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
-        border: 0.0625rem solid #fff !important; color: #fff !important;
-        transform: scale(1.15) !important;
-        box-shadow: 0 0 0.1rem rgb(var(--neon-primary)) inset, 0 0 0.5rem rgb(var(--neon-primary)) inset, 0 0 1rem rgb(var(--neon-primary)), 0 0 2.5rem rgb(var(--neon-primary)), 0 0.5rem 1rem rgba(0,0,0,0.2) !important;
-    }
-
-    #bubble-icon, .sub-bubble i { transition: filter var(--neon-duration) ease-out, transform 0.4s ease; }
-    #nav-bubble:hover #bubble-icon, .sub-bubble.active i { filter: drop-shadow(0 0 0.3rem rgb(var(--neon-primary))); }
-    #nav-bubble.red-mode #bubble-icon { filter: drop-shadow(0 0 0.5rem rgb(var(--neon-danger))); transform: rotate(90deg); }
-
 
     /* =================================================================
-       3. TRẠNG THÁI TẮT ĐÈN (NEON-OFF) - ĐÃ ĐỒNG BỘ TUYỆT ĐỐI
+       2. TRẠNG THÁI ON (BẬT NHANH 0.5 GIÂY)
+       Khi body có class .neon-active, các giá trị này sẽ đè lên
        ================================================================= */
 
-    /* 3.1. ÉP ĐỒNG BỘ 2S CHO TẤT CẢ ÁNH SÁNG VÀ MÀU SẮC */
-    body.neon-off #nav-bubble,
-    body.neon-off #nav-bubble:hover,
-    body.neon-off .sub-bubble,
-        /* body.neon-off .sub-bubble:hover, -> XÓA DÒNG NÀY ĐỂ TRÁNH CONFLICT TRANSITION KHI HOVER */
-    body.neon-off .main-bubble-badge,
-    body.neon-off #bubble-icon,
-    body.neon-off .sub-bubble i {
-        /* Transition chậm 2s */
+    body.neon-active #nav-bubble,
+    body.neon-active .sub-bubble.active {
+        border-color: #fff;
+
+        /* Shadow phát sáng (5 lớp tương ứng với 5 lớp rỗng ở trên) */
+        box-shadow:
+            0 0 0.1rem rgb(var(--neon-primary)) inset,
+            0 0 0.5rem rgb(var(--neon-primary)) inset,
+            0 0 1rem rgb(var(--neon-primary)),
+            0 0 2.5rem rgb(var(--neon-primary)),
+            0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+
+        /* Ghi đè thời gian transition thành 0.5s để bật nhanh */
         transition:
-            box-shadow 2s ease-out,
-            border-color 2s ease-out,
-            background-color 2s ease-out,
-            color 2s ease-out,
-            transform 2s ease-out, /* Đồng bộ scale */
-            filter 2s ease-out !important;
-        transition-delay: 0s !important;
+            transform 0.3s ease,
+            background-color 0.3s ease,
+            opacity 0.3s ease,
+            box-shadow 0.5s ease-out, /* Bật nhanh 0.5s */
+            border-color 0.5s ease-out;
     }
 
-    /* Riêng trạng thái hover trong neon-off vẫn cần transition mượt nhưng không được ghi đè bởi rule trên */
-    body.neon-off .sub-bubble:hover {
-        transition: all 2s ease-out !important;
+    /* Màu đỏ khi mở menu */
+    body.neon-active #nav-bubble.red-mode {
+        box-shadow:
+            0 0 0.1rem rgb(var(--neon-danger)) inset,
+            0 0 0.5rem rgb(var(--neon-danger)) inset,
+            0 0 1.5rem rgb(var(--neon-danger)),
+            0 0 3.5rem rgb(var(--neon-danger)),
+            0 0.5rem 1rem rgba(0, 0, 0, 0.2);
     }
 
-    /* 3.2. LOẠI BỎ VIỀN cho các bóng CHƯA được chọn */
-    body.neon-off #nav-bubble:not(.red-mode),
-    body.neon-off .sub-bubble:not(.active) {
-        border-color: transparent !important;
-        box-shadow: 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0) inset, 0 0 0 0 rgba(0,0,0,0), 0 0 0 0 rgba(0,0,0,0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-        /* Lưu ý: Không force transform: scale(1) ở đây nữa để cho phép hover hoạt động nếu muốn,
-           hoặc nếu muốn tắt đèn là không zoom thì giữ nguyên.
-           Hiện tại logic JS 'mouseenter' sẽ đánh thức neon nên hover sẽ luôn sáng.
-           Dòng dưới chỉ áp dụng khi người dùng KHÔNG chạm vào (vừa hết time out) */
-        transform: scale(1);
+    /* Icon phát sáng */
+    body.neon-active #nav-bubble:hover #bubble-icon,
+    body.neon-active .sub-bubble.active i {
+        filter: drop-shadow(0 0 0.3rem rgb(var(--neon-primary)));
+        transition: filter 0.5s ease-out; /* Bật nhanh 0.5s */
     }
 
-    /* Khi tắt đèn mà hover vào (trường hợp hiếm nếu JS chưa kịp wake up) thì vẫn cho zoom nhẹ */
-    body.neon-off #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
-        transform: scale(1.1);
+    body.neon-active #nav-bubble.red-mode #bubble-icon {
+        filter: drop-shadow(0 0 0.5rem rgb(var(--neon-danger)));
     }
 
-    /* 3.3. GIỮ VIỀN VÀ NỀN cho bong bóng con ĐANG CHỌN (ACTIVE) */
-    body.neon-off .sub-bubble.active {
-        border-color: #ffffff !important;
+    /* =================================================================
+       3. CÁC TRẠNG THÁI KHÁC
+       ================================================================= */
+
+    /* Active vật lý (khi mở menu) */
+    .sub-bubble.active {
         background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+        border: 0.0625rem solid #fff !important;
+        color: #fff !important;
         transform: scale(1.15) !important;
-        box-shadow: 0 0 0 0 rgba(var(--neon-primary), 0) inset, 0 0 0 0 rgba(var(--neon-primary), 0) inset, 0 0 0 0 rgba(var(--neon-primary), 0), 0 0 0 0 rgba(var(--neon-primary), 0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
+        opacity: 1 !important;
     }
 
-    /* GIỮ VIỀN VÀ NỀN cho bong bóng Menu chính đang mở (RED MODE) */
-    body.neon-off #nav-bubble.red-mode {
-        border-color: #ffffff !important;
+    #nav-bubble.red-mode {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        transform: scale(1) !important;
-        box-shadow: 0 0 0 0 rgba(var(--neon-danger), 0) inset, 0 0 0 0 rgba(var(--neon-danger), 0) inset, 0 0 0 0 rgba(var(--neon-danger), 0), 0 0 0 0 rgba(var(--neon-danger), 0), 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
-    }
-
-    /* 3.4. CÁC CHI TIẾT KHÁC KHI TẮT ĐÈN */
-    body.neon-off #bubble-icon,
-    body.neon-off .sub-bubble i { filter: none !important; }
-    body.neon-off .main-bubble-badge {
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
         border-color: #fff !important;
     }
+    #nav-bubble.red-mode #bubble-icon { transform: rotate(90deg); }
 
-    /* --- LAYOUT UTILS --- */
+    /* Hover nhẹ khi chưa active */
+    #bubble-wrapper.expanded .sub-bubble:not(.active):hover {
+        transform: scale(1.1);
+        transition: transform 0.2s;
+    }
+
+    /* Layout utils */
     .sub-bubbles-container { position: absolute; left: 0; width: 3.75rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; pointer-events: none; z-index: 1; }
-    .main-bubble-badge { position: absolute; top: 0; right: 0; width: 1rem; height: 1rem; background-color: #ef4444; border: 0.0625rem solid #fff; border-radius: 50%; z-index: 11; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; transition: box-shadow var(--neon-duration) ease-out, border-color var(--neon-duration) ease-out; }
+    .main-bubble-badge { position: absolute; top: 0; right: 0; width: 1rem; height: 1rem; background-color: #ef4444; border: 0.0625rem solid #fff; border-radius: 50%; z-index: 11; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; transition: box-shadow 2s ease-out; }
+    body.neon-active .main-bubble-badge { box-shadow: 0 0 5px #ef4444; transition: box-shadow 0.5s ease-out; }
 
-    /* --- POPUP & BACKDROP --- */
-    #nav-popup {
-        position: fixed; z-index: 9999; background: var(--popup-bg);
-        backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border);
-        box-shadow: var(--popup-shadow); border-radius: 1.25rem !important; overflow: hidden !important;
-        overflow-y: auto !important; -webkit-overflow-scrolling: touch;
-        opacity: 0; visibility: hidden; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s;
-        width: fit-content; max-width: 95vw; display: flex; flex-direction: column;
-        scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent;
-    }
-    #nav-popup::-webkit-scrollbar { width: 4px; }
-    #nav-popup::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; }
+    /* Popup & Backdrop */
+    #nav-popup { position: fixed; z-index: 9999; background: var(--popup-bg); backdrop-filter: blur(1rem); border: 0.0625rem solid var(--popup-border); box-shadow: var(--popup-shadow); border-radius: 1.25rem !important; overflow: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; opacity: 0; visibility: hidden; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; width: fit-content; max-width: 95vw; display: flex; flex-direction: column; scrollbar-width: thin; }
     #nav-popup.active { opacity: 1; visibility: visible; transform: scale(1); }
-    #nav-backdrop {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998;
-        opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px);
-    }
+    #nav-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
     #nav-backdrop.active { opacity: 1; visibility: visible; }
-    /* Quan trọng: Trạng thái expanded set scale(1) nhưng độ ưu tiên thấp hơn hover phía trên */
     #bubble-wrapper.expanded .sub-bubble { opacity: 1; transform: scale(1); pointer-events: auto; }
 </style>
 
@@ -215,85 +194,37 @@
             chat: document.getElementById('btn-open-chat'),
             settings: document.getElementById('btn-open-settings')
         };
-        const allBubbles = [mainBubble, btns.menu, btns.chat, btns.settings];
 
-        window.isSystemOpen = false;
-        window.currentPopupMode = 'menu';
-
-        // --- 1. LOGIC NEON AUTO OFF ---
-        let neonTimeout;
-
-        const startNeonCountdown = () => {
-            const key = 'admin_neon_auto_off';
-            if(localStorage.getItem(key) === 'true') {
-                clearTimeout(neonTimeout);
-                neonTimeout = setTimeout(() => {
-                    document.body.classList.add('neon-off');
-                }, 5000);
-            }
-        };
-
-        const wakeUpNeon = () => {
-            document.body.classList.remove('neon-off');
-            startNeonCountdown();
-        };
-
-        window.initNeonEffect = function() {
-            const isAutoOff = localStorage.getItem('admin_neon_auto_off') === 'true';
-            clearTimeout(neonTimeout);
-            if (!isAutoOff) {
-                document.body.classList.remove('neon-off');
-            } else {
-                startNeonCountdown();
-            }
-        };
-
-        allBubbles.forEach(bubble => {
-            if(bubble) {
-                bubble.addEventListener('click', wakeUpNeon);
-                bubble.addEventListener('touchstart', wakeUpNeon, { passive: true });
-                bubble.addEventListener('mouseenter', wakeUpNeon);
-            }
+        // --- GÁN SỰ KIỆN NEON (Hover In / Hover Out) ---
+        const neonTargets = document.querySelectorAll('.neon-target');
+        neonTargets.forEach(el => {
+            el.addEventListener('mouseenter', () => { if(window.NeonManager) window.NeonManager.wakeUp(); });
+            el.addEventListener('mouseleave', () => { if(window.NeonManager) window.NeonManager.sleep(); });
+            el.addEventListener('click', () => { if(window.NeonManager) window.NeonManager.wakeUp(); });
         });
 
-        window.initNeonEffect();
-
-        // --- 2. POSITION & DRAG LOGIC (GIỮ NGUYÊN) ---
+        // --- DRAG LOGIC ---
         let isDragging = false, startX, startY, initialLeft, initialTop;
         const storageKeyPos = 'admin_bubblePos';
-
         const restorePosition = () => {
             const savedPos = localStorage.getItem(storageKeyPos);
             if (savedPos) {
                 try {
                     const pos = JSON.parse(savedPos);
-                    let left = parseFloat(pos.left), top = parseFloat(pos.top);
-                    const winW = window.innerWidth, winH = window.innerHeight, bubbleSize = 60;
-                    if (isNaN(left) || isNaN(top)) return;
-                    left = Math.min(Math.max(0, left), winW - bubbleSize);
-                    top = Math.min(Math.max(0, top), winH - bubbleSize);
+                    let left = Math.min(Math.max(0, pos.left), window.innerWidth - 60);
+                    let top = Math.min(Math.max(0, pos.top), window.innerHeight - 60);
                     wrapper.style.left = left + 'px'; wrapper.style.top = top + 'px';
                     wrapper.style.bottom = 'auto'; wrapper.style.right = 'auto';
-                } catch (e) { localStorage.removeItem(storageKeyPos); }
+                } catch (e) {}
             }
         };
         restorePosition();
 
-        window.addEventListener('resize', () => {
-            if(!isDragging && wrapper.style.left) {
-                const r = wrapper.getBoundingClientRect();
-                const winW = window.innerWidth, winH = window.innerHeight;
-                let newLeft = r.left, newTop = r.top;
-                if (newLeft + r.width > winW) newLeft = winW - r.width - 10;
-                if (newTop + r.height > winH) newTop = winH - r.height - 10;
-                wrapper.style.left = Math.max(0, newLeft) + 'px'; wrapper.style.top = Math.max(0, newTop) + 'px';
-            }
-            if (window.isSystemOpen) window.positionPopup(window.currentPopupMode);
-        });
+        window.addEventListener('resize', () => { if(window.isSystemOpen) window.positionPopup(window.currentPopupMode); });
 
         const getPos = (e) => e.touches ? e.touches[0] : e;
         const onDragStart = (e) => {
-            wakeUpNeon();
+            if(window.NeonManager) window.NeonManager.wakeUp();
             isDragging = false; const p = getPos(e); startX = p.clientX; startY = p.clientY;
             const r = wrapper.getBoundingClientRect(); initialLeft = r.left; initialTop = r.top;
             Object.assign(wrapper.style, { left: r.left + 'px', top: r.top + 'px', bottom: 'auto', right: 'auto', transition: 'none' });
@@ -305,9 +236,8 @@
             const p = getPos(e);
             if (Math.abs(p.clientX - startX) > 5 || Math.abs(p.clientY - startY) > 5) {
                 isDragging = true; e.preventDefault();
-                let nL = initialLeft + (p.clientX - startX); let nT = initialTop + (p.clientY - startY);
-                nL = Math.min(Math.max(0, nL), window.innerWidth - wrapper.offsetWidth);
-                nT = Math.min(Math.max(0, nT), window.innerHeight - wrapper.offsetHeight);
+                let nL = Math.min(Math.max(0, initialLeft + (p.clientX - startX)), window.innerWidth - wrapper.offsetWidth);
+                let nT = Math.min(Math.max(0, initialTop + (p.clientY - startY)), window.innerHeight - wrapper.offsetHeight);
                 wrapper.style.left = `${nL}px`; wrapper.style.top = `${nT}px`;
                 if (window.isSystemOpen) { expandBubblesVisual(); window.positionPopup(window.currentPopupMode); }
             }
@@ -316,7 +246,7 @@
             document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd);
             document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', onDragEnd);
             document.body.classList.remove('no-select'); wrapper.style.transition = '';
-            if (isDragging) { localStorage.setItem(storageKeyPos, JSON.stringify({ left: wrapper.style.left, top: wrapper.style.top })); setTimeout(() => isDragging = false, 50); }
+            if (isDragging) { localStorage.setItem(storageKeyPos, JSON.stringify({ left: parseFloat(wrapper.style.left), top: parseFloat(wrapper.style.top) })); setTimeout(() => isDragging = false, 50); }
         };
 
         mainBubble.addEventListener('mousedown', onDragStart);
@@ -324,7 +254,7 @@
         mainBubble.onclick = () => { if (!isDragging) window.isSystemOpen ? closeAll() : openAll('menu'); };
 
         window.openAll = (mode) => {
-            wakeUpNeon();
+            if(window.NeonManager) window.NeonManager.wakeUp();
             window.isSystemOpen = true; window.currentPopupMode = mode;
             expandBubblesVisual();
             if(mode === 'menu' && typeof window.renderMenuContent === 'function') window.renderMenuContent();
@@ -340,7 +270,7 @@
         };
 
         window.closeAll = () => {
-            wakeUpNeon();
+            if(window.NeonManager) window.NeonManager.wakeUp();
             window.isSystemOpen = false; wrapper.classList.remove('expanded'); popup.classList.remove('active');
             icon.classList.replace('fa-xmark', 'fa-bars'); backdrop.classList.remove('active');
             mainBubble.classList.remove('red-mode'); highlight(null);
