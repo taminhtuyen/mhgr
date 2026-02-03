@@ -10,18 +10,26 @@ class DashboardStats extends Component
     public $stats = [];
     public $chartData = [];
 
-    // [QUAN TRỌNG] Gửi dữ liệu ngay khi component khởi tạo để vẽ chart luôn
+    // [MỚI] Biến lưu trạng thái bộ lọc
+    public $filterType = '7days';
+
     public function mount(DashboardService $service)
     {
         $this->loadData($service);
     }
 
-    // Chạy mỗi lần poll
+    // [MỚI] Hàm này tự động chạy khi $filterType thay đổi (nhờ wire:model.live)
+    public function updatedFilterType()
+    {
+        // Gọi lại logic load data và render lại
+        // Livewire sẽ tự động trigger render() sau hàm này
+    }
+
     public function render(DashboardService $service)
     {
+        // Truyền $this->filterType vào Service
         $this->loadData($service);
 
-        // [QUAN TRỌNG] Bắn sự kiện cập nhật số liệu mới
         $this->dispatch('update-revenue-chart', data: $this->chartData);
 
         return view('livewire.admin.dashboard.dashboard-stats');
@@ -30,6 +38,7 @@ class DashboardStats extends Component
     private function loadData($service)
     {
         $this->stats = $service->getSummaryStats();
-        $this->chartData = $service->getRevenueChartData();
+        // Truyền loại lọc vào service
+        $this->chartData = $service->getRevenueChartData($this->filterType);
     }
 }

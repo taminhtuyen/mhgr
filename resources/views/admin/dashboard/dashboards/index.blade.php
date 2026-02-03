@@ -4,9 +4,7 @@
 
 @push('styles')
 <style>
-    /* -----------------------------------------------------------
-       1. CẤU HÌNH BIẾN MÀU (CSS VARIABLES)
-       ----------------------------------------------------------- */
+    /* ... (Giữ nguyên các biến CSS cũ) ... */
     :root {
         --db-card-bg: #ffffff;
         --db-text-main: #2b3445;
@@ -14,26 +12,19 @@
         --db-border-color: rgba(0,0,0,0.05);
         --db-shadow: 0 0.25rem 1rem rgba(0,0,0,0.05);
         --db-primary: #0d6efd;
-
-        /* Màu nền riêng cho Tooltip Header để tạo điểm nhấn */
         --db-tooltip-header: #f8f9fa;
     }
-
-    /* CHẾ ĐỘ TỐI (DARK MODE) */
+    /* ... (Dark mode giữ nguyên) ... */
     [data-theme="dark"], body.dark-mode {
         --db-card-bg: #1e1e2d;
         --db-text-main: #e4e6ef;
         --db-text-sub: #b5b5c3;
         --db-border-color: #2b2b40;
         --db-shadow: none;
-
-        /* Header tối hơn nền card một chút */
         --db-tooltip-header: #151521;
     }
 
-    /* -----------------------------------------------------------
-       2. UTILITY CLASSES
-       ----------------------------------------------------------- */
+    /* ... (Utility class cũ) ... */
     .db-card {
         background-color: var(--db-card-bg);
         color: var(--db-text-main);
@@ -50,42 +41,34 @@
     }
     .dashboard-wrapper { padding-top: 1.5rem; }
 
-    /* -----------------------------------------------------------
-       3. [MỚI] TÙY CHỈNH APEXCHARTS TOOLTIP (FIX DARK MODE)
-       ----------------------------------------------------------- */
-    /* Khung ngoài của Tooltip */
+    /* Fix Tooltip */
     .apexcharts-tooltip {
         background-color: var(--db-card-bg) !important;
         border-color: var(--db-border-color) !important;
         color: var(--db-text-main) !important;
         box-shadow: var(--db-shadow) !important;
     }
-
-    /* Phần tiêu đề (Ngày tháng) */
     .apexcharts-tooltip-title {
         background-color: var(--db-tooltip-header) !important;
         border-bottom: 1px solid var(--db-border-color) !important;
-        font-family: inherit !important; /* Dùng font của web */
-        color: var(--db-text-main) !important;
-    }
-
-    /* Phần nội dung text (Series name: Value) */
-    .apexcharts-tooltip-text {
-        color: var(--db-text-main) !important;
         font-family: inherit !important;
-    }
-
-    /* Màu của con số giá trị */
-    .apexcharts-tooltip-text-value,
-    .apexcharts-tooltip-text-z-value,
-    .apexcharts-tooltip-text-y-label {
         color: var(--db-text-main) !important;
-        font-weight: 600;
     }
+    .apexcharts-tooltip-text { color: var(--db-text-main) !important; font-family: inherit !important; }
+    .apexcharts-tooltip-text-value { color: var(--db-text-main) !important; font-weight: 600; }
+    .apexcharts-tooltip-marker { margin-right: 0.5rem; }
 
-    /* Marker (chấm tròn màu) bên cạnh text */
-    .apexcharts-tooltip-marker {
-        margin-right: 0.5rem;
+    /* [MỚI] Style cho Select Box trong Dark Mode */
+    .db-select {
+        background-color: var(--db-card-bg);
+        color: var(--db-text-main);
+        border-color: var(--db-border-color);
+    }
+    .db-select:focus {
+        background-color: var(--db-card-bg);
+        color: var(--db-text-main);
+        border-color: var(--db-primary);
+        box-shadow: none;
     }
 </style>
 @endpush
@@ -96,7 +79,7 @@
         <div class="col-12">
             <h2 class="h4 mb-1 db-text-main">Dashboard Demo</h2>
             <p class="db-text-sub small mb-0">
-                <i class="fa-solid fa-clock me-1"></i> Số liệu & Biểu đồ cập nhật Live (10s/lần)
+                <i class="fa-solid fa-clock me-1"></i> Khám phá sức mạnh của ApexCharts & Livewire
             </p>
         </div>
     </div>
@@ -106,26 +89,29 @@
 @endsection
 
 @push('scripts')
-{{-- Load thư viện ApexCharts từ Local --}}
 <script src="{{ asset('libs/apexcharts/apexcharts.min.js') }}"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-
         function getCssVar(name) {
             return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         }
 
-        // Cấu hình Chart
+        // Hàm format số thông minh (Hỗ trợ Tỷ - Billion)
+        function smartNumberFormatter(value) {
+            if (value >= 1000000000) { // Lớn hơn 1 Tỷ
+                return (value / 1000000000).toFixed(1).replace('.0', '') + 'B';
+            }
+            if (value >= 1000000) { // Lớn hơn 1 Triệu
+                return (value / 1000000).toFixed(1).replace('.0', '') + 'M';
+            }
+            return new Intl.NumberFormat('vi-VN').format(value);
+        }
+
         var options = {
-            series: [{
-                name: 'Doanh thu',
-                data: []
-            }],
+            series: [{ name: 'Doanh thu', data: [] }],
             chart: {
-                type: 'area',
-                height: 350,
-                background: 'transparent',
+                type: 'area', height: 350, background: 'transparent',
                 toolbar: { show: false },
                 animations: { enabled: true, easing: 'easeinout', speed: 800 }
             },
@@ -133,51 +119,29 @@
             dataLabels: { enabled: false },
             stroke: { curve: 'smooth', width: 2 },
 
-            // Trục X (Ngày tháng)
             xaxis: {
-                type: 'category',
-                categories: [],
+                type: 'category', categories: [],
                 labels: {
                     style: { colors: getCssVar('--db-text-sub') },
-                    rotate: -45,
-                    rotateAlways: false,
+                    rotate: -45, rotateAlways: false,
                 },
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-                tooltip: { enabled: false }
+                axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false }
             },
 
-            // [CẬP NHẬT MỚI] Trục Y (Định dạng số tiền)
             yaxis: {
                 labels: {
                     style: { colors: getCssVar('--db-text-sub') },
-                    // Hàm định dạng số liệu trục Y
                     formatter: function (value) {
-                        // Nếu số lớn hơn 1 triệu -> Chuyển thành 10M, 1.5M
-                        if (value >= 1000000) {
-                            // toFixed(1): Lấy 1 số thập phân (1.5)
-                            // replace('.0', ''): Nếu là 10.0M thì bỏ .0 thành 10M cho đẹp
-                            return (value / 1000000).toFixed(1).replace('.0', '') + 'M';
-                        }
-                        // Nếu số nhỏ hơn 1 triệu -> Hiển thị dạng 500.000
-                        return new Intl.NumberFormat('vi-VN').format(value);
+                        return smartNumberFormatter(value);
                     }
                 }
             },
-
-            grid: {
-                borderColor: getCssVar('--db-border-color'),
-                strokeDashArray: 4,
-            },
-
-            // Tooltip (Hiển thị chi tiết khi rê chuột)
+            grid: { borderColor: getCssVar('--db-border-color'), strokeDashArray: 4 },
             tooltip: {
-                theme: false,
-                style: { fontSize: '12px', fontFamily: 'inherit' },
-                x: { show: true, format: 'dd/MM' },
+                theme: false, style: { fontSize: '12px', fontFamily: 'inherit' },
+                x: { show: true },
                 y: {
                     formatter: function (val) {
-                        // Trong Tooltip vẫn hiển thị đầy đủ (10.000.000 ₫) cho chi tiết
                         return new Intl.NumberFormat('vi-VN').format(val) + ' ₫';
                     }
                 }
@@ -205,24 +169,15 @@
                         },
                         colors: [getCssVar('--db-primary') || '#0d6efd'],
                         grid: { borderColor: getCssVar('--db-border-color') },
-                        // Cập nhật lại màu text trục Y khi đổi theme
                         yaxis: {
                             labels: {
                                 style: { colors: getCssVar('--db-text-sub') },
-                                formatter: function (value) {
-                                    if (value >= 1000000) {
-                                        return (value / 1000000).toFixed(1).replace('.0', '') + 'M';
-                                    }
-                                    return new Intl.NumberFormat('vi-VN').format(value);
-                                }
+                                formatter: function (value) { return smartNumberFormatter(value); }
                             }
                         }
                     });
 
-                    chart.updateSeries([{
-                        name: 'Doanh thu',
-                        data: data.series
-                    }]);
+                    chart.updateSeries([{ name: 'Doanh thu', data: data.series }]);
                 }
             });
         }

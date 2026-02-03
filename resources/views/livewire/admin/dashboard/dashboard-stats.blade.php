@@ -1,6 +1,7 @@
 <div wire:poll.10s>
-    {{-- PHẦN 1: 4 WIDGET THỐNG KÊ --}}
+    {{-- PHẦN 1: 4 WIDGET GIỮ NGUYÊN ... --}}
     <div class="row g-3 mb-4">
+        {{-- ... (Code widget cũ) ... --}}
         {{-- Widget 1: Doanh Thu --}}
         <div class="col-12 col-md-6 col-lg-3">
             <div class="db-card p-3 h-100">
@@ -82,21 +83,30 @@
         </div>
     </div>
 
-    {{-- PHẦN 2: BIỂU ĐỒ (QUAN TRỌNG) --}}
+    {{-- PHẦN 2: BIỂU ĐỒ NÂNG CẤP --}}
     <div class="row">
         <div class="col-12">
             <div class="db-card h-100">
-                <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: var(--db-border-color) !important;">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-color: var(--db-border-color) !important;">
                     <h6 class="mb-0 fw-bold db-text-main">
-                        <i class="fa-solid fa-chart-area me-2 text-primary"></i>Doanh Thu 7 Ngày Qua (Demo)
+                        <i class="fa-solid fa-chart-area me-2 text-primary"></i>Biểu đồ Doanh Thu
                     </h6>
-                    <span class="badge bg-primary bg-opacity-10 text-primary">Live Update</span>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary d-none d-sm-inline-block">Live</span>
+
+                        {{-- [MỚI] SELECT BOX ĐẸP --}}
+                        <select class="form-select form-select-sm db-select fw-bold"
+                                style="width: auto; cursor: pointer;"
+                                wire:model.live="filterType">
+                            <option value="7days">7 ngày qua</option>
+                            <option value="30days">30 ngày qua</option>
+                            <option value="12months">12 tháng qua</option>
+                            <option value="10years">10 năm qua</option>
+                        </select>
+                    </div>
                 </div>
 
-                {{--
-                wire:ignore -> Bắt buộc có để Livewire KHÔNG render lại thẻ này
-                (tránh làm mất biểu đồ khi số liệu thay đổi)
-                --}}
                 <div class="p-3" wire:ignore>
                     <div id="revenueChart" style="min-height: 350px;"></div>
                 </div>
