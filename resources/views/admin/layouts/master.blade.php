@@ -98,6 +98,7 @@
         body.dark-mode .modal-text-danger { color: #ff453a !important; }
     </style>
 </head>
+@stack('scripts')
 <body>
 
 <div id="main-wrapper">

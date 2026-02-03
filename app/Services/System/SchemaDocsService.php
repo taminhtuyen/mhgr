@@ -13,7 +13,6 @@ class SchemaDocsService
      */
     public static function getModuleMap()
     {
-        // ... (Giữ nguyên cấu hình Module Map như cũ, không thay đổi) ...
         return [
             // GROUP: SALES
             'orders' => ['title' => 'Quản lý đơn hàng', 'description' => 'Trung tâm xử lý đơn hàng.', 'main' => 'orders', 'related' => ['order_items', 'order_history', 'order_transactions', 'tax_invoices']],
@@ -91,7 +90,6 @@ class SchemaDocsService
             'booking-statuses' => ['title' => 'Trạng thái Booking', 'description' => 'Status config.', 'main' => 'booking_statuses', 'related' => []],
             'leave-schedules' => ['title' => 'Lịch nghỉ', 'description' => 'Quản lý nhân sự.', 'main' => 'user_leave_schedules', 'related' => []],
             'tax-classes' => ['title' => 'Nhóm thuế', 'description' => 'Phân loại.', 'main' => 'tax_classes', 'related' => ['tax_rates']],
-            'tax-schedules' => ['title' => 'Lịch trình thuế', 'description' => 'Thuế theo thời gian.', 'main' => 'tax_schedules', 'related' => []],
             'pulses' => ['title' => 'Pulse', 'description' => 'Sức khỏe server.', 'main' => 'pulse_entries', 'related' => []],
             'queue-jobs' => ['title' => 'Queue', 'description' => 'Background jobs.', 'main' => 'jobs', 'related' => ['failed_jobs']],
             'sessions' => ['title' => 'Sessions', 'description' => 'Phiên đăng nhập.', 'main' => 'sessions', 'related' => []],
@@ -133,7 +131,6 @@ class SchemaDocsService
         foreach ($rawColumns as $col) {
             $foreignKeyInfo = $dbForeignKeys[$col->Field] ?? null;
 
-            // Nếu DB không có FK cứng, dùng thuật toán đoán thông minh
             if (!$foreignKeyInfo && str_ends_with($col->Field, '_id')) {
                 $guessedTable = self::guessForeignTable($col->Field);
                 if ($guessedTable) {
@@ -161,14 +158,10 @@ class SchemaDocsService
         ];
     }
 
-    /**
-     * THUẬT TOÁN ĐOÁN BẢNG LIÊN KẾT (INTELLIGENT MAPPING)
-     */
     private static function guessForeignTable($columnName)
     {
         $baseName = str_replace('_id', '', $columnName);
 
-        // BƯỚC 1: Xử lý các trường hợp ngoại lệ (Địa lý & Cấu trúc cây)
         $customMap = [
             'shipping_province_id' => 'provinces',
             'billing_province_id'  => 'provinces',
@@ -179,7 +172,7 @@ class SchemaDocsService
             'shipping_district_id' => 'districts',
             'billing_district_id'  => 'districts',
             'district_id'          => 'districts',
-            'parent_id'            => null, // Bỏ qua đệ quy
+            'parent_id'            => null,
         ];
 
         if (array_key_exists($columnName, $customMap)) {
@@ -189,43 +182,24 @@ class SchemaDocsService
             return null;
         }
 
-        // BƯỚC 2: Kiểm tra theo quy tắc chuẩn Laravel (Số nhiều)
-        // Ví dụ: shipping_driver_id -> shipping_drivers. Nếu bảng này TỒN TẠI -> Ưu tiên số 1
         $pluralName = Str::plural($baseName);
         if (Schema::hasTable($pluralName)) {
             return $pluralName;
         }
 
-        // BƯỚC 3: SUY LUẬN VAI TRÒ NGƯỜI DÙNG (User Heuristic)
-        // Nếu bảng riêng không tồn tại (VD: sellers, buyers không có),
-        // và tên cột chứa từ khóa chỉ "Người" -> Map về 'users'
         $userKeywords = [
-            'manager',  // preparing_manager_id, shipping_manager_id...
-            'seller',   // seller_id
-            'buyer',    // buyer_id
-            'creator',  // creator_id
-            'editor',   // editor_id
-            'author',   // author_id
-            'user',     // user_id
-            'customer', // customer_id
-            'reviewer', // reviewer_id
-            'approver', // approver_id
-            'admin',    // sale_admin_id
-            'employee',
-            'staff',
-            'person'
+            'manager', 'seller', 'buyer', 'creator', 'editor', 'author', 'user',
+            'customer', 'reviewer', 'approver', 'admin', 'employee', 'staff', 'person'
         ];
 
         foreach ($userKeywords as $keyword) {
             if (str_contains($baseName, $keyword)) {
-                // Kiểm tra xem bảng 'users' có tồn tại không để map vào
                 if (Schema::hasTable('users')) {
                     return 'users';
                 }
             }
         }
 
-        // BƯỚC 4: Fallback thử dạng số ít (ít gặp)
         if (Schema::hasTable($baseName)) {
             return $baseName;
         }
